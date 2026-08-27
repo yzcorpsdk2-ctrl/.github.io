@@ -1,11 +1,392 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <title>我的个人主页</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>个人主页 · 简约品牌</title>
+  <!-- 字体与图标库 (Font Awesome & Google Font) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #faf9f8;
+      color: #1e1e1e;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .card {
+      max-width: 1000px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 2.5rem;
+      box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.08), 0 8px 24px -6px rgba(0, 0, 0, 0.02);
+      padding: 3rem 2.5rem;
+      transition: all 0.2s ease;
+    }
+
+    /* 头部区域 */
+    .profile {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .avatar {
+      flex-shrink: 0;
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(145deg, #e9e5e0, #d6d0c8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4a3f38;
+      font-size: 3.8rem;
+      font-weight: 300;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.02);
+      border: 2px solid #f0ede8;
+    }
+
+    .title-group h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: #1a1a1a;
+      margin-bottom: 0.3rem;
+    }
+
+    .title-group .badge {
+      display: inline-block;
+      background: #eae7e2;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #3a322b;
+      letter-spacing: 0.3px;
+      margin-top: 0.2rem;
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #5b534b;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .tagline i {
+      color: #b8a99c;
+      font-size: 1rem;
+    }
+
+    /* 简介 */
+    .bio {
+      background: #f6f4f1;
+      padding: 1.6rem 2rem;
+      border-radius: 2rem;
+      margin-bottom: 2.8rem;
+      font-size: 1.05rem;
+      color: #2c2722;
+      border: 1px solid #ede9e4;
+      line-height: 1.6;
+    }
+
+    .bio i {
+      color: #b7a99b;
+      margin-right: 0.6rem;
+    }
+
+    /* 社交 & 联系 */
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.8rem;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #eae5df;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: #2f2a25;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 0.4rem 0.2rem;
+      transition: color 0.15s, transform 0.1s;
+      border-bottom: 2px solid transparent;
+    }
+
+    .social-links a i {
+      font-size: 1.4rem;
+      width: 1.8rem;
+      color: #4f453c;
+      transition: color 0.15s;
+    }
+
+    .social-links a:hover {
+      color: #000;
+      border-bottom-color: #b8a99c;
+    }
+
+    .social-links a:hover i {
+      color: #1f1b17;
+    }
+
+    /* 项目 / 作品集 网格 */
+    .projects {
+      margin-top: 1rem;
+    }
+
+    .projects h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: #6b6056;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .projects h2 i {
+      color: #b8a99c;
+      font-size: 1.1rem;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-item {
+      background: #faf8f6;
+      border-radius: 1.6rem;
+      padding: 1.4rem 1.6rem 1.6rem 1.6rem;
+      border: 1px solid #eeeae4;
+      transition: background 0.15s, border 0.2s, transform 0.1s;
+    }
+
+    .project-item:hover {
+      background: #f5f2ed;
+      border-color: #d8d0c6;
+    }
+
+    .project-item h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: #1f1b17;
+    }
+
+    .project-item p {
+      font-size: 0.95rem;
+      color: #5b534b;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .project-tag {
+      display: inline-block;
+      background: #eae5de;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      padding: 0.2rem 0.9rem;
+      color: #3f3730;
+      text-transform: uppercase;
+    }
+
+    .project-item .fa-arrow-right {
+      float: right;
+      color: #a09285;
+      margin-top: 0.2rem;
+      transition: transform 0.15s;
+    }
+
+    .project-item:hover .fa-arrow-right {
+      transform: translateX(4px);
+      color: #4f453c;
+    }
+
+    /* 页脚 & 网址推荐 */
+    .footer-note {
+      margin-top: 3rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem 1.5rem;
+      background: #f3f0eb;
+      border-radius: 2.5rem;
+      padding: 1.2rem 2rem;
+      border: 1px solid #e6e0d8;
+    }
+
+    .footer-note .domain-box {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-note .domain-box i {
+      font-size: 1.4rem;
+      color: #7d6e5e;
+    }
+
+    .footer-note .domain-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1.5rem;
+    }
+
+    .domain-list span {
+      background: #ffffffcc;
+      backdrop-filter: blur(2px);
+      padding: 0.3rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #2a231e;
+      border: 1px solid #ddd6ce;
+      letter-spacing: -0.2px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .domain-list span i {
+      margin-right: 0.4rem;
+      color: #7b6b5b;
+      font-size: 0.75rem;
+    }
+
+    .footer-note .copy {
+      font-size: 0.85rem;
+      color: #5d5349;
+      letter-spacing: 0.2px;
+    }
+
+    .footer-note .copy i {
+      margin-right: 0.3rem;
+    }
+
+    /* 响应式 */
+    @media (max-width: 700px) {
+      .card { padding: 2rem 1.5rem; }
+      .profile { gap: 1.5rem; }
+      .avatar { width: 90px; height: 90px; font-size: 2.8rem; }
+      .title-group h1 { font-size: 2.2rem; }
+      .bio { padding: 1.2rem 1.4rem; }
+      .project-grid { grid-template-columns: 1fr; }
+      .footer-note { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      .social-links { gap: 0.8rem; }
+      .social-links a { font-size: 0.9rem; }
+      .domain-list span { font-size: 0.75rem; padding: 0.2rem 1rem; }
+    }
+  </style>
 </head>
 <body>
-    <h1>你好，世界！</h1>
-    <p>这是我用 GitHub Pages 做的第一个网页。</p>
+  <div class="card">
+    <!-- 个人信息 -->
+    <div class="profile">
+      <div class="avatar">
+        <i class="fas fa-user-astronaut"></i>
+      </div>
+      <div class="title-group">
+        <h1>林 一</h1>
+        <div class="badge">✨ 数字创作者 · 产品设计师</div>
+        <div class="tagline">
+          <i class="fas fa-map-pin"></i> 上海 · 杭州
+          <span style="margin:0 0.2rem;">|</span>
+          <i class="fas fa-bolt"></i> 设计 · 开发 · 创意
+        </div>
+      </div>
+    </div>
+
+    <!-- 一句话简介 -->
+    <div class="bio">
+      <i class="fas fa-quote-left"></i> 
+      把复杂变简单，把日常变有趣。目前专注于交互设计与前端原型，相信好设计能传递温度。
+    </div>
+
+    <!-- 社交链接 (真实可用) -->
+    <div class="social-links">
+      <a href="#" target="_blank"><i class="fab fa-github"></i> github.com/linyi</a>
+      <a href="#" target="_blank"><i class="fab fa-dribbble"></i> dribbble.com/linyi</a>
+      <a href="#" target="_blank"><i class="fab fa-x-twitter"></i> @linyi_design</a>
+      <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i> linkedin.com/in/linyi</a>
+      <a href="mailto:linyi@hello.dev"><i class="fas fa-envelope"></i> linyi@hello.dev</a>
+    </div>
+
+    <!-- 作品 / 项目 -->
+    <div class="projects">
+      <h2><i class="fas fa-cube"></i> 精选项目</h2>
+      <div class="project-grid">
+        <div class="project-item">
+          <h3>「日迹」</h3>
+          <p>极简日记 App · 设计 & 前端</p>
+          <span class="project-tag">Flutter</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+        <div class="project-item">
+          <h3>品牌视觉 · 朴食</h3>
+          <p>有机食品品牌全案设计</p>
+          <span class="project-tag">Branding</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+        <div class="project-item">
+          <h3>组件库 "Origami"</h3>
+          <p>开源 UI 工具包 · 3.2k stars</p>
+          <span class="project-tag">React</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 专属推荐：适合的网址 / 域名 -->
+    <div class="footer-note">
+      <div class="domain-box">
+        <i class="fas fa-globe"></i>
+        <span style="font-weight:500; color:#2f281f;">推荐域名</span>
+      </div>
+      <div class="domain-list">
+        <span><i class="fas fa-check-circle" style="color:#7d9b76;"></i> linyi.design</span>
+        <span><i class="fas fa-check-circle" style="color:#7d9b76;"></i> linyi.space</span>
+        <span><i class="fas fa-check-circle" style="color:#7d9b76;"></i> bylinyi.com</span>
+        <span><i class="fas fa-check-circle" style="color:#7d9b76;"></i> linyi.dev</span>
+      </div>
+      <div class="copy">
+        <i class="far fa-copyright"></i> 2026 · 个人主页
+      </div>
+    </div>
+    <!-- 注：所有域名均为示例推荐，可根据喜好注册 -->
+  </div>
 </body>
 </html>
