@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置 · 小实验</title>
+    <style>
+        /* 同样的主题变量，保持和主页一致 */
+        :root {
+            --bg: #f9f9f9;
+            --text: #222;
+            --card: #fff;
+            --border: #ddd;
+            --input-bg: #fff;
+        }
+        body.dark {
+            --bg: #1e1e1e;
+            --text: #eee;
+            --card: #2d2d2d;
+            --border: #444;
+            --input-bg: #3a3a3a;
+        }
+        body {
+            font-family: system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 2rem 2.5rem;
+            border-radius: 2rem;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: background 0.3s, border 0.3s;
+        }
+        h2 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-group {
+            margin: 1.5rem 0;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border-radius: 3rem;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .theme-options {
+            display: flex;
+            gap: 1rem;
+            margin: 0.5rem 0 1.5rem 0;
+        }
+        .theme-btn {
+            flex: 1;
+            padding: 0.7rem;
+            border-radius: 3rem;
+            border: 2px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            text-align: center;
+        }
+        .theme-btn.active {
+            border-color: #2b6c94;
+            background: #2b6c9410;
+        }
+        .theme-btn:hover {
+            background: var(--border);
+        }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.7rem 2rem;
+            border-radius: 3rem;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.15s;
+        }
+        .btn-primary {
+            background: #2b6c94;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1f4f6e;
+        }
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+        .btn-secondary:hover {
+            opacity: 0.7;
+        }
+        .status-msg {
+            margin-top: 1.2rem;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            background: #2b6c9415;
+            color: #1f4f6e;
+            text-align: center;
+            display: none;
+        }
+        body.dark .status-msg {
+            background: #2b6c9430;
+            color: #8bb9d9;
+        }
+        .status-msg.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>⚙️ 偏好设置</h2>
+        <p style="opacity:0.7; margin-bottom:1.8rem;">修改后会自动保存，回到主页就能看到变化。</p>
+
+        <!-- 名字输入 -->
+        <div class="form-group">
+            <label for="nameInput">👤 你的名字</label>
+            <input type="text" id="nameInput" placeholder="例如：林一" />
+        </div>
+
+        <!-- 主题选择 -->
+        <div class="form-group">
+            <label>🎨 颜色主题</label>
+            <div class="theme-options">
+                <div class="theme-btn" data-theme="light" id="themeLight">☀️ 亮色</div>
+                <div class="theme-btn" data-theme="dark" id="themeDark">🌙 暗色</div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="btn-group">
+            <button class="btn btn-primary" id="saveBtn">💾 保存并回到主页</button>
+            <button class="btn btn-secondary" id="resetBtn">↩️ 重置</button>
+        </div>
+
+        <!-- 状态提示 -->
+        <div class="status-msg" id="statusMsg">✅ 已保存！</div>
+    </div>
+
+    <script>
+        // 获取页面元素
+        const nameInput = document.getElementById('nameInput');
+        const themeLight = document.getElementById('themeLight');
+        const themeDark = document.getElementById('themeDark');
+        const saveBtn = document.getElementById('saveBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const statusMsg = document.getElementById('statusMsg');
+
+        // --- 1. 加载已保存的数据，填充到表单 ---
+        function loadSettings() {
+            const savedName = localStorage.getItem('userName');
+            const savedTheme = localStorage.getItem('theme');
+
+            if (savedName) {
+                nameInput.value = savedName;
+            }
+
+            // 高亮当前选中的主题按钮
+            if (savedTheme === 'dark') {
+                themeDark.classList.add('active');
+                themeLight.classList.remove('active');
+                document.body.classList.add('dark'); // 预览暗色效果
+            } else {
+                themeLight.classList.add('active');
+                themeDark.classList.remove('active');
+                document.body.classList.remove('dark');
+            }
+        }
+
+        // --- 2. 保存设置 ---
+        function saveSettings() {
+            const name = nameInput.value.trim();
+            let theme = 'light';
+            if (themeDark.classList.contains('active')) {
+                theme = 'dark';
+            }
+
+            // 存入 localStorage
+            if (name) {
+                localStorage.setItem('userName', name);
+            } else {
+                localStorage.removeItem('userName'); // 如果名字为空，就删除它
+            }
+            localStorage.setItem('theme', theme);
+
+            // 显示保存成功提示
+            statusMsg.textContent = `✅ 已保存！${name ? '欢迎 ' + name : ''}`;
+            statusMsg.classList.add('show');
+            setTimeout(() => {
+                statusMsg.classList.remove('show');
+            }, 2500);
+        }
+
+        // --- 3. 重置所有设置 ---
+        function resetSettings() {
+            if (confirm('重置所有偏好设置吗？')) {
+                localStorage.removeItem('userName');
+                localStorage.removeItem('theme');
+                // 清空输入框
+                nameInput.value = '';
+                // 恢复默认主题（亮色）
+                themeLight.classList.add('active');
+                themeDark.classList.remove('active');
+                document.body.classList.remove('dark');
+                statusMsg.textContent = '🔄 已重置为默认设置';
+                statusMsg.classList.add('show');
+                setTimeout(() => {
+                    statusMsg.classList.remove('show');
+                }, 2000);
+            }
+        }
+
+        // --- 4. 主题按钮切换逻辑 ---
+        themeLight.addEventListener('click', function() {
+            themeLight.classList.add('active');
+            themeDark.classList.remove('active');
+            document.body.classList.remove('dark');
+        });
+
+        themeDark.addEventListener('click', function() {
+            themeDark.classList.add('active');
+            themeLight.classList.remove('active');
+            document.body.classList.add('dark');
+        });
+
+        // --- 5. 绑定按钮事件 ---
+        saveBtn.addEventListener('click', function() {
+            saveSettings();
+            // 延迟跳转，让用户看到保存成功的提示
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 800);
+        });
+
+        resetBtn.addEventListener('click', resetSettings);
+
+        // 页面加载时读取已有设置
+        loadSettings();
+    </script>
+</body>
+</html>
