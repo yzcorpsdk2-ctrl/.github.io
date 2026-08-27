@@ -1,392 +1,629 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>个人主页 · 简约品牌</title>
-  <!-- 字体与图标库 (Font Awesome & Google Font) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>COMOSER 研究机构：Origin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #faf9f8;
-      color: #1e1e1e;
-      line-height: 1.5;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1.5rem;
-    }
+        body {
+            background: #000000;
+            font-family: 'Inter', 'Segoe UI', system-ui, 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-    .card {
-      max-width: 1000px;
-      width: 100%;
-      background: #ffffff;
-      border-radius: 2.5rem;
-      box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.08), 0 8px 24px -6px rgba(0, 0, 0, 0.02);
-      padding: 3rem 2.5rem;
-      transition: all 0.2s ease;
-    }
+        /* 主容器：黑底白边卡片，玻璃质感 */
+        .comoser-container {
+            position: relative;
+            z-index: 10;
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(1px);
+            border: 1px solid #2c2c2c;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255,255,255,0.03) inset;
+            padding: 2.5rem 2.5rem 3rem;
+            transition: border 0.2s;
+        }
 
-    /* 头部区域 */
-    .profile {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 2.5rem;
-      margin-bottom: 3rem;
-    }
+        /* 头部区域：居中布局 */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 1.5rem;
+        }
 
-    .avatar {
-      flex-shrink: 0;
-      width: 120px;
-      height: 120px;
-      background: linear-gradient(145deg, #e9e5e0, #d6d0c8);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #4a3f38;
-      font-size: 3.8rem;
-      font-weight: 300;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.02);
-      border: 2px solid #f0ede8;
-    }
+        /* 主标题：更粗 + 悬停效果（无跳转） */
+        .title-main {
+            font-size: 2.6rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 0%, #dddddd 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-family: 'Inter', monospace;
+            margin-bottom: 0.8rem;
+            filter: drop-shadow(0 0 6px rgba(255,255,255,0.1));
+            transition: all 0.25s ease;
+            cursor: default;
+            display: inline-block;
+        }
+        .title-main:hover {
+            text-shadow: 0 0 12px rgba(255,255,255,0.7);
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            transform: scale(1.01);
+        }
 
-    .title-group h1 {
-      font-size: 2.8rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: #1a1a1a;
-      margin-bottom: 0.3rem;
-    }
+        /* 副标题：在大标题正下方居中 */
+        .sub {
+            font-size: 0.75rem;
+            color: #8a8a8a;
+            letter-spacing: 3px;
+            font-family: monospace;
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 0.4rem;
+        }
 
-    .title-group .badge {
-      display: inline-block;
-      background: #eae7e2;
-      padding: 0.3rem 1rem;
-      border-radius: 40px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #3a322b;
-      letter-spacing: 0.3px;
-      margin-top: 0.2rem;
-    }
+        /* 部门网格布局 */
+        .department-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0 2rem;
+        }
 
-    .tagline {
-      font-size: 1.2rem;
-      font-weight: 400;
-      color: #5b534b;
-      margin-top: 0.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-    }
+        /* 卡片样式 */
+        .dept-card {
+            background: #070707;
+            border: 1px solid #2a2a2a;
+            border-radius: 28px;
+            padding: 1.6rem 1.2rem;
+            transition: all 0.25s ease;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            cursor: pointer;
+        }
 
-    .tagline i {
-      color: #b8a99c;
-      font-size: 1rem;
-    }
+        .dept-card:hover {
+            border-color: #ffffff;
+            background: #0f0f0f;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.6);
+        }
 
-    /* 简介 */
-    .bio {
-      background: #f6f4f1;
-      padding: 1.6rem 2rem;
-      border-radius: 2rem;
-      margin-bottom: 2.8rem;
-      font-size: 1.05rem;
-      color: #2c2722;
-      border: 1px solid #ede9e4;
-      line-height: 1.6;
-    }
+        /* 部门名称样式 (乱码动态文本) */
+        .dept-name {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #f0f0f0;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 0.5rem;
+            transition: text-shadow 0.2s;
+            word-break: break-word;
+        }
 
-    .bio i {
-      color: #b7a99b;
-      margin-right: 0.6rem;
-    }
+        .dept-card:hover .dept-name {
+            text-shadow: 0 0 5px rgba(255,255,240,0.6);
+            color: #ffffff;
+        }
 
-    /* 社交 & 联系 */
-    .social-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem 1.8rem;
-      margin-bottom: 3rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid #eae5df;
-    }
+        .dept-desc {
+            font-size: 0.7rem;
+            color: #8a8a8a;
+            font-family: monospace;
+            border-top: 0.5px solid #252525;
+            padding-top: 0.8rem;
+            margin-top: 0.5rem;
+            letter-spacing: 1px;
+        }
 
-    .social-links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      text-decoration: none;
-      color: #2f2a25;
-      font-weight: 500;
-      font-size: 1rem;
-      padding: 0.4rem 0.2rem;
-      transition: color 0.15s, transform 0.1s;
-      border-bottom: 2px solid transparent;
-    }
+        /* 底部动态打字区域 */
+        .footer-terminal {
+            margin-top: 2.2rem;
+            text-align: right;
+            font-size: 0.7rem;
+            color: #5a5a5a;
+            font-family: monospace;
+            border-top: 1px solid #1f1f1f;
+            padding-top: 1rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .status-label {
+            color: #3a8f3a;
+            letter-spacing: 1px;
+        }
+        .typing-area {
+            display: inline-block;
+            min-width: 240px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            color: #bbbbbb;
+            background: #0a0a0a;
+            padding: 0 4px;
+        }
+        .cursor-blink {
+            display: inline-block;
+            width: 2px;
+            height: 0.9rem;
+            background-color: #bbbbbb;
+            vertical-align: middle;
+            margin-left: 4px;
+            animation: blink 0.9s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
 
-    .social-links a i {
-      font-size: 1.4rem;
-      width: 1.8rem;
-      color: #4f453c;
-      transition: color 0.15s;
-    }
+        /* 密码弹窗样式 */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .password-modal {
+            background: #0c0c0c;
+            border: 1px solid #ffffff;
+            border-radius: 24px;
+            max-width: 380px;
+            width: 90%;
+            padding: 2rem 1.8rem;
+            text-align: center;
+        }
+        .password-modal h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 16px;
+            font-family: monospace;
+        }
+        .password-modal .hint {
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 20px;
+            font-family: monospace;
+        }
+        .password-input {
+            width: 100%;
+            background: #070707;
+            border: 1px solid #3a3a3a;
+            padding: 12px 16px;
+            font-size: 1.1rem;
+            color: #ffffff;
+            font-family: monospace;
+            text-align: center;
+            letter-spacing: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        .password-input:focus {
+            border-color: #ffffff;
+        }
+        .error-msg {
+            color: #ff4444;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            font-family: monospace;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .modal-btn {
+            background: #1a1a1a;
+            border: 1px solid #4a4a4a;
+            padding: 8px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: #ddd;
+            font-family: monospace;
+            transition: 0.2s;
+        }
+        .modal-btn:hover {
+            border-color: #ffffff;
+            background: #2a2a2a;
+            color: white;
+        }
 
-    .social-links a:hover {
-      color: #000;
-      border-bottom-color: #b8a99c;
-    }
-
-    .social-links a:hover i {
-      color: #1f1b17;
-    }
-
-    /* 项目 / 作品集 网格 */
-    .projects {
-      margin-top: 1rem;
-    }
-
-    .projects h2 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      color: #6b6056;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .projects h2 i {
-      color: #b8a99c;
-      font-size: 1.1rem;
-    }
-
-    .project-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .project-item {
-      background: #faf8f6;
-      border-radius: 1.6rem;
-      padding: 1.4rem 1.6rem 1.6rem 1.6rem;
-      border: 1px solid #eeeae4;
-      transition: background 0.15s, border 0.2s, transform 0.1s;
-    }
-
-    .project-item:hover {
-      background: #f5f2ed;
-      border-color: #d8d0c6;
-    }
-
-    .project-item h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-      color: #1f1b17;
-    }
-
-    .project-item p {
-      font-size: 0.95rem;
-      color: #5b534b;
-      margin-bottom: 1rem;
-      line-height: 1.4;
-    }
-
-    .project-tag {
-      display: inline-block;
-      background: #eae5de;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      padding: 0.2rem 0.9rem;
-      color: #3f3730;
-      text-transform: uppercase;
-    }
-
-    .project-item .fa-arrow-right {
-      float: right;
-      color: #a09285;
-      margin-top: 0.2rem;
-      transition: transform 0.15s;
-    }
-
-    .project-item:hover .fa-arrow-right {
-      transform: translateX(4px);
-      color: #4f453c;
-    }
-
-    /* 页脚 & 网址推荐 */
-    .footer-note {
-      margin-top: 3rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem 1.5rem;
-      background: #f3f0eb;
-      border-radius: 2.5rem;
-      padding: 1.2rem 2rem;
-      border: 1px solid #e6e0d8;
-    }
-
-    .footer-note .domain-box {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      flex-wrap: wrap;
-    }
-
-    .footer-note .domain-box i {
-      font-size: 1.4rem;
-      color: #7d6e5e;
-    }
-
-    .footer-note .domain-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem 1.5rem;
-    }
-
-    .domain-list span {
-      background: #ffffffcc;
-      backdrop-filter: blur(2px);
-      padding: 0.3rem 1.2rem;
-      border-radius: 40px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #2a231e;
-      border: 1px solid #ddd6ce;
-      letter-spacing: -0.2px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-    }
-
-    .domain-list span i {
-      margin-right: 0.4rem;
-      color: #7b6b5b;
-      font-size: 0.75rem;
-    }
-
-    .footer-note .copy {
-      font-size: 0.85rem;
-      color: #5d5349;
-      letter-spacing: 0.2px;
-    }
-
-    .footer-note .copy i {
-      margin-right: 0.3rem;
-    }
-
-    /* 响应式 */
-    @media (max-width: 700px) {
-      .card { padding: 2rem 1.5rem; }
-      .profile { gap: 1.5rem; }
-      .avatar { width: 90px; height: 90px; font-size: 2.8rem; }
-      .title-group h1 { font-size: 2.2rem; }
-      .bio { padding: 1.2rem 1.4rem; }
-      .project-grid { grid-template-columns: 1fr; }
-      .footer-note { flex-direction: column; align-items: flex-start; }
-    }
-
-    @media (max-width: 480px) {
-      .social-links { gap: 0.8rem; }
-      .social-links a { font-size: 0.9rem; }
-      .domain-list span { font-size: 0.75rem; padding: 0.2rem 1rem; }
-    }
-  </style>
+        /* 响应式 */
+        @media (max-width: 680px) {
+            .comoser-container {
+                padding: 1.5rem;
+            }
+            .title-main {
+                font-size: 1.8rem;
+            }
+            .dept-name {
+                font-size: 1.3rem;
+            }
+            .typing-area {
+                min-width: 160px;
+                font-size: 0.65rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <!-- 个人信息 -->
-    <div class="profile">
-      <div class="avatar">
-        <i class="fas fa-user-astronaut"></i>
-      </div>
-      <div class="title-group">
-        <h1>林 一</h1>
-        <div class="badge">✨ 数字创作者 · 产品设计师</div>
-        <div class="tagline">
-          <i class="fas fa-map-pin"></i> 上海 · 杭州
-          <span style="margin:0 0.2rem;">|</span>
-          <i class="fas fa-bolt"></i> 设计 · 开发 · 创意
-        </div>
-      </div>
+<div class="comoser-container">
+    <div class="hero">
+        <div class="title-main">COMOSER 研究机构</div>
+        <div class="sub">[ 异客机构 · Origin ]</div>
     </div>
 
-    <!-- 一句话简介 -->
-    <div class="bio">
-      <i class="fas fa-quote-left"></i> 
-      把复杂变简单，把日常变有趣。目前专注于交互设计与前端原型，相信好设计能传递温度。
+    <div class="department-grid" id="deptGrid"></div>
+    
+    <div class="footer-terminal">
+        <span class="status-label">SIGN4L:</span>
+        <span class="typing-area" id="dynamicTyping"></span>
+        <span class="cursor-blink"></span>
     </div>
+</div>
 
-    <!-- 社交链接 (真实可用) -->
-    <div class="social-links">
-      <a href="#" target="_blank"><i class="fab fa-github"></i> github.com/linyi</a>
-      <a href="#" target="_blank"><i class="fab fa-dribbble"></i> dribbble.com/linyi</a>
-      <a href="#" target="_blank"><i class="fab fa-x-twitter"></i> @linyi_design</a>
-      <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i> linkedin.com/in/linyi</a>
-      <a href="mailto:linyi@hello.dev"><i class="fas fa-envelope"></i> linyi@hello.dev</a>
+<!-- 密码验证弹窗 -->
+<div id="passwordOverlay" class="password-overlay">
+    <div class="password-modal">
+        <h3>High-privilege Area</h3>
+        <div class="hint">Please enter a 7-digit password to continue accessing the site.</div>
+        <input type="password" id="passwordInput" class="password-input" placeholder="请输入密码" maxlength="20" autocomplete="off">
+        <div id="errorMsg" class="error-msg"></div>
+        <div class="modal-buttons">
+            <button class="modal-btn" id="confirmBtn">Comfirm</button>
+            <button class="modal-btn" id="cancelBtn">Cancel</button>
+        </div>
     </div>
+</div>
 
-    <!-- 作品 / 项目 -->
-    <div class="projects">
-      <h2><i class="fas fa-cube"></i> 精选项目</h2>
-      <div class="project-grid">
-        <div class="project-item">
-          <h3>「日迹」</h3>
-          <p>极简日记 App · 设计 & 前端</p>
-          <span class="project-tag">Flutter</span>
-          <i class="fas fa-arrow-right"></i>
-        </div>
-        <div class="project-item">
-          <h3>品牌视觉 · 朴食</h3>
-          <p>有机食品品牌全案设计</p>
-          <span class="project-tag">Branding</span>
-          <i class="fas fa-arrow-right"></i>
-        </div>
-        <div class="project-item">
-          <h3>组件库 "Origami"</h3>
-          <p>开源 UI 工具包 · 3.2k stars</p>
-          <span class="project-tag">React</span>
-          <i class="fas fa-arrow-right"></i>
-        </div>
-      </div>
-    </div>
+<script>
+    // --------------------------------------------------------------
+    // 部门数据：中文名 / 英文乱码目标 / 跳转链接
+    // --------------------------------------------------------------
+    // 高权限区域的原始目标链接
+    const HIGH_SECURITY_URL = "https://the0project001user.neocities.org/%E5%8A%A0%E5%AF%86%E6%96%87%E6%A1%A3/verifymenu";
+    
+    const departments = [
+        { 
+            chinese: "人物档案部", 
+            english: "Personnel Archives Dptm", 
+            url: "https://the0project001user.neocities.org/charactermenu", 
+            desc: "职员信息储备区",
+            requirePassword: false
+        },
+        { 
+            chinese: "信息咨询部", 
+            english: "Information Consulting Dptm", 
+            url: "https://the0project001user.neocities.org/databasedptm/LISTOFDATABASE", 
+            desc: "基础文档和情报交流馆",
+            requirePassword: false
+        },
+        { 
+            chinese: "人际关系网", 
+            english: "Relationship", 
+            url: "https://the0project001user.neocities.org/relationship/relationship", 
+            desc: "人际关系网络图",
+            requirePassword: false
+        },
+        { 
+            chinese: "高权限区域", 
+            english: "HIGH-PRIVILEGE AREA", 
+            url: HIGH_SECURITY_URL, 
+            desc: "权限不足 / 加密区域",
+            requirePassword: true
+        },
+        { 
+            chinese: "览书阁", 
+            english: "Novel Dptm", 
+            url: "https://the0project001user.neocities.org/NOVEL/NOVELLIST", 
+            desc: "小说文本阅读区",
+            requirePassword: false
+        },
+        { 
+            chinese: "外部转接口", 
+            english: "External Adapter", 
+            url: "https://the0project001user.neocities.org/ppppp", 
+            desc: "COMOSER系列的其他作品",
+            requirePassword: false
+        }
+    ];
 
-    <!-- 专属推荐：适合的网址 / 域名 -->
-    <div class="footer-note">
-      <div class="domain-box">
-        <i class="fas fa-globe"></i>
-        <span style="font-weight:500; color:#2f281f;">推荐域名</span>
-      </div>
-      <div class="domain-list">
-        <span><i class="fas fa-check-circle" style="color:#7d9b76;"></i> linyi.design</span>
-        <span><i class="fas fa-check-circle" style="color:#7d9b76;"></i> linyi.space</span>
-        <span><i class="fas fa-check-circle" style="color:#7d9b76;"></i> bylinyi.com</span>
-        <span><i class="fas fa-check-circle" style="color:#7d9b76;"></i> linyi.dev</span>
-      </div>
-      <div class="copy">
-        <i class="far fa-copyright"></i> 2026 · 个人主页
-      </div>
-    </div>
-    <!-- 注：所有域名均为示例推荐，可根据喜好注册 -->
-  </div>
+    // 正确密码（7位数）
+    const CORRECT_PASSWORD = "GINK327";
+    
+    // 密码弹窗相关变量
+    let pendingUrl = null;           // 待跳转的URL
+    let pendingDeptName = null;      // 待验证的部门名称
+    
+    // 获取DOM元素
+    const passwordOverlay = document.getElementById("passwordOverlay");
+    const passwordInput = document.getElementById("passwordInput");
+    const errorMsgDiv = document.getElementById("errorMsg");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    
+    // 乱码字符集
+    const glitchSymbols = "█▓▒░◆◣◤✖✜#%&@⛓️⚡⏳◈▇□■∅⟐⌇⍟⌘?!@#$%^&*()_+[]{};:<>/\\|";
+    let cardInstances = [];
+    
+    function getRandomSymbol() {
+        return glitchSymbols[Math.floor(Math.random() * glitchSymbols.length)];
+    }
+
+    // 乱码过渡
+    function startIndividualGlitch(element, targetText, durationMs = 420) {
+        return new Promise((resolve) => {
+            if (!element) return resolve();
+            const sourceText = element.innerText;
+            if (sourceText === targetText) return resolve();
+            
+            const steps = 14;
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step >= steps) {
+                    clearInterval(interval);
+                    element.innerText = targetText;
+                    resolve();
+                    return;
+                }
+                const progress = step / steps;
+                let output = "";
+                const maxLen = Math.max(sourceText.length, targetText.length);
+                for (let i = 0; i < maxLen; i++) {
+                    if (i < targetText.length) {
+                        const showTarget = Math.random() < progress * 1.3;
+                        if (showTarget && step > steps * 0.3) {
+                            output += (Math.random() < 0.2 && step < steps - 2) ? getRandomSymbol() : targetText[i];
+                        } else {
+                            output += getRandomSymbol();
+                        }
+                    } else {
+                        output += getRandomSymbol();
+                    }
+                }
+                if (output.length > targetText.length + 1) output = output.substring(0, targetText.length);
+                if (step >= steps - 2 && output.length !== targetText.length) {
+                    while (output.length < targetText.length) output += targetText[output.length];
+                    if (output.length > targetText.length) output = output.substring(0, targetText.length);
+                }
+                element.innerText = output;
+                step++;
+            }, durationMs / steps);
+        });
+    }
+    
+    async function scheduleCardLoop(card) {
+        const { element, chineseText, englishText } = card;
+        let isChinese = true;
+        while (true) {
+            const holdTime = 3800 + Math.random() * 1800;
+            await new Promise(r => setTimeout(r, holdTime));
+            const target = isChinese ? englishText : chineseText;
+            await startIndividualGlitch(element, target, 460);
+            isChinese = !isChinese;
+        }
+    }
+    
+    function buildDepartments() {
+        const grid = document.getElementById("deptGrid");
+        grid.innerHTML = "";
+        cardInstances = [];
+        
+        departments.forEach((dept) => {
+            const cardLink = document.createElement("a");
+            // 注意：不直接设置 href，而是通过点击事件处理（为了支持密码验证）
+            cardLink.href = "javascript:void(0);";
+            cardLink.style.display = "block";
+            cardLink.style.textDecoration = "none";
+            
+            const cardDiv = document.createElement("div");
+            cardDiv.className = "dept-card";
+            
+            const nameSpan = document.createElement("div");
+            nameSpan.className = "dept-name";
+            nameSpan.innerText = dept.chinese;
+            
+            const descSpan = document.createElement("div");
+            descSpan.className = "dept-desc";
+            descSpan.innerText = dept.desc;
+            
+            cardDiv.appendChild(nameSpan);
+            cardDiv.appendChild(descSpan);
+            cardLink.appendChild(cardDiv);
+            
+            // 添加点击事件处理
+            cardLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (dept.requirePassword) {
+                    // 需要密码验证的区域
+                    pendingUrl = dept.url;
+                    pendingDeptName = dept.chinese;
+                    openPasswordModal();
+                } else {
+                    // 不需要密码验证，直接跳转
+                    window.open(dept.url, "_blank");
+                }
+            });
+            
+            grid.appendChild(cardLink);
+            
+            cardInstances.push({
+                element: nameSpan,
+                chineseText: dept.chinese,
+                englishText: dept.english,
+            });
+        });
+        
+        for (let i = 0; i < cardInstances.length; i++) {
+            scheduleCardLoop(cardInstances[i]);
+        }
+    }
+    
+    // --------------------------------------------------------------
+    // 密码弹窗功能（无次数限制）
+    // --------------------------------------------------------------
+    function openPasswordModal() {
+        passwordInput.value = "";
+        errorMsgDiv.innerHTML = "";
+        passwordOverlay.style.display = "flex";
+        setTimeout(() => passwordInput.focus(), 100);
+    }
+    
+    function closePasswordModal() {
+        passwordOverlay.style.display = "none";
+        passwordInput.value = "";
+        errorMsgDiv.innerHTML = "";
+        pendingUrl = null;
+        pendingDeptName = null;
+    }
+    
+    function verifyPassword() {
+        const enteredPwd = passwordInput.value.trim();
+        
+        if (enteredPwd === CORRECT_PASSWORD) {
+            // 密码正确，跳转到目标链接
+            if (pendingUrl) {
+                window.open(pendingUrl, "_blank");
+            }
+            closePasswordModal();
+        } else {
+            // 密码错误，显示提示（无次数限制，不锁定）
+            errorMsgDiv.innerHTML = "❌ Incorrect password, please re-enter.";
+            passwordInput.value = "";
+            passwordInput.focus();
+        }
+    }
+    
+    // 绑定密码弹窗事件
+    confirmBtn.addEventListener("click", verifyPassword);
+    cancelBtn.addEventListener("click", closePasswordModal);
+    
+    // 点击遮罩层关闭
+    passwordOverlay.addEventListener("click", (e) => {
+        if (e.target === passwordOverlay) {
+            closePasswordModal();
+        }
+    });
+    
+    // 回车键提交
+    passwordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            verifyPassword();
+        }
+    });
+    
+    // --------------------------------------------------------------
+    // 底部打字机效果
+    // --------------------------------------------------------------
+    const typingPool = [
+        "illusoryrealmsof6paths...",
+        "connection processing - CMS2012",
+        "start decompressing files...",
+        "Please do not close the page.",
+        "> Access Protocol：COMOSER",
+        "C:\\> 权限验证通过",
+        "trace: 未知报错 0x7F 请重新启动...",
+        "help me, please, they're lier...",
+        "正在解压文件包。",
+        "It's all lies, it's all fake, run...!",
+        "Device sequence verification now.",
+        "verify password is GINK327..."
+    ];
+    
+    let isTypingActive = false;
+    const typingElement = document.getElementById("dynamicTyping");
+    
+    async function typeText(text, element, speed = 55) {
+        return new Promise((resolve) => {
+            let i = 0;
+            element.innerText = "";
+            function addChar() {
+                if (i < text.length) {
+                    element.innerText += text.charAt(i);
+                    i++;
+                    setTimeout(addChar, speed);
+                } else {
+                    resolve();
+                }
+            }
+            addChar();
+        });
+    }
+    
+    async function deleteText(element, speed = 35) {
+        return new Promise((resolve) => {
+            let current = element.innerText;
+            let len = current.length;
+            if (len === 0) return resolve();
+            let i = len;
+            function removeChar() {
+                if (i > 0) {
+                    element.innerText = current.substring(0, i - 1);
+                    i--;
+                    setTimeout(removeChar, speed);
+                } else {
+                    resolve();
+                }
+            }
+            removeChar();
+        });
+    }
+    
+    async function runTypingCycle() {
+        if (isTypingActive) return;
+        isTypingActive = true;
+        while (true) {
+            const newSentence = typingPool[Math.floor(Math.random() * typingPool.length)];
+            if (typingElement.innerText.length > 0) {
+                await deleteText(typingElement, 40);
+                await new Promise(r => setTimeout(r, 180));
+            }
+            await typeText(newSentence, typingElement, 55);
+            await new Promise(r => setTimeout(r, 2800 + Math.random() * 1500));
+        }
+    }
+    
+    function cleanUp() {
+        isTypingActive = false;
+    }
+    
+    window.addEventListener("load", () => {
+        buildDepartments();
+        runTypingCycle().catch(console.warn);
+    });
+    
+    window.addEventListener("beforeunload", () => cleanUp());
+</script>
 </body>
 </html>
