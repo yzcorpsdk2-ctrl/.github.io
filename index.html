@@ -3,146 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的小实验 · 欢迎</title>
+    <title>云端备份实验</title>
     <style>
-        /* 简单的亮色/暗色主题变量 */
-        :root {
-            --bg: #f9f9f9;
-            --text: #222;
-            --card: #fff;
-            --border: #ddd;
-        }
-        body.dark {
-            --bg: #1e1e1e;
-            --text: #eee;
-            --card: #2d2d2d;
-            --border: #444;
-        }
-        body {
-            font-family: system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            transition: background 0.3s, color 0.3s;
-        }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 2rem 2.5rem;
-            border-radius: 2rem;
-            max-width: 480px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            transition: background 0.3s, border 0.3s;
-        }
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 0.5rem;
-        }
-        .greeting {
-            font-size: 1.5rem;
-            margin: 1.5rem 0;
-            font-weight: 500;
-        }
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 1.8rem;
-        }
-        .btn {
-            background: var(--border);
-            color: var(--text);
-            border: none;
-            padding: 0.7rem 1.8rem;
-            border-radius: 3rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: 0.15s;
-        }
-        .btn-primary {
-            background: #2b6c94;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #1f4f6e;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-        }
-        .btn-outline:hover {
-            background: var(--border);
-        }
-        .hint {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
+        body { font-family: system-ui; max-width: 500px; margin: 50px auto; padding: 20px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { margin-top: 20px; padding: 10px 20px; background: #2b6c94; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #message { margin-top: 20px; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
-    <div class="card" id="app">
-        <h1>👋 欢迎</h1>
-        <!-- 这里会显示用户的名字 -->
-        <div class="greeting" id="greeting">加载中...</div>
-        <p id="theme-status" style="font-size:0.95rem; opacity:0.8;"></p>
-        <div class="btn-group">
-            <a href="settings.html" class="btn btn-primary">⚙️ 去设置</a>
-            <button class="btn btn-outline" onclick="resetData()">🗑️ 重置记忆</button>
-        </div>
-        <div class="hint">💡 数据保存在你的浏览器中，换设备不会同步。</div>
-    </div>
+    <h2>📬 数据云端备份实验</h2>
+    <form id="myForm">
+        <label for="Name">你的名字</label>
+        <input type="text" id="Name" name="Name" required>
+
+        <label for="Email">你的邮箱</label>
+        <input type="email" id="Email" name="Email" required>
+
+        <label for="Message">留言</label>
+        <textarea id="Message" name="Message" rows="4" required></textarea>
+
+        <button type="submit">📤 提交到云端</button>
+    </form>
+    <div id="message"></div>
 
     <script>
-        // 页面加载时立即执行
-        function loadPreferences() {
-            // 从 localStorage 读取数据
-            const userName = localStorage.getItem('userName');
-            const theme = localStorage.getItem('theme'); // 'light' 或 'dark'
+        // 【重要】把这里替换成你的 Google Apps Script Web App URL！
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwBnUhIzKkkfRSMB4BP6r2ZRnD9To1DZ08oZ3K_kyIcWa_qmTgUsK6Vc1Sjr2eH-nTeqA/exec';
+        const form = document.getElementById('myForm');
+        const messageDiv = document.getElementById('message');
 
-            // 1. 应用主题
-            if (theme === 'dark') {
-                document.body.classList.add('dark');
-            } else {
-                document.body.classList.remove('dark');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // 阻止页面刷新
+            messageDiv.textContent = '⏳ 提交中...';
+            messageDiv.className = '';
+
+            // 创建 FormData 对象，它会自动抓取表单里所有有 name 属性的字段
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.result === 'success') {
+                    messageDiv.textContent = '✅ 数据保存成功！去你的 Google Sheets 看看吧。';
+                    messageDiv.className = 'success';
+                    form.reset(); // 清空表单
+                } else {
+                    throw new Error('保存失败');
+                }
+            } catch (error) {
+                messageDiv.textContent = `❌ 出错了：${error.message}`;
+                messageDiv.className = 'error';
             }
-
-            // 2. 显示欢迎语
-            const greetingEl = document.getElementById('greeting');
-            if (userName) {
-                greetingEl.textContent = `你好，${userName}！✨`;
-            } else {
-                greetingEl.textContent = '你好，朋友！👋 去设置你的名字吧。';
-            }
-
-            // 3. 显示当前主题状态（可选）
-            const statusEl = document.getElementById('theme-status');
-            statusEl.textContent = `当前主题：${theme === 'dark' ? '🌙 暗色' : '☀️ 亮色'}`;
-        }
-
-        // 重置所有数据
-        function resetData() {
-            if (confirm('确定要清除所有记忆吗？')) {
-                localStorage.removeItem('userName');
-                localStorage.removeItem('theme');
-                loadPreferences(); // 刷新页面显示
-                // 也可以直接刷新页面：location.reload();
-            }
-        }
-
-        // 页面一加载就运行
-        loadPreferences();
+        });
     </script>
 </body>
 </html>
