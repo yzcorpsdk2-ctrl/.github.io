@@ -141,6 +141,7 @@
         .btn-submit:disabled {
             background: #a0aec0;
             cursor: not-allowed;
+            opacity: 0.7;
         }
         .hidden {
             display: none !important;
@@ -214,9 +215,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .btn-submit:disabled {
-            opacity: 0.7;
-        }
     </style>
 </head>
 <body>
@@ -243,7 +241,7 @@
         <div id="signupForm" class="hidden">
             <h2 id="signupTitle">📋 Daftar Staf Baru</h2>
             <form id="staffForm" onsubmit="submitSignup(event)">
-                <!-- Group Name - 改为选项 -->
+                <!-- Group Name -->
                 <div class="form-group">
                     <label class="field-required" id="lblGroupName">Group Name</label>
                     <select id="GroupName" required onchange="handleGroupChange()">
@@ -258,7 +256,7 @@
                         <option value="Others">Others (Lain-lain)</option>
                     </select>
                     <div id="otherGroupContainer" class="hidden" style="margin-top:8px;">
-                        <input type="text" id="OtherGroupInput" placeholder="Sila nyatakan kumpulan lain" oninput="syncOtherGroup()">
+                        <input type="text" id="OtherGroupInput" placeholder="Sila nyatakan kumpulan lain">
                     </div>
                 </div>
 
@@ -320,13 +318,13 @@
                     <input type="tel" id="TelefonNo" placeholder="012-3456789" required>
                 </div>
 
-                <!-- Email - 非必填 -->
+                <!-- Email -->
                 <div class="form-group">
                     <label id="lblEmail">Email</label>
                     <input type="email" id="Email" placeholder="email@contoh.com">
                 </div>
 
-                <!-- Shift Type - 改为选项 + 自定义时间 -->
+                <!-- Shift Type -->
                 <div class="form-group">
                     <label class="field-required" id="lblShiftType">Shift Type</label>
                     <select id="ShiftType" required onchange="handleShiftChange()">
@@ -355,11 +353,10 @@
                             <span>:</span>
                             <input type="number" id="ShiftEndMin" placeholder="Min" min="0" max="59" style="width:70px;">
                         </div>
-                        <input type="hidden" id="OtherShiftFull">
                     </div>
                 </div>
 
-                <!-- Off Day - 改为选项 星期一到星期日 -->
+                <!-- Off Day -->
                 <div class="form-group">
                     <label class="field-required" id="lblOffDay">Off Day</label>
                     <select id="OffDay" required>
@@ -380,13 +377,13 @@
                     <input type="text" id="AlamatTetap" placeholder="Alamat Rumah" required>
                 </div>
 
-                <!-- Nama Waris - 非必填 -->
+                <!-- Nama Waris -->
                 <div class="form-group">
                     <label id="lblNamaWaris">Nama Waris</label>
                     <input type="text" id="NamaWaris" placeholder="Nama Waris">
                 </div>
 
-                <!-- Alamat Waris - 非必填 -->
+                <!-- Alamat Waris -->
                 <div class="form-group">
                     <label id="lblAlamatWaris">Alamat Waris</label>
                     <input type="text" id="AlamatWaris" placeholder="Alamat Waris">
@@ -412,7 +409,7 @@
                         <option value="Others">Others (Lain-lain)</option>
                     </select>
                     <div id="otherBankContainer" class="hidden" style="margin-top:8px;">
-                        <input type="text" id="OtherBankInput" placeholder="Sila nyatakan bank lain" oninput="syncOtherBank()">
+                        <input type="text" id="OtherBankInput" placeholder="Sila nyatakan bank lain">
                     </div>
                 </div>
 
@@ -472,9 +469,7 @@
                     <input type="password" id="LoginPassword" placeholder="Kata Laluan" required>
                 </div>
 
-                <!-- Hidden fields: Situation, Holidays akan diisi default di backend -->
-                <input type="hidden" id="SignupDate" value="">
-                <input type="hidden" id="UpdateDate" value="">
+                <!-- Hidden fields -->
                 <input type="hidden" id="AgreementSituation" value="Default">
 
                 <button type="submit" class="btn-submit" id="signupSubmitBtn">📤 Daftar</button>
@@ -496,7 +491,7 @@
             <div id="loginResult" style="margin-top:12px; font-weight:600;"></div>
         </div>
 
-        <!-- ========== PROFILE / EDIT VIEW ========== -->
+        <!-- ========== PROFILE VIEW ========== -->
         <div id="profileView" class="hidden">
             <h2 id="profileTitle">👤 Profil Staf</h2>
             <div class="edit-indicator" id="editIndicator">✏️ Klik pada mana-mana medan untuk sunting</div>
@@ -508,7 +503,7 @@
     <script>
         // ============= CONFIG =============
         // ⚠️ 重要：替换为您的实际部署 URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzz5z-hn9rQX3jRE_VTC0hH9IzX7zCjY50bEz8m7pYo-8f9QlcQRPcgVoPAanzqkfPTUw/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
         let currentLanguage = 'ms';
         let currentUser = null;
@@ -696,7 +691,6 @@
                 document.getElementById('OtherGroupInput').value = '';
             }
         }
-        function syncOtherGroup() {}
 
         // ============= SHIFT HANDLING =============
         function handleShiftChange() {
@@ -745,7 +739,6 @@
                 document.getElementById('OtherBankInput').value = '';
             }
         }
-        function syncOtherBank() {}
 
         // ============= SUBMIT SIGNUP =============
         function submitSignup(e) {
@@ -810,12 +803,9 @@
                 YellowCard: document.getElementById('YellowCard').value,
                 PhoneType: document.getElementById('PhoneType').value.trim(),
                 LoginPassword: document.getElementById('LoginPassword').value.trim(),
-                SignupDate: new Date().toISOString(),
-                UpdateDate: new Date().toISOString(),
                 AgreementSituation: 'Default',
             };
 
-            // Set loading state
             const submitBtn = document.getElementById('signupSubmitBtn');
             submitBtn.dataset.originalText = submitBtn.textContent;
             setLoading('signupSubmitBtn', true, t('registering'));
@@ -982,17 +972,6 @@
 
         // ============= INIT =============
         setLanguage('ms');
-        
-        // Test connection on load
-        fetch(SCRIPT_URL + '?action=getData')
-        .then(response => response.json())
-        .then(data => {
-            console.log('Connection successful! Data count:', data.length || 0);
-        })
-        .catch(err => {
-            console.warn('Connection test failed:', err.message);
-            // Don't show alert here, let user try login/register first
-        });
     </script>
 </body>
 </html>
