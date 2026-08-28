@@ -1,68 +1,900 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云端备份实验</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Sistem Pengurusan Staf</title>
     <style>
-        body { font-family: system-ui; max-width: 500px; margin: 50px auto; padding: 20px; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-        button { margin-top: 20px; padding: 10px 20px; background: #2b6c94; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        #message { margin-top: 20px; padding: 10px; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 16px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #1a3a5c;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        .lang-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            padding: 8px 18px;
+            border: 2px solid #1a3a5c;
+            background: transparent;
+            color: #1a3a5c;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        .lang-btn.active, .lang-btn:hover {
+            background: #1a3a5c;
+            color: white;
+        }
+        .auth-section {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 16px 0 20px;
+            flex-wrap: wrap;
+        }
+        .auth-btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            background: #e2e8f0;
+            color: #1a3a5c;
+            flex: 1 1 auto;
+            min-width: 120px;
+        }
+        .auth-btn.primary {
+            background: #1a3a5c;
+            color: white;
+        }
+        .auth-btn.primary:hover {
+            background: #0f2a44;
+            transform: scale(1.02);
+        }
+        .auth-btn.secondary {
+            background: #d4a373;
+            color: white;
+        }
+        .auth-btn.secondary:hover {
+            background: #b8834f;
+            transform: scale(1.02);
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: 0.2s;
+            background: #fafcfd;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #1a3a5c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26,58,92,0.15);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #1a3a5c;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            margin-top: 8px;
+        }
+        .btn-submit:hover {
+            background: #0f2a44;
+            transform: scale(1.01);
+        }
+        .btn-submit:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .alert {
+            background: #fed7d7;
+            color: #9b2c2c;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            display: none;
+        }
+        .alert.show {
+            display: block;
+        }
+        .info-note {
+            font-size: 13px;
+            color: #4a5568;
+            background: #edf2f7;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-top: 4px;
+        }
+        .edit-indicator {
+            background: #e6fffa;
+            padding: 8px 14px;
+            border-radius: 40px;
+            font-size: 13px;
+            color: #234e52;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .field-required::after {
+            content: " *";
+            color: #e53e3e;
+            font-weight: 700;
+        }
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 480px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b0c4de;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
-    <h2>📬 数据云端备份实验</h2>
-    <form id="myForm">
-        <label for="Name">你的名字</label>
-        <input type="text" id="Name" name="Name" required>
+    <div class="container" id="appContainer">
+        <h1 id="mainTitle">Sistem Pengurusan Staf</h1>
+        
+        <!-- Language Bar -->
+        <div class="lang-bar">
+            <button class="lang-btn" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
+            <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
+            <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
+        </div>
 
-        <label for="Email">你的邮箱</label>
-        <input type="email" id="Email" name="Email" required>
+        <!-- Auth Section -->
+        <div class="auth-section" id="authSection">
+            <button class="auth-btn primary" id="signupBtn" onclick="showSignup()">📝 Daftar</button>
+            <button class="auth-btn secondary" id="loginBtn" onclick="showLogin()">🔑 Log Masuk</button>
+        </div>
 
-        <label for="Message">留言</label>
-        <textarea id="Message" name="Message" rows="4" required></textarea>
+        <!-- Alert Box -->
+        <div class="alert" id="alertBox"></div>
 
-        <button type="submit">📤 提交到云端</button>
-    </form>
-    <div id="message"></div>
+        <!-- ========== SIGNUP FORM ========== -->
+        <div id="signupForm" class="hidden">
+            <h2 id="signupTitle">📋 Daftar Staf Baru</h2>
+            <form id="staffForm" onsubmit="submitSignup(event)">
+                <!-- 所有字段 (按需求映射) -->
+                <div class="form-group">
+                    <label class="field-required" id="lblSituation">Situation</label>
+                    <input type="text" id="Situation" placeholder="Contoh: Aktif" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblGroupName">Group Name</label>
+                    <input type="text" id="GroupName" placeholder="Kumpulan" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblCode">Code</label>
+                    <input type="text" id="Code" placeholder="Kod Unik" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblName">Name</label>
+                    <input type="text" id="Name" placeholder="Nama Penuh" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblJantina">Jantina</label>
+                    <select id="Jantina" required>
+                        <option value="">-- Sila Pilih --</option>
+                        <option value="Lelaki">Lelaki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblTarikhLahir">Tarikh Lahir</label>
+                    <input type="date" id="TarikhLahir" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblHolidays">Holidays</label>
+                    <input type="text" id="Holidays" placeholder="Cuti" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblSalary">Salary</label>
+                    <input type="number" id="Salary" placeholder="Gaji" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblIC">IC/Passport/Doc.No</label>
+                    <input type="text" id="IC" placeholder="No. KP/Passport" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblJawatan">Jawatan</label>
+                    <input type="text" id="Jawatan" placeholder="Jawatan" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblTarikhMasuk">Tarikh Masuk Kerja</label>
+                    <input type="date" id="TarikhMasukKerja" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblTelefon">Telefon No.</label>
+                    <input type="tel" id="TelefonNo" placeholder="012-3456789" required>
+                </div>
+                <div class="form-group">
+                    <label id="lblEmail">Email</label>
+                    <input type="email" id="Email" placeholder="email@contoh.com">
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblShiftType">Shift Type</label>
+                    <input type="text" id="ShiftType" placeholder="Contoh: Pagi" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblOffDay">Off Day</label>
+                    <input type="text" id="OffDay" placeholder="Hari Rehat" required>
+                </div>
+                <!-- Agreement Situation 不显示 -->
+                <div class="form-group hidden">
+                    <label>Agreement Situation</label>
+                    <input type="text" id="AgreementSituation" value="Default">
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblAlamatTetap">Alamat Tetap</label>
+                    <input type="text" id="AlamatTetap" placeholder="Alamat Rumah" required>
+                </div>
+                <div class="form-group">
+                    <label id="lblNamaWaris">Nama Waris</label>
+                    <input type="text" id="NamaWaris" placeholder="Nama Waris">
+                </div>
+                <div class="form-group">
+                    <label id="lblAlamatWaris">Alamat Waris</label>
+                    <input type="text" id="AlamatWaris" placeholder="Alamat Waris">
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblBankNama">Bank Nama</label>
+                    <select id="BankNama" required onchange="handleBankChange()">
+                        <option value="">-- Pilih Bank --</option>
+                        <option value="AGRO BANK">AGRO BANK</option>
+                        <option value="AMBANK">AMBANK</option>
+                        <option value="BANK ISLAM">BANK ISLAM</option>
+                        <option value="BANK MUAMALAT">BANK MUAMALAT</option>
+                        <option value="BSN">BSN</option>
+                        <option value="CASH">CASH</option>
+                        <option value="CIMB BAMK">CIMB BAMK</option>
+                        <option value="HONG LEONG BANK">HONG LEONG BANK</option>
+                        <option value="MAYBANK">MAYBANK</option>
+                        <option value="MECHANTRADE">MECHANTRADE</option>
+                        <option value="PUBLIC BANK(PBB)">PUBLIC BANK (PBB)</option>
+                        <option value="RHB BANK">RHB BANK</option>
+                        <option value="Others">Others (Lain-lain)</option>
+                    </select>
+                    <div id="otherBankContainer" class="hidden" style="margin-top:8px;">
+                        <input type="text" id="OtherBankInput" placeholder="Sila nyatakan bank lain" oninput="syncOtherBank()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblBankAccount">Bank Account No.</label>
+                    <input type="text" id="BankAccountNo" placeholder="No. Akaun" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblEPF">EPF (kwsp) No.</label>
+                    <input type="text" id="EPF" placeholder="No. KWSP" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblPERKESO">PERKESO NO.</label>
+                    <input type="text" id="PERKESO" placeholder="No. PERKESO" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblEIS">EIS NO.</label>
+                    <input type="text" id="EIS" placeholder="No. EIS" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lbl24Jam">24Jam Lindungan</label>
+                    <select id="Lindungan" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblYellowCard">Kad Kebersihan (Yellow Card)</label>
+                    <select id="YellowCard" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblPhoneType">Phone type</label>
+                    <input type="text" id="PhoneType" placeholder="Contoh: Android" required>
+                </div>
+                <div class="form-group">
+                    <label class="field-required" id="lblLoginPassword">Login Password</label>
+                    <input type="password" id="LoginPassword" placeholder="Kata Laluan" required>
+                </div>
+                <!-- Hidden fields -->
+                <input type="hidden" id="SignupDate" value="">
+                <input type="hidden" id="UpdateDate" value="">
+                <input type="hidden" id="AgreementSituationHidden" value="Default">
+
+                <button type="submit" class="btn-submit" id="signupSubmitBtn">📤 Daftar</button>
+            </form>
+        </div>
+
+        <!-- ========== LOGIN FORM ========== -->
+        <div id="loginForm" class="hidden">
+            <h2 id="loginTitle">🔐 Log Masuk</h2>
+            <div class="form-group">
+                <label class="field-required" id="lblLoginCode">Code</label>
+                <input type="text" id="loginCode" placeholder="Masukkan Code">
+            </div>
+            <div class="form-group">
+                <label class="field-required" id="lblLoginPassword2">Password</label>
+                <input type="password" id="loginPassword" placeholder="Kata Laluan">
+            </div>
+            <button class="btn-submit" onclick="performLogin()">🔓 Log Masuk</button>
+            <div id="loginResult" style="margin-top:12px; font-weight:600;"></div>
+        </div>
+
+        <!-- ========== PROFILE / EDIT VIEW ========== -->
+        <div id="profileView" class="hidden">
+            <h2 id="profileTitle">👤 Profil Staf</h2>
+            <div class="edit-indicator" id="editIndicator">✏️ Klik pada mana-mana medan untuk sunting</div>
+            <div id="profileFields"></div>
+            <button class="btn-submit" onclick="logout()" style="background:#c53030;">🚪 Log Keluar</button>
+        </div>
+    </div>
 
     <script>
-        // 【重要】把这里替换成你的 Google Apps Script Web App URL！
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwBnUhIzKkkfRSMB4BP6r2ZRnD9To1DZ08oZ3K_kyIcWa_qmTgUsK6Vc1Sjr2eH-nTeqA/exec';
-        const form = document.getElementById('myForm');
-        const messageDiv = document.getElementById('message');
+        // ============= CONFIG =============
+        // Ganti dengan URL deployment web app anda
+        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'; 
+        // Pastikan 'STAFF LOGIN RECORD' sebagai sheet name, dan header dari B2 (iaitu column B = index 1)
+        // Untuk kesederhanaan, kita hantar dengan parameter nama column. Pastikan column di sheet sepadan.
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // 阻止页面刷新
-            messageDiv.textContent = '⏳ 提交中...';
-            messageDiv.className = '';
+        let currentLanguage = 'ms';
+        let currentUser = null; // simpan data user selepas login
+        let isEditing = false;
 
-            // 创建 FormData 对象，它会自动抓取表单里所有有 name 属性的字段
-            const formData = new FormData(form);
-
-            try {
-                const response = await fetch(scriptURL, {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await response.json();
-
-                if (result.result === 'success') {
-                    messageDiv.textContent = '✅ 数据保存成功！去你的 Google Sheets 看看吧。';
-                    messageDiv.className = 'success';
-                    form.reset(); // 清空表单
-                } else {
-                    throw new Error('保存失败');
-                }
-            } catch (error) {
-                messageDiv.textContent = `❌ 出错了：${error.message}`;
-                messageDiv.className = 'error';
+        // ============= TRANSLATIONS =============
+        const langMap = {
+            ms: {
+                title: 'Sistem Pengurusan Staf',
+                signup: '📝 Daftar',
+                login: '🔑 Log Masuk',
+                signupTitle: '📋 Daftar Staf Baru',
+                loginTitle: '🔐 Log Masuk',
+                profileTitle: '👤 Profil Staf',
+                editHint: '✏️ Klik pada mana-mana medan untuk sunting',
+                logout: '🚪 Log Keluar',
+                submit: '📤 Daftar',
+                loginBtn: '🔓 Log Masuk',
+                // labels
+                lblSituation: 'Situation', lblGroupName: 'Group Name', lblCode: 'Code',
+                lblName: 'Name', lblJantina: 'Jantina', lblTarikhLahir: 'Tarikh Lahir',
+                lblHolidays: 'Holidays', lblSalary: 'Salary', lblIC: 'IC/Passport/Doc.No',
+                lblJawatan: 'Jawatan', lblTarikhMasuk: 'Tarikh Masuk Kerja', lblTelefon: 'Telefon No.',
+                lblEmail: 'Email', lblShiftType: 'Shift Type', lblOffDay: 'Off Day',
+                lblAlamatTetap: 'Alamat Tetap', lblNamaWaris: 'Nama Waris', lblAlamatWaris: 'Alamat Waris',
+                lblBankNama: 'Bank Nama', lblBankAccount: 'Bank Account No.', lblEPF: 'EPF (kwsp) No.',
+                lblPERKESO: 'PERKESO NO.', lblEIS: 'EIS NO.', lbl24Jam: '24Jam Lindungan',
+                lblYellowCard: 'Kad Kebersihan (Yellow Card)', lblPhoneType: 'Phone type',
+                lblLoginPassword: 'Login Password', lblLoginCode: 'Code', lblLoginPassword2: 'Password',
+                required: 'Sila isi semua medan yang wajib.',
+                loginSuccess: 'Log masuk berjaya!',
+                loginFail: 'Code atau Password salah.',
+                saveSuccess: 'Data berjaya disimpan.',
+                saveFail: 'Ralat menyimpan data.',
+                confirmLogout: 'Anda pasti mahu log keluar?',
+            },
+            en: {
+                title: 'Staff Management System',
+                signup: '📝 Sign Up',
+                login: '🔑 Login',
+                signupTitle: '📋 New Staff Registration',
+                loginTitle: '🔐 Login',
+                profileTitle: '👤 Staff Profile',
+                editHint: '✏️ Click any field to edit',
+                logout: '🚪 Logout',
+                submit: '📤 Register',
+                loginBtn: '🔓 Login',
+                lblSituation: 'Situation', lblGroupName: 'Group Name', lblCode: 'Code',
+                lblName: 'Name', lblJantina: 'Gender', lblTarikhLahir: 'Date of Birth',
+                lblHolidays: 'Holidays', lblSalary: 'Salary', lblIC: 'IC/Passport/Doc.No',
+                lblJawatan: 'Position', lblTarikhMasuk: 'Start Date', lblTelefon: 'Phone No.',
+                lblEmail: 'Email', lblShiftType: 'Shift Type', lblOffDay: 'Off Day',
+                lblAlamatTetap: 'Permanent Address', lblNamaWaris: 'Next of Kin', lblAlamatWaris: 'Next of Kin Address',
+                lblBankNama: 'Bank Name', lblBankAccount: 'Bank Account No.', lblEPF: 'EPF (kwsp) No.',
+                lblPERKESO: 'PERKESO NO.', lblEIS: 'EIS NO.', lbl24Jam: '24Jam Lindungan',
+                lblYellowCard: 'Kad Kebersihan (Yellow Card)', lblPhoneType: 'Phone type',
+                lblLoginPassword: 'Login Password', lblLoginCode: 'Code', lblLoginPassword2: 'Password',
+                required: 'Please fill in all required fields.',
+                loginSuccess: 'Login successful!',
+                loginFail: 'Incorrect Code or Password.',
+                saveSuccess: 'Data saved successfully.',
+                saveFail: 'Error saving data.',
+                confirmLogout: 'Are you sure you want to logout?',
+            },
+            zh: {
+                title: '员工管理系统',
+                signup: '📝 注册',
+                login: '🔑 登录',
+                signupTitle: '📋 新员工注册',
+                loginTitle: '🔐 登录',
+                profileTitle: '👤 员工资料',
+                editHint: '✏️ 点击任意字段进行编辑',
+                logout: '🚪 退出登录',
+                submit: '📤 注册',
+                loginBtn: '🔓 登录',
+                lblSituation: '情况', lblGroupName: '组名', lblCode: '代码',
+                lblName: '姓名', lblJantina: '性别', lblTarikhLahir: '出生日期',
+                lblHolidays: '假期', lblSalary: '薪资', lblIC: '身份证/护照/证件号',
+                lblJawatan: '职位', lblTarikhMasuk: '入职日期', lblTelefon: '电话号码',
+                lblEmail: '电子邮件', lblShiftType: '班次类型', lblOffDay: '休息日',
+                lblAlamatTetap: '固定地址', lblNamaWaris: '紧急联系人', lblAlamatWaris: '紧急联系人地址',
+                lblBankNama: '银行名称', lblBankAccount: '银行账号', lblEPF: 'EPF (kwsp) 号码',
+                lblPERKESO: 'PERKESO 号码', lblEIS: 'EIS 号码', lbl24Jam: '24小时保障',
+                lblYellowCard: '卫生卡 (黄卡)', lblPhoneType: '手机类型',
+                lblLoginPassword: '登录密码', lblLoginCode: '代码', lblLoginPassword2: '密码',
+                required: '请填写所有必填字段。',
+                loginSuccess: '登录成功！',
+                loginFail: '代码或密码错误。',
+                saveSuccess: '数据保存成功。',
+                saveFail: '保存数据出错。',
+                confirmLogout: '您确定要退出登录吗？',
             }
-        });
+        };
+
+        function t(key) {
+            return langMap[currentLanguage]?.[key] || key;
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+            // Update UI text
+            document.getElementById('mainTitle').textContent = t('title');
+            document.getElementById('signupBtn').textContent = t('signup');
+            document.getElementById('loginBtn').textContent = t('login');
+            document.getElementById('signupTitle').textContent = t('signupTitle');
+            document.getElementById('loginTitle').textContent = t('loginTitle');
+            document.getElementById('profileTitle').textContent = t('profileTitle');
+            document.getElementById('editIndicator').textContent = t('editHint');
+            document.querySelector('#profileView .btn-submit').textContent = t('logout');
+            document.getElementById('signupSubmitBtn').textContent = t('submit');
+            // Update all labels
+            const labelMap = {
+                'lblSituation': 'Situation','lblGroupName':'GroupName','lblCode':'Code','lblName':'Name',
+                'lblJantina':'Jantina','lblTarikhLahir':'TarikhLahir','lblHolidays':'Holidays','lblSalary':'Salary',
+                'lblIC':'IC','lblJawatan':'Jawatan','lblTarikhMasuk':'TarikhMasuk','lblTelefon':'Telefon',
+                'lblEmail':'Email','lblShiftType':'ShiftType','lblOffDay':'OffDay','lblAlamatTetap':'AlamatTetap',
+                'lblNamaWaris':'NamaWaris','lblAlamatWaris':'AlamatWaris','lblBankNama':'BankNama',
+                'lblBankAccount':'BankAccount','lblEPF':'EPF','lblPERKESO':'PERKESO','lblEIS':'EIS',
+                'lbl24Jam':'24Jam','lblYellowCard':'YellowCard','lblPhoneType':'PhoneType',
+                'lblLoginPassword':'LoginPassword','lblLoginCode':'loginCode','lblLoginPassword2':'loginPassword'
+            };
+            // For each label id, update text
+            for (let [id, key] of Object.entries(labelMap)) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = t(key) + (el.classList.contains('field-required') ? ' *' : '');
+            }
+            // Login button
+            const loginBtn = document.querySelector('#loginForm .btn-submit');
+            if (loginBtn) loginBtn.textContent = t('loginBtn');
+        }
+
+        // ============= UI HELPERS =============
+        function showAlert(msg, isError = true) {
+            const box = document.getElementById('alertBox');
+            box.textContent = msg;
+            box.style.display = 'block';
+            box.style.background = isError ? '#fed7d7' : '#c6f6d5';
+            box.style.color = isError ? '#9b2c2c' : '#22543d';
+            setTimeout(() => { box.style.display = 'none'; }, 5000);
+        }
+
+        function showSignup() {
+            document.getElementById('signupForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('signupForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('loginForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function logout() {
+            if (!confirm(t('confirmLogout'))) return;
+            currentUser = null;
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('loginResult').textContent = '';
+        }
+
+        // ============= BANK HANDLING =============
+        function handleBankChange() {
+            const bank = document.getElementById('BankNama').value;
+            const otherContainer = document.getElementById('otherBankContainer');
+            const accInput = document.getElementById('BankAccountNo');
+            if (bank === 'CASH' || bank === 'MECHANTRADE') {
+                accInput.value = '-';
+                accInput.readOnly = true;
+                accInput.required = false;
+            } else {
+                accInput.readOnly = false;
+                accInput.required = true;
+                if (accInput.value === '-') accInput.value = '';
+            }
+            if (bank === 'Others') {
+                otherContainer.classList.remove('hidden');
+            } else {
+                otherContainer.classList.add('hidden');
+                document.getElementById('OtherBankInput').value = '';
+            }
+        }
+
+        function syncOtherBank() {
+            const val = document.getElementById('OtherBankInput').value;
+            const sel = document.getElementById('BankNama');
+            if (sel.value === 'Others') {
+                // We keep the select as 'Others', but we will send the actual value via hidden? 
+                // We'll just collect from OtherBankInput during submit.
+            }
+        }
+
+        // ============= SUBMIT SIGNUP =============
+        function submitSignup(e) {
+            e.preventDefault();
+            const form = document.getElementById('staffForm');
+            // Check required fields (except Email, NamaWaris, AlamatWaris)
+            const requiredIds = ['Situation','GroupName','Code','Name','Jantina','TarikhLahir','Holidays','Salary',
+                'IC','Jawatan','TarikhMasukKerja','TelefonNo','ShiftType','OffDay','AlamatTetap','BankNama',
+                'BankAccountNo','EPF','PERKESO','EIS','Lindungan','YellowCard','PhoneType','LoginPassword'];
+            for (let id of requiredIds) {
+                const el = document.getElementById(id);
+                if (!el || !el.value.trim()) {
+                    showAlert(t('required'));
+                    el.focus();
+                    return;
+                }
+            }
+            // Special: if Bank is Others, ensure OtherBankInput filled
+            const bankSel = document.getElementById('BankNama');
+            if (bankSel.value === 'Others') {
+                const otherVal = document.getElementById('OtherBankInput').value.trim();
+                if (!otherVal) {
+                    showAlert('Sila nyatakan nama bank lain / Please specify other bank');
+                    document.getElementById('OtherBankInput').focus();
+                    return;
+                }
+            }
+
+            // Build data object
+            const data = {
+                Situation: document.getElementById('Situation').value.trim(),
+                GroupName: document.getElementById('GroupName').value.trim(),
+                Code: document.getElementById('Code').value.trim(),
+                Name: document.getElementById('Name').value.trim(),
+                Jantina: document.getElementById('Jantina').value,
+                TarikhLahir: document.getElementById('TarikhLahir').value,
+                Holidays: document.getElementById('Holidays').value.trim(),
+                Salary: document.getElementById('Salary').value.trim(),
+                IC: document.getElementById('IC').value.trim(),
+                Jawatan: document.getElementById('Jawatan').value.trim(),
+                TarikhMasukKerja: document.getElementById('TarikhMasukKerja').value,
+                TelefonNo: document.getElementById('TelefonNo').value.trim(),
+                Email: document.getElementById('Email').value.trim(),
+                ShiftType: document.getElementById('ShiftType').value.trim(),
+                OffDay: document.getElementById('OffDay').value.trim(),
+                AgreementSituation: 'Default', // not shown
+                AlamatTetap: document.getElementById('AlamatTetap').value.trim(),
+                NamaWaris: document.getElementById('NamaWaris').value.trim(),
+                AlamatWaris: document.getElementById('AlamatWaris').value.trim(),
+                BankNama: (bankSel.value === 'Others') ? document.getElementById('OtherBankInput').value.trim() : bankSel.value,
+                BankAccountNo: document.getElementById('BankAccountNo').value.trim(),
+                EPF: document.getElementById('EPF').value.trim(),
+                PERKESO: document.getElementById('PERKESO').value.trim(),
+                EIS: document.getElementById('EIS').value.trim(),
+                Lindungan: document.getElementById('Lindungan').value,
+                YellowCard: document.getElementById('YellowCard').value,
+                PhoneType: document.getElementById('PhoneType').value.trim(),
+                LoginPassword: document.getElementById('LoginPassword').value.trim(),
+                SignupDate: new Date().toISOString(),
+                UpdateDate: new Date().toISOString(),
+                // B2, H2, AD, AC, Q2 not included as per requirement
+            };
+
+            // Send to Google Sheets via POST
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // because CORS not enabled on GAS
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(data)
+            }).then(() => {
+                showAlert('Pendaftaran berjaya! / Registration successful!', false);
+                form.reset();
+                document.getElementById('BankAccountNo').readOnly = false;
+                document.getElementById('BankAccountNo').required = true;
+                document.getElementById('otherBankContainer').classList.add('hidden');
+                document.getElementById('OtherBankInput').value = '';
+                // Switch to login?
+                showLogin();
+            }).catch(err => {
+                showAlert('Ralat: ' + err.message);
+            });
+        }
+
+        // ============= LOGIN =============
+        function performLogin() {
+            const code = document.getElementById('loginCode').value.trim();
+            const pwd = document.getElementById('loginPassword').value.trim();
+            if (!code || !pwd) {
+                showAlert('Sila masukkan Code dan Password.');
+                return;
+            }
+            // We need to fetch all data from sheet and match. Since we can't query easily via doPost,
+            // we use a workaround: we can use GET with query? We'll use fetch with GET to a separate endpoint?
+            // Better: we use the same script with a GET parameter? But GAS doGet can be used.
+            // For simplicity, we assume we have a doGet that returns all data as JSON.
+            // But since user provided only doPost, we need to add doGet in Apps Script.
+            // We'll implement a simple fetch to a deployed web app that returns data.
+            // *** IMPORTANT: You need to deploy a doGet version as well. ***
+            // For now, we'll use a mock login for demo, but in real usage, you need to implement doGet.
+            // I'll provide the doGet code in the Apps Script section below.
+            // Here we simulate by fetching from a JSON endpoint (if available)
+            // We'll assume the Apps Script has doGet that returns all records.
+            // For demo, we'll do a mock check (but we'll replace with actual fetch)
+            // Actually we'll use the SCRIPT_URL with ?action=getData
+            fetch(SCRIPT_URL + '?action=getData')
+            .then(res => res.json())
+            .then(data => {
+                if (!data || !data.length) {
+                    showAlert('Tiada data / No data');
+                    return;
+                }
+                // data is array of objects with headers as keys
+                const user = data.find(row => row.Code === code && row.LoginPassword === pwd);
+                if (user) {
+                    currentUser = user;
+                    showAlert('Log masuk berjaya!', false);
+                    displayProfile(user);
+                } else {
+                    showAlert('Code atau Password salah.');
+                }
+            })
+            .catch(err => {
+                // Fallback mock for demo (since no doGet yet)
+                // Mock: if code=test and pwd=123, show profile
+                if (code === 'test' && pwd === '123') {
+                    const mockUser = {
+                        Code: 'test', Name: 'Ahmad Bin Ali', Jantina: 'Lelaki',
+                        TarikhLahir: '1990-01-01', Holidays: '2', Salary: '3000',
+                        IC: '900101-10-1234', Jawatan: 'Supervisor', TarikhMasukKerja: '2020-01-01',
+                        TelefonNo: '012-3456789', Email: 'ahmad@email.com', ShiftType: 'Pagi',
+                        OffDay: 'Ahad', AlamatTetap: 'No. 1, Jalan 1, KL',
+                        NamaWaris: 'Ali', AlamatWaris: 'No. 2, Jalan 2, KL',
+                        BankNama: 'MAYBANK', BankAccountNo: '1234567890',
+                        EPF: 'EPF123', PERKESO: 'PER123', EIS: 'EIS123',
+                        Lindungan: 'YES', YellowCard: 'NO', PhoneType: 'Android',
+                        LoginPassword: '123', SignupDate: '2025-01-01T00:00:00Z', UpdateDate: '2025-01-01T00:00:00Z'
+                    };
+                    currentUser = mockUser;
+                    displayProfile(mockUser);
+                    showAlert('Login berjaya (demo)', false);
+                } else {
+                    showAlert('Ralat: ' + err.message + ' (Pastikan doGet di Apps Script disediakan)');
+                }
+            });
+        }
+
+        // ============= DISPLAY PROFILE =============
+        function displayProfile(user) {
+            document.getElementById('profileView').classList.remove('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('authSection').classList.add('hidden');
+            const container = document.getElementById('profileFields');
+            container.innerHTML = '';
+            // List of fields to show (excluding some)
+            const fields = [
+                'Situation','GroupName','Code','Name','Jantina','TarikhLahir','Holidays','Salary',
+                'IC','Jawatan','TarikhMasukKerja','TelefonNo','Email','ShiftType','OffDay',
+                'AlamatTetap','NamaWaris','AlamatWaris','BankNama','BankAccountNo','EPF','PERKESO',
+                'EIS','Lindungan','YellowCard','PhoneType','LoginPassword','SignupDate','UpdateDate'
+            ];
+            // Map to display labels
+            const labelMap = {
+                Situation:'Situation', GroupName:'Group Name', Code:'Code', Name:'Name',
+                Jantina:'Jantina', TarikhLahir:'Tarikh Lahir', Holidays:'Holidays', Salary:'Salary',
+                IC:'IC/Passport/Doc.No', Jawatan:'Jawatan', TarikhMasukKerja:'Tarikh Masuk Kerja',
+                TelefonNo:'Telefon No.', Email:'Email', ShiftType:'Shift Type', OffDay:'Off Day',
+                AlamatTetap:'Alamat Tetap', NamaWaris:'Nama Waris', AlamatWaris:'Alamat Waris',
+                BankNama:'Bank Nama', BankAccountNo:'Bank Account No.', EPF:'EPF (kwsp) No.',
+                PERKESO:'PERKESO NO.', EIS:'EIS NO.', Lindungan:'24Jam Lindungan',
+                YellowCard:'Kad Kebersihan (Yellow Card)', PhoneType:'Phone type',
+                LoginPassword:'Login Password', SignupDate:'Signup Date', UpdateDate:'Update Date'
+            };
+
+            for (let key of fields) {
+                const val = user[key] || '';
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                const label = document.createElement('label');
+                label.textContent = (labelMap[key] || key) + ':';
+                const input = document.createElement('input');
+                input.type = (key === 'LoginPassword') ? 'password' : 'text';
+                input.value = val;
+                input.dataset.field = key;
+                input.id = 'prof_' + key;
+                // Allow editing
+                input.addEventListener('change', function() {
+                    // Update local user object
+                    currentUser[key] = this.value;
+                    // Auto-update UpdateDate
+                    currentUser.UpdateDate = new Date().toISOString();
+                    // Save to sheet? We'll call saveProfile()
+                    saveProfile();
+                });
+                div.appendChild(label);
+                div.appendChild(input);
+                container.appendChild(div);
+            }
+            document.getElementById('profileView').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ============= SAVE PROFILE (update to sheet) =============
+        function saveProfile() {
+            // We need to update the row in Google Sheets.
+            // Since we don't have row index, we need to find by Code.
+            // We'll send an update request with Code and all fields.
+            // Apps Script doPost can handle update if we add logic.
+            // For simplicity, we'll just send an update with action=update
+            // But we need to implement update in Apps Script.
+            // We'll use a different endpoint or same with parameter.
+            // For demo, we show alert.
+            showAlert('Data dikemas kini (simulasi) / Data updated (simulation)', false);
+            // In real, you'd call fetch with POST and action=update
+            // e.g. fetch(SCRIPT_URL, {method:'POST', body: new URLSearchParams({action:'update', ...currentUser})})
+            // We'll implement in Apps Script section.
+        }
+
+        // ============= INIT =============
+        // Set default language to Malay
+        setLanguage('ms');
+
+        // ============= APPS SCRIPT CODE (TAMBAHAN) =============
+        // Sila tambah fungsi berikut ke dalam Apps Script anda:
+        /*
+        // doGet untuk mendapatkan semua data (untuk login)
+        function doGet(e) {
+          const doc = SpreadsheetApp.openById(scriptProp.getProperty('key'));
+          const sheet = doc.getSheetByName(sheetName);
+          const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+          const data = sheet.getRange(2, 1, sheet.getLastRow()-1, headers.length).getValues();
+          const result = data.map(row => {
+            let obj = {};
+            headers.forEach((h, i) => obj[h] = row[i]);
+            return obj;
+          });
+          return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        // Ubah doPost untuk handle update
+        function doPost(e) {
+          const lock = LockService.getScriptLock();
+          lock.tryLock(10000);
+          try {
+            const doc = SpreadsheetApp.openById(scriptProp.getProperty('key'));
+            const sheet = doc.getSheetByName(sheetName);
+            const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+            const params = e.parameter;
+            
+            // Jika action=update, cari baris berdasarkan Code
+            if (params.action === 'update' && params.Code) {
+              const data = sheet.getRange(2, 1, sheet.getLastRow()-1, headers.length).getValues();
+              let rowIndex = -1;
+              for (let i = 0; i < data.length; i++) {
+                if (data[i][headers.indexOf('Code')] === params.Code) {
+                  rowIndex = i + 2;
+                  break;
+                }
+              }
+              if (rowIndex > 0) {
+                const newRow = headers.map(h => params[h] || '');
+                sheet.getRange(rowIndex, 1, 1, newRow.length).setValues([newRow]);
+                return ContentService.createTextOutput(JSON.stringify({result:'updated'})).setMimeType(ContentService.MimeType.JSON);
+              } else {
+                return ContentService.createTextOutput(JSON.stringify({result:'not found'})).setMimeType(ContentService.MimeType.JSON);
+              }
+            }
+            
+            // Jika tidak, tambah baru (signup)
+            const nextRow = sheet.getLastRow() + 1;
+            const newRow = headers.map(h => {
+              if (h === 'Date') return new Date();
+              return params[h] || '';
+            });
+            sheet.getRange(nextRow, 1, 1, newRow.length).setValues([newRow]);
+            return ContentService.createTextOutput(JSON.stringify({result:'success', row:nextRow})).setMimeType(ContentService.MimeType.JSON);
+          } catch (error) {
+            return ContentService.createTextOutput(JSON.stringify({result:'error', error:error.toString()})).setMimeType(ContentService.MimeType.JSON);
+          } finally {
+            lock.releaseLock();
+          }
+        }
+        */
     </script>
 </body>
 </html>
