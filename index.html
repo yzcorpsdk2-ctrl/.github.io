@@ -2,37 +2,64 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Sistem Pengurusan Staf</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f0f4f8;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             justify-content: center;
             min-height: 100vh;
         }
         .container {
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            padding: 20px 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-        h1, h2 { text-align: center; color: #1a3a5c; margin-bottom: 16px; }
+        h1, h2 { text-align: center; color: #1a3a5c; margin-bottom: 16px; font-size: 24px; }
+        h2 { font-size: 20px; }
+        
+        /* Language Bar */
+        .lang-bar {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            padding: 6px 16px;
+            border: 2px solid #1a3a5c;
+            background: transparent;
+            color: #1a3a5c;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+        .lang-btn.active, .lang-btn:hover {
+            background: #1a3a5c;
+            color: white;
+        }
+
+        /* Buttons */
         .btn {
             width: 100%;
             padding: 12px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .btn-primary { background: #1a3a5c; color: white; }
         .btn-primary:hover { background: #0f2a44; }
@@ -40,14 +67,25 @@
         .btn-secondary:hover { background: #b8834f; }
         .btn-danger { background: #c53030; color: white; }
         .btn-danger:hover { background: #9b2c2c; }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-success { background: #38a169; color: white; }
         .btn-success:hover { background: #2f855a; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-gray { background: #e2e8f0; color: #4a5568; }
+        .btn-gray:hover { background: #cbd5e0; }
+
+        .auth-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .auth-section .btn { margin-bottom: 0; }
+
+        /* Form */
         .form-group { margin-bottom: 12px; }
         .form-group label {
             display: block;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             color: #2d3748;
             margin-bottom: 4px;
         }
@@ -55,17 +93,24 @@
             width: 100%;
             padding: 10px 12px;
             border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fafcfd;
         }
         .form-group input:focus, .form-group select:focus {
             border-color: #1a3a5c;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
+        }
+        .form-group input:read-only {
+            background: #f7fafc;
         }
         .hidden { display: none !important; }
+
+        /* Alert */
         .alert {
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-bottom: 16px;
             display: none;
             font-weight: 500;
@@ -73,34 +118,12 @@
         .alert.error { background: #fed7d7; color: #9b2c2c; display: block; }
         .alert.success { background: #c6f6d5; color: #22543d; display: block; }
         .alert.info { background: #bee3f8; color: #2a4365; display: block; }
-        .auth-section { display: flex; gap: 10px; margin-bottom: 20px; }
-        .auth-section .btn { margin-bottom: 0; }
-        .field-required::after { content: " *"; color: #e53e3e; }
-        .profile-field { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 8px 0;
-            border-bottom: 1px solid #e2e8f0;
-            align-items: center;
-        }
-        .profile-field label { font-weight: 600; color: #4a5568; font-size: 14px; flex: 0 0 100px; }
-        .profile-field input {
-            border: none;
-            text-align: right;
-            font-size: 14px;
-            background: transparent;
-            flex: 1;
-            padding: 4px 8px;
-        }
-        .profile-field input:focus {
-            outline: 2px solid #1a3a5c;
-            background: white;
-            border-radius: 4px;
-        }
+
+        /* Status Bar */
         .status-bar {
             background: #edf2f7;
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 13px;
             color: #4a5568;
             margin-bottom: 16px;
@@ -108,144 +131,679 @@
         }
         .status-bar.success { background: #c6f6d5; color: #22543d; }
         .status-bar.error { background: #fed7d7; color: #9b2c2c; }
+
+        /* Profile */
+        .profile-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .profile-field label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 13px;
+            flex: 0 0 120px;
+        }
+        .profile-field input {
+            border: none;
+            text-align: right;
+            font-size: 14px;
+            background: transparent;
+            flex: 1;
+            padding: 4px 8px;
+            min-width: 100px;
+        }
+        .profile-field input:focus {
+            outline: 2px solid #1a3a5c;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .required-star { color: #e53e3e; }
+        .field-required::after { content: " *"; color: #e53e3e; }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a3a5c;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .other-input {
+            margin-top: 6px;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 16px 12px; }
+            .profile-field label { flex: 0 0 90px; font-size: 12px; }
+            .profile-field input { font-size: 13px; }
+            .lang-btn { font-size: 12px; padding: 4px 12px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>👤 Staff System</h1>
-        
-        <!-- 状态栏 -->
-        <div id="statusBar" class="status-bar">🔌 Checking connection...</div>
+        <h1 id="mainTitle">👤 Sistem Pengurusan Staf</h1>
 
-        <!-- 按钮区域 -->
-        <div class="auth-section" id="authSection">
-            <button class="btn btn-primary" onclick="showSignup()">📝 Register</button>
-            <button class="btn btn-secondary" onclick="showLogin()">🔑 Login</button>
+        <!-- Language Bar -->
+        <div class="lang-bar">
+            <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
+            <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
+            <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
         </div>
 
-        <!-- 提示框 -->
+        <!-- Status Bar -->
+        <div id="statusBar" class="status-bar">🔌 Menyambung...</div>
+
+        <!-- Auth Section -->
+        <div class="auth-section" id="authSection">
+            <button class="btn btn-primary" id="signupBtn" onclick="showSignup()">📝 Daftar</button>
+            <button class="btn btn-secondary" id="loginBtn" onclick="showLogin()">🔑 Log Masuk</button>
+        </div>
+
+        <!-- Alert -->
         <div id="alert" class="alert"></div>
 
-        <!-- ========== 注册表单 ========== -->
+        <!-- ========== REGISTER FORM ========== -->
         <div id="signupForm" class="hidden">
-            <h2>📋 Register Staff</h2>
+            <h2 id="signupTitle">📋 Daftar Staf Baru</h2>
             <form id="registerForm">
+                <!-- Group Name -->
                 <div class="form-group">
-                    <label class="field-required">Code</label>
-                    <input type="text" id="sCode" placeholder="e.g. 0001" required>
-                </div>
-                <div class="form-group">
-                    <label class="field-required">Name</label>
-                    <input type="text" id="sName" placeholder="Full Name" required>
-                </div>
-                <div class="form-group">
-                    <label class="field-required">Password</label>
-                    <input type="password" id="sPassword" placeholder="Password" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input type="tel" id="sPhone" placeholder="012-3456789">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="sEmail" placeholder="email@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Group</label>
-                    <select id="sGroup">
-                        <option value="">Select</option>
-                        <option value="SIANG SIANG BANDAR">SIANG SIANG BANDAR</option>
-                        <option value="SIANG SIANG BATU 4">SIANG SIANG BATU 4</option>
+                    <label class="field-required" id="lblGroupName">Group Name</label>
+                    <select id="sGroupName" required onchange="handleGroupChange()">
+                        <option value="">-- Sila Pilih --</option>
+                        <option value="SIANG SIANG RESTAURANT(BANDAR)">SIANG SIANG RESTAURANT (BANDAR)</option>
+                        <option value="SIANG SIANG RESTAURANT(BATU 4)">SIANG SIANG RESTAURANT (BATU 4)</option>
                         <option value="YZ UFO">YZ UFO</option>
-                        <option value="Others">Others</option>
+                        <option value="YZ CYBER CAFE(BANDAR)">YZ CYBER CAFE (BANDAR)</option>
+                        <option value="YZ CYBER CAFE(SEJATI)">YZ CYBER CAFE (SEJATI)</option>
+                        <option value="CC TELESHOP (KIMFUNG)">CC TELESHOP (KIMFUNG)</option>
+                        <option value="CC TELESHOP (MESRA)">CC TELESHOP (MESRA)</option>
+                        <option value="Others">Others (Lain-lain)</option>
+                    </select>
+                    <div id="otherGroupContainer" class="hidden other-input">
+                        <input type="text" id="OtherGroupInput" placeholder="Sila nyatakan kumpulan lain">
+                    </div>
+                </div>
+
+                <!-- Code -->
+                <div class="form-group">
+                    <label class="field-required" id="lblCode">Code</label>
+                    <input type="text" id="sCode" placeholder="Kod Unik" required>
+                </div>
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label class="field-required" id="lblName">Name</label>
+                    <input type="text" id="sName" placeholder="Nama Penuh" required>
+                </div>
+
+                <!-- Jantina -->
+                <div class="form-group">
+                    <label class="field-required" id="lblJantina">Jantina</label>
+                    <select id="sJantina" required>
+                        <option value="">-- Sila Pilih --</option>
+                        <option value="Lelaki">Lelaki</option>
+                        <option value="Perempuan">Perempuan</option>
                     </select>
                 </div>
+
+                <!-- Tarikh Lahir -->
                 <div class="form-group">
-                    <label>Shift</label>
-                    <select id="sShift">
-                        <option value="">Select</option>
+                    <label class="field-required" id="lblTarikhLahir">Tarikh Lahir</label>
+                    <input type="date" id="sTarikhLahir" required>
+                </div>
+
+                <!-- Salary -->
+                <div class="form-group">
+                    <label class="field-required" id="lblSalary">Salary</label>
+                    <input type="number" id="sSalary" placeholder="Gaji" required>
+                </div>
+
+                <!-- IC -->
+                <div class="form-group">
+                    <label class="field-required" id="lblIC">IC/Passport/Doc.No</label>
+                    <input type="text" id="sIC" placeholder="No. KP/Passport" required>
+                </div>
+
+                <!-- Jawatan -->
+                <div class="form-group">
+                    <label class="field-required" id="lblJawatan">Jawatan</label>
+                    <input type="text" id="sJawatan" placeholder="Jawatan" required>
+                </div>
+
+                <!-- Tarikh Masuk Kerja -->
+                <div class="form-group">
+                    <label class="field-required" id="lblTarikhMasuk">Tarikh Masuk Kerja</label>
+                    <input type="date" id="sTarikhMasukKerja" required>
+                </div>
+
+                <!-- Telefon -->
+                <div class="form-group">
+                    <label class="field-required" id="lblTelefon">Telefon No.</label>
+                    <input type="tel" id="sTelefonNo" placeholder="012-3456789" required>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label id="lblEmail">Email</label>
+                    <input type="email" id="sEmail" placeholder="email@contoh.com">
+                </div>
+
+                <!-- Shift Type -->
+                <div class="form-group">
+                    <label class="field-required" id="lblShiftType">Shift Type</label>
+                    <select id="sShiftType" required onchange="handleShiftChange()">
+                        <option value="">-- Sila Pilih --</option>
                         <option value="6AM-2.30PM">6AM - 2.30PM</option>
                         <option value="8AM-4.30PM">8AM - 4.30PM</option>
                         <option value="2PM-10.30PM">2PM - 10.30PM</option>
                         <option value="3.30PM-11.00PM">3.30PM - 11.00PM</option>
+                        <option value="Others">Others (Lain-lain)</option>
+                    </select>
+                    <div id="otherShiftContainer" class="hidden other-input">
+                        <input type="text" id="OtherShiftInput" placeholder="Contoh: 9AM-5PM">
+                    </div>
+                </div>
+
+                <!-- Off Day -->
+                <div class="form-group">
+                    <label class="field-required" id="lblOffDay">Off Day</label>
+                    <select id="sOffDay" required>
+                        <option value="">-- Sila Pilih --</option>
+                        <option value="Isnin">Isnin (Monday)</option>
+                        <option value="Selasa">Selasa (Tuesday)</option>
+                        <option value="Rabu">Rabu (Wednesday)</option>
+                        <option value="Khamis">Khamis (Thursday)</option>
+                        <option value="Jumaat">Jumaat (Friday)</option>
+                        <option value="Sabtu">Sabtu (Saturday)</option>
+                        <option value="Ahad">Ahad (Sunday)</option>
                     </select>
                 </div>
+
+                <!-- Alamat Tetap -->
                 <div class="form-group">
-                    <label>Off Day</label>
-                    <select id="sOffDay">
-                        <option value="">Select</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                    </select>
+                    <label class="field-required" id="lblAlamatTetap">Alamat Tetap</label>
+                    <input type="text" id="sAlamatTetap" placeholder="Alamat Rumah" required>
                 </div>
+
+                <!-- Nama Waris -->
                 <div class="form-group">
-                    <label>Bank</label>
-                    <select id="sBank">
-                        <option value="">Select</option>
-                        <option value="MAYBANK">MAYBANK</option>
-                        <option value="CIMB">CIMB</option>
+                    <label id="lblNamaWaris">Nama Waris</label>
+                    <input type="text" id="sNamaWaris" placeholder="Nama Waris">
+                </div>
+
+                <!-- Alamat Waris -->
+                <div class="form-group">
+                    <label id="lblAlamatWaris">Alamat Waris</label>
+                    <input type="text" id="sAlamatWaris" placeholder="Alamat Waris">
+                </div>
+
+                <!-- Bank Nama -->
+                <div class="form-group">
+                    <label class="field-required" id="lblBankNama">Bank Nama</label>
+                    <select id="sBankNama" required onchange="handleBankChange()">
+                        <option value="">-- Pilih Bank --</option>
+                        <option value="AGRO BANK">AGRO BANK</option>
+                        <option value="AMBANK">AMBANK</option>
+                        <option value="BANK ISLAM">BANK ISLAM</option>
+                        <option value="BANK MUAMALAT">BANK MUAMALAT</option>
                         <option value="BSN">BSN</option>
                         <option value="CASH">CASH</option>
-                        <option value="Others">Others</option>
+                        <option value="CIMB BAMK">CIMB BAMK</option>
+                        <option value="HONG LEONG BANK">HONG LEONG BANK</option>
+                        <option value="MAYBANK">MAYBANK</option>
+                        <option value="MECHANTRADE">MECHANTRADE</option>
+                        <option value="PUBLIC BANK(PBB)">PUBLIC BANK (PBB)</option>
+                        <option value="RHB BANK">RHB BANK</option>
+                        <option value="Others">Others (Lain-lain)</option>
+                    </select>
+                    <div id="otherBankContainer" class="hidden other-input">
+                        <input type="text" id="OtherBankInput" placeholder="Sila nyatakan bank lain">
+                    </div>
+                </div>
+
+                <!-- Bank Account No -->
+                <div class="form-group">
+                    <label class="field-required" id="lblBankAccount">Bank Account No.</label>
+                    <input type="text" id="sBankAccountNo" placeholder="No. Akaun" required>
+                </div>
+
+                <!-- EPF -->
+                <div class="form-group">
+                    <label class="field-required" id="lblEPF">EPF (kwsp) No.</label>
+                    <input type="text" id="sEPF" placeholder="No. KWSP" required>
+                </div>
+
+                <!-- PERKESO -->
+                <div class="form-group">
+                    <label class="field-required" id="lblPERKESO">PERKESO NO.</label>
+                    <input type="text" id="sPERKESO" placeholder="No. PERKESO" required>
+                </div>
+
+                <!-- EIS -->
+                <div class="form-group">
+                    <label class="field-required" id="lblEIS">EIS NO.</label>
+                    <input type="text" id="sEIS" placeholder="No. EIS" required>
+                </div>
+
+                <!-- 24Jam Lindungan -->
+                <div class="form-group">
+                    <label class="field-required" id="lblLindungan">24Jam Lindungan</label>
+                    <select id="sLindungan" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
                     </select>
                 </div>
+
+                <!-- Yellow Card -->
                 <div class="form-group">
-                    <label>Account No.</label>
-                    <input type="text" id="sAccount" placeholder="Bank Account Number">
+                    <label class="field-required" id="lblYellowCard">Kad Kebersihan (Yellow Card)</label>
+                    <select id="sYellowCard" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                    </select>
                 </div>
+
+                <!-- Login Password -->
                 <div class="form-group">
-                    <label>EPF No.</label>
-                    <input type="text" id="sEPF" placeholder="EPF Number">
+                    <label class="field-required" id="lblLoginPassword">Login Password</label>
+                    <input type="password" id="sLoginPassword" placeholder="Kata Laluan" required>
                 </div>
-                <div class="form-group">
-                    <label>PERKESO No.</label>
-                    <input type="text" id="sPERKESO" placeholder="PERKESO Number">
-                </div>
-                <div class="form-group">
-                    <label>EIS No.</label>
-                    <input type="text" id="sEIS" placeholder="EIS Number">
-                </div>
-                <button type="submit" class="btn btn-success" id="signupBtn">📤 Register</button>
-                <button type="button" class="btn" onclick="goBack()" style="background:#e2e8f0;">← Back</button>
+
+                <!-- Phone Type (hidden - auto detected) -->
+                <input type="hidden" id="sPhoneType" value="">
+
+                <button type="submit" class="btn btn-success" id="signupSubmitBtn">📤 Daftar</button>
+                <button type="button" class="btn btn-gray" onclick="goBack()">← Kembali</button>
             </form>
         </div>
 
-        <!-- ========== 登录表单 ========== -->
+        <!-- ========== LOGIN FORM ========== -->
         <div id="loginForm" class="hidden">
-            <h2>🔐 Login</h2>
+            <h2 id="loginTitle">🔐 Log Masuk</h2>
             <div class="form-group">
-                <label class="field-required">Code</label>
-                <input type="text" id="lCode" placeholder="Enter your Code">
+                <label class="field-required" id="lblLoginCode">Code</label>
+                <input type="text" id="lCode" placeholder="Masukkan Code">
             </div>
             <div class="form-group">
-                <label class="field-required">Password</label>
-                <input type="password" id="lPassword" placeholder="Enter your Password">
+                <label class="field-required" id="lblLoginPassword2">Password</label>
+                <input type="password" id="lPassword" placeholder="Kata Laluan">
             </div>
-            <button class="btn btn-primary" id="loginBtn" onclick="performLogin()">🔓 Login</button>
-            <button type="button" class="btn" onclick="goBack()" style="background:#e2e8f0;">← Back</button>
+            <button class="btn btn-primary" id="loginSubmitBtn" onclick="performLogin()">🔓 Log Masuk</button>
+            <button type="button" class="btn btn-gray" onclick="goBack()">← Kembali</button>
             <div id="loginResult" style="margin-top:12px; text-align:center; font-weight:600;"></div>
         </div>
 
-        <!-- ========== 个人资料 ========== -->
+        <!-- ========== PROFILE ========== -->
         <div id="profileView" class="hidden">
-            <h2>👤 Profile</h2>
+            <h2 id="profileTitle">👤 Profil Staf</h2>
+            <div style="text-align:center; font-size:13px; color:#718096; margin-bottom:12px;">
+                ✏️ Klik pada mana-mana medan untuk sunting
+            </div>
             <div id="profileFields"></div>
-            <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+            <button class="btn btn-danger" onclick="logout()">🚪 Log Keluar</button>
         </div>
     </div>
 
     <script>
         // ============= CONFIG =============
-        // ⚠️ 重要：替换成您的 Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn0Yb7XLio68sW0Y_4-FO6EmYJJBaaqP8t_76M3zslDXXcl6SzJF1ULQ8rO6xVDlagtg/exec';
+        // ⚠️ 替换为您的 Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
 
         let currentUser = null;
         let isConnected = false;
+        let currentLanguage = 'ms';
+
+        // ============= TRANSLATIONS =============
+        const translations = {
+            ms: {
+                title: '👤 Sistem Pengurusan Staf',
+                signup: '📝 Daftar',
+                login: '🔑 Log Masuk',
+                signupTitle: '📋 Daftar Staf Baru',
+                loginTitle: '🔐 Log Masuk',
+                profileTitle: '👤 Profil Staf',
+                logout: '🚪 Log Keluar',
+                register: '📤 Daftar',
+                loginBtn: '🔓 Log Masuk',
+                back: '← Kembali',
+                // Labels
+                lblGroupName: 'Group Name',
+                lblCode: 'Code',
+                lblName: 'Name',
+                lblJantina: 'Jantina',
+                lblTarikhLahir: 'Tarikh Lahir',
+                lblSalary: 'Salary',
+                lblIC: 'IC/Passport/Doc.No',
+                lblJawatan: 'Jawatan',
+                lblTarikhMasuk: 'Tarikh Masuk Kerja',
+                lblTelefon: 'Telefon No.',
+                lblEmail: 'Email',
+                lblShiftType: 'Shift Type',
+                lblOffDay: 'Off Day',
+                lblAlamatTetap: 'Alamat Tetap',
+                lblNamaWaris: 'Nama Waris',
+                lblAlamatWaris: 'Alamat Waris',
+                lblBankNama: 'Bank Nama',
+                lblBankAccount: 'Bank Account No.',
+                lblEPF: 'EPF (kwsp) No.',
+                lblPERKESO: 'PERKESO NO.',
+                lblEIS: 'EIS NO.',
+                lblLindungan: '24Jam Lindungan',
+                lblYellowCard: 'Kad Kebersihan (Yellow Card)',
+                lblLoginPassword: 'Login Password',
+                lblLoginCode: 'Code',
+                lblLoginPassword2: 'Password',
+                // Messages
+                required: 'Sila isi semua medan yang wajib.',
+                loginSuccess: 'Log masuk berjaya!',
+                loginFail: 'Code atau Password salah.',
+                saveSuccess: 'Data berjaya disimpan.',
+                saveFail: 'Ralat menyimpan data.',
+                confirmLogout: 'Anda pasti mahu log keluar?',
+                noData: 'Tiada data. Sila daftar terlebih dahulu.',
+                networkError: 'Ralat rangkaian. Pastikan Apps Script sudah dideploy.',
+                registering: 'Mendaftar...',
+                loggingIn: 'Log masuk...',
+                saving: 'Menyimpan...',
+                selectOption: '-- Sila Pilih --',
+                selectBank: '-- Pilih Bank --',
+                selectGroup: '-- Sila Pilih --',
+                selectGender: '-- Sila Pilih --',
+                selectShift: '-- Sila Pilih --',
+                selectOffDay: '-- Sila Pilih --',
+                selectYesNo: '-- Pilih --',
+                otherGroup: 'Others (Lain-lain)',
+                otherBank: 'Others (Lain-lain)',
+                otherShift: 'Others (Lain-lain)',
+                pleaseSpecify: 'Sila nyatakan',
+                bankOthers: 'Sila nyatakan bank lain',
+                groupOthers: 'Sila nyatakan kumpulan lain',
+                shiftOthers: 'Contoh: 9AM-5PM',
+                yes: 'YES',
+                no: 'NO',
+                male: 'Lelaki',
+                female: 'Perempuan',
+                // Days
+                monday: 'Isnin (Monday)',
+                tuesday: 'Selasa (Tuesday)',
+                wednesday: 'Rabu (Wednesday)',
+                thursday: 'Khamis (Thursday)',
+                friday: 'Jumaat (Friday)',
+                saturday: 'Sabtu (Saturday)',
+                sunday: 'Ahad (Sunday)',
+            },
+            en: {
+                title: '👤 Staff Management System',
+                signup: '📝 Sign Up',
+                login: '🔑 Login',
+                signupTitle: '📋 New Staff Registration',
+                loginTitle: '🔐 Login',
+                profileTitle: '👤 Staff Profile',
+                logout: '🚪 Logout',
+                register: '📤 Register',
+                loginBtn: '🔓 Login',
+                back: '← Back',
+                lblGroupName: 'Group Name',
+                lblCode: 'Code',
+                lblName: 'Name',
+                lblJantina: 'Gender',
+                lblTarikhLahir: 'Date of Birth',
+                lblSalary: 'Salary',
+                lblIC: 'IC/Passport/Doc.No',
+                lblJawatan: 'Position',
+                lblTarikhMasuk: 'Start Date',
+                lblTelefon: 'Phone No.',
+                lblEmail: 'Email',
+                lblShiftType: 'Shift Type',
+                lblOffDay: 'Off Day',
+                lblAlamatTetap: 'Permanent Address',
+                lblNamaWaris: 'Next of Kin',
+                lblAlamatWaris: 'Next of Kin Address',
+                lblBankNama: 'Bank Name',
+                lblBankAccount: 'Bank Account No.',
+                lblEPF: 'EPF (kwsp) No.',
+                lblPERKESO: 'PERKESO NO.',
+                lblEIS: 'EIS NO.',
+                lblLindungan: '24Jam Lindungan',
+                lblYellowCard: 'Kad Kebersihan (Yellow Card)',
+                lblLoginPassword: 'Login Password',
+                lblLoginCode: 'Code',
+                lblLoginPassword2: 'Password',
+                required: 'Please fill in all required fields.',
+                loginSuccess: 'Login successful!',
+                loginFail: 'Incorrect Code or Password.',
+                saveSuccess: 'Data saved successfully.',
+                saveFail: 'Error saving data.',
+                confirmLogout: 'Are you sure you want to logout?',
+                noData: 'No data. Please register first.',
+                networkError: 'Network error. Make sure Apps Script is deployed.',
+                registering: 'Registering...',
+                loggingIn: 'Logging in...',
+                saving: 'Saving...',
+                selectOption: '-- Select --',
+                selectBank: '-- Select Bank --',
+                selectGroup: '-- Select --',
+                selectGender: '-- Select --',
+                selectShift: '-- Select --',
+                selectOffDay: '-- Select --',
+                selectYesNo: '-- Select --',
+                otherGroup: 'Others',
+                otherBank: 'Others',
+                otherShift: 'Others',
+                pleaseSpecify: 'Please specify',
+                bankOthers: 'Please specify other bank',
+                groupOthers: 'Please specify other group',
+                shiftOthers: 'Example: 9AM-5PM',
+                yes: 'YES',
+                no: 'NO',
+                male: 'Male',
+                female: 'Female',
+                monday: 'Monday',
+                tuesday: 'Tuesday',
+                wednesday: 'Wednesday',
+                thursday: 'Thursday',
+                friday: 'Friday',
+                saturday: 'Saturday',
+                sunday: 'Sunday',
+            },
+            zh: {
+                title: '👤 员工管理系统',
+                signup: '📝 注册',
+                login: '🔑 登录',
+                signupTitle: '📋 新员工注册',
+                loginTitle: '🔐 登录',
+                profileTitle: '👤 员工资料',
+                logout: '🚪 退出登录',
+                register: '📤 注册',
+                loginBtn: '🔓 登录',
+                back: '← 返回',
+                lblGroupName: '组名',
+                lblCode: '代码',
+                lblName: '姓名',
+                lblJantina: '性别',
+                lblTarikhLahir: '出生日期',
+                lblSalary: '薪资',
+                lblIC: '身份证/护照/证件号',
+                lblJawatan: '职位',
+                lblTarikhMasuk: '入职日期',
+                lblTelefon: '电话号码',
+                lblEmail: '电子邮件',
+                lblShiftType: '班次类型',
+                lblOffDay: '休息日',
+                lblAlamatTetap: '固定地址',
+                lblNamaWaris: '紧急联系人',
+                lblAlamatWaris: '紧急联系人地址',
+                lblBankNama: '银行名称',
+                lblBankAccount: '银行账号',
+                lblEPF: 'EPF (kwsp) 号码',
+                lblPERKESO: 'PERKESO 号码',
+                lblEIS: 'EIS 号码',
+                lblLindungan: '24小时保障',
+                lblYellowCard: '卫生卡 (黄卡)',
+                lblLoginPassword: '登录密码',
+                lblLoginCode: '代码',
+                lblLoginPassword2: '密码',
+                required: '请填写所有必填字段。',
+                loginSuccess: '登录成功！',
+                loginFail: '代码或密码错误。',
+                saveSuccess: '数据保存成功。',
+                saveFail: '保存数据出错。',
+                confirmLogout: '您确定要退出登录吗？',
+                noData: '暂无数据，请先注册。',
+                networkError: '网络错误，请确保 Apps Script 已部署。',
+                registering: '注册中...',
+                loggingIn: '登录中...',
+                saving: '保存中...',
+                selectOption: '-- 请选择 --',
+                selectBank: '-- 选择银行 --',
+                selectGroup: '-- 请选择 --',
+                selectGender: '-- 请选择 --',
+                selectShift: '-- 请选择 --',
+                selectOffDay: '-- 请选择 --',
+                selectYesNo: '-- 请选择 --',
+                otherGroup: '其他',
+                otherBank: '其他',
+                otherShift: '其他',
+                pleaseSpecify: '请注明',
+                bankOthers: '请注明其他银行',
+                groupOthers: '请注明其他组别',
+                shiftOthers: '例如：9AM-5PM',
+                yes: '是',
+                no: '否',
+                male: '男',
+                female: '女',
+                monday: '星期一',
+                tuesday: '星期二',
+                wednesday: '星期三',
+                thursday: '星期四',
+                friday: '星期五',
+                saturday: '星期六',
+                sunday: '星期日',
+            }
+        };
+
+        function t(key) {
+            return translations[currentLanguage]?.[key] || key;
+        }
+
+        // ============= LANGUAGE =============
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.lang === lang);
+            });
+            updateAllTexts();
+        }
+
+        function updateAllTexts() {
+            document.getElementById('mainTitle').textContent = t('title');
+            document.getElementById('signupBtn').textContent = t('signup');
+            document.getElementById('loginBtn').textContent = t('login');
+            document.getElementById('signupTitle').textContent = t('signupTitle');
+            document.getElementById('loginTitle').textContent = t('loginTitle');
+            document.getElementById('profileTitle').textContent = t('profileTitle');
+            document.getElementById('signupSubmitBtn').textContent = t('register');
+            document.getElementById('loginSubmitBtn').textContent = t('loginBtn');
+
+            const labelMap = {
+                'lblGroupName': 'GroupName',
+                'lblCode': 'Code',
+                'lblName': 'Name',
+                'lblJantina': 'Jantina',
+                'lblTarikhLahir': 'TarikhLahir',
+                'lblSalary': 'Salary',
+                'lblIC': 'IC',
+                'lblJawatan': 'Jawatan',
+                'lblTarikhMasuk': 'TarikhMasuk',
+                'lblTelefon': 'Telefon',
+                'lblEmail': 'Email',
+                'lblShiftType': 'ShiftType',
+                'lblOffDay': 'OffDay',
+                'lblAlamatTetap': 'AlamatTetap',
+                'lblNamaWaris': 'NamaWaris',
+                'lblAlamatWaris': 'AlamatWaris',
+                'lblBankNama': 'BankNama',
+                'lblBankAccount': 'BankAccount',
+                'lblEPF': 'EPF',
+                'lblPERKESO': 'PERKESO',
+                'lblEIS': 'EIS',
+                'lblLindungan': 'Lindungan',
+                'lblYellowCard': 'YellowCard',
+                'lblLoginPassword': 'LoginPassword',
+                'lblLoginCode': 'loginCode',
+                'lblLoginPassword2': 'loginPassword'
+            };
+            for (let [id, key] of Object.entries(labelMap)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    const label = t(key);
+                    el.textContent = label + (el.classList.contains('field-required') ? ' *' : '');
+                }
+            }
+            // Update select placeholders
+            updateSelectPlaceholders();
+        }
+
+        function updateSelectPlaceholders() {
+            const selects = [
+                { id: 'sGroupName', text: t('selectGroup') },
+                { id: 'sJantina', text: t('selectGender') },
+                { id: 'sShiftType', text: t('selectShift') },
+                { id: 'sOffDay', text: t('selectOffDay') },
+                { id: 'sBankNama', text: t('selectBank') },
+                { id: 'sLindungan', text: t('selectYesNo') },
+                { id: 'sYellowCard', text: t('selectYesNo') }
+            ];
+            selects.forEach(({id, text}) => {
+                const el = document.getElementById(id);
+                if (el && el.options.length > 0) {
+                    el.options[0].text = text;
+                }
+            });
+            // Update option texts
+            const groupSel = document.getElementById('sGroupName');
+            if (groupSel) {
+                const opt = groupSel.querySelector('option[value="Others"]');
+                if (opt) opt.text = t('otherGroup');
+            }
+            const bankSel = document.getElementById('sBankNama');
+            if (bankSel) {
+                const opt = bankSel.querySelector('option[value="Others"]');
+                if (opt) opt.text = t('otherBank');
+            }
+            const shiftSel = document.getElementById('sShiftType');
+            if (shiftSel) {
+                const opt = shiftSel.querySelector('option[value="Others"]');
+                if (opt) opt.text = t('otherShift');
+            }
+            // Update placeholders
+            const placeholders = [
+                { id: 'OtherGroupInput', text: t('groupOthers') },
+                { id: 'OtherBankInput', text: t('bankOthers') },
+                { id: 'OtherShiftInput', text: t('shiftOthers') }
+            ];
+            placeholders.forEach(({id, text}) => {
+                const el = document.getElementById(id);
+                if (el) el.placeholder = text;
+            });
+        }
 
         // ============= UI FUNCTIONS =============
         function showAlert(msg, type = 'error') {
@@ -266,6 +824,8 @@
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('profileView').classList.add('hidden');
             document.getElementById('authSection').classList.add('hidden');
+            // Auto detect phone type
+            detectPhoneType();
         }
 
         function showLogin() {
@@ -283,7 +843,7 @@
         }
 
         function logout() {
-            if (!confirm('Are you sure you want to logout?')) return;
+            if (!confirm(t('confirmLogout'))) return;
             currentUser = null;
             goBack();
         }
@@ -292,33 +852,106 @@
             const btn = document.getElementById(btnId);
             if (isLoading) {
                 btn.disabled = true;
-                btn.textContent = '⏳ ' + text;
+                btn.innerHTML = `<span class="loading-spinner"></span>${text}`;
             } else {
                 btn.disabled = false;
-                btn.textContent = btn.dataset.originalText || 'Submit';
+                btn.innerHTML = btn.dataset.originalText || btn.textContent;
+            }
+        }
+
+        // ============= PHONE TYPE DETECTION =============
+        function detectPhoneType() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            let device = 'Unknown';
+            
+            if (/android/i.test(userAgent)) {
+                device = 'Android';
+            } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                device = 'iOS';
+            } else if (/Windows Phone/i.test(userAgent)) {
+                device = 'Windows Phone';
+            } else if (/Macintosh|Mac OS X/i.test(userAgent)) {
+                device = 'Mac';
+            } else if (/Windows/i.test(userAgent)) {
+                device = 'Windows';
+            } else if (/Linux/i.test(userAgent)) {
+                device = 'Linux';
+            }
+            
+            // Get more details if possible
+            if (navigator.userAgentData && navigator.userAgentData.platform) {
+                device = navigator.userAgentData.platform;
+            }
+            
+            document.getElementById('sPhoneType').value = device;
+            console.log('📱 Phone Type detected:', device);
+        }
+
+        // ============= GROUP HANDLING =============
+        function handleGroupChange() {
+            const sel = document.getElementById('sGroupName');
+            const container = document.getElementById('otherGroupContainer');
+            if (sel.value === 'Others') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('OtherGroupInput').value = '';
+            }
+        }
+
+        // ============= SHIFT HANDLING =============
+        function handleShiftChange() {
+            const sel = document.getElementById('sShiftType');
+            const container = document.getElementById('otherShiftContainer');
+            if (sel.value === 'Others') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('OtherShiftInput').value = '';
+            }
+        }
+
+        // ============= BANK HANDLING =============
+        function handleBankChange() {
+            const bank = document.getElementById('sBankNama').value;
+            const otherContainer = document.getElementById('otherBankContainer');
+            const accInput = document.getElementById('sBankAccountNo');
+            
+            if (bank === 'CASH' || bank === 'MECHANTRADE') {
+                accInput.value = '-';
+                accInput.readOnly = true;
+                accInput.required = false;
+            } else {
+                accInput.readOnly = false;
+                accInput.required = true;
+                if (accInput.value === '-') accInput.value = '';
+            }
+            if (bank === 'Others') {
+                otherContainer.classList.remove('hidden');
+            } else {
+                otherContainer.classList.add('hidden');
+                document.getElementById('OtherBankInput').value = '';
             }
         }
 
         // ============= TEST CONNECTION =============
         function testConnection() {
-            updateStatus('🔌 Testing connection...');
+            updateStatus('🔌 Menyambung...');
             
             fetch(SCRIPT_URL + '?action=getData')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
+                if (!response.ok) throw new Error('HTTP ' + response.status);
                 return response.json();
             })
             .then(data => {
                 isConnected = true;
                 const count = data.length || 0;
-                updateStatus('✅ Connected! ' + count + ' records found.', 'success');
+                updateStatus('✅ Bersambung! ' + count + ' rekod ditemui.', 'success');
                 console.log('✅ Connection successful. Data:', data);
             })
             .catch(err => {
                 isConnected = false;
-                updateStatus('❌ Connection failed: ' + err.message + ' - Check URL and deployment', 'error');
+                updateStatus('❌ Sambungan gagal: ' + err.message, 'error');
                 console.error('❌ Connection error:', err);
             });
         }
@@ -327,40 +960,108 @@
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Get values
             const code = document.getElementById('sCode').value.trim();
             const name = document.getElementById('sName').value.trim();
-            const password = document.getElementById('sPassword').value.trim();
+            const password = document.getElementById('sLoginPassword').value.trim();
             
-            if (!code || !name || !password) {
-                showAlert('Please fill in Code, Name and Password!');
+            // Check required fields
+            const requiredIds = [
+                'sGroupName', 'sCode', 'sName', 'sJantina', 'sTarikhLahir',
+                'sSalary', 'sIC', 'sJawatan', 'sTarikhMasukKerja', 'sTelefonNo',
+                'sShiftType', 'sOffDay', 'sAlamatTetap', 'sBankNama',
+                'sBankAccountNo', 'sEPF', 'sPERKESO', 'sEIS', 'sLindungan',
+                'sYellowCard', 'sLoginPassword'
+            ];
+            
+            for (let id of requiredIds) {
+                const el = document.getElementById(id);
+                if (!el || !el.value.trim()) {
+                    showAlert(t('required'));
+                    el.focus();
+                    return;
+                }
+            }
+            
+            // Check if BankAccountNo is required (not CASH or MECHANTRADE)
+            const bank = document.getElementById('sBankNama').value;
+            const accInput = document.getElementById('sBankAccountNo');
+            if (bank !== 'CASH' && bank !== 'MECHANTRADE' && !accInput.value.trim()) {
+                showAlert('Sila masukkan Bank Account No.');
+                accInput.focus();
                 return;
+            }
+            
+            // Group Others
+            let groupVal = document.getElementById('sGroupName').value;
+            if (groupVal === 'Others') {
+                const other = document.getElementById('OtherGroupInput').value.trim();
+                if (!other) {
+                    showAlert('Sila nyatakan kumpulan lain / Please specify other group');
+                    document.getElementById('OtherGroupInput').focus();
+                    return;
+                }
+                groupVal = other;
+            }
+            
+            // Bank Others
+            let bankVal = document.getElementById('sBankNama').value;
+            if (bankVal === 'Others') {
+                const other = document.getElementById('OtherBankInput').value.trim();
+                if (!other) {
+                    showAlert('Sila nyatakan bank lain / Please specify other bank');
+                    document.getElementById('OtherBankInput').focus();
+                    return;
+                }
+                bankVal = other;
+            }
+            
+            // Shift Others
+            let shiftVal = document.getElementById('sShiftType').value;
+            if (shiftVal === 'Others') {
+                const other = document.getElementById('OtherShiftInput').value.trim();
+                if (!other) {
+                    showAlert('Sila nyatakan waktu shift / Please specify shift time');
+                    document.getElementById('OtherShiftInput').focus();
+                    return;
+                }
+                shiftVal = other;
             }
 
-            // 检查连接
-            if (!isConnected) {
-                showAlert('⚠️ Not connected to server. Please refresh and try again.');
-                return;
-            }
+            // Get phone type from hidden field
+            const phoneType = document.getElementById('sPhoneType').value || 'Unknown';
 
             const data = {
+                GroupName: groupVal,
                 Code: code,
                 Name: name,
-                Password: password,
-                Phone: document.getElementById('sPhone').value.trim(),
+                Jantina: document.getElementById('sJantina').value,
+                TarikhLahir: document.getElementById('sTarikhLahir').value,
+                Salary: document.getElementById('sSalary').value.trim(),
+                IC: document.getElementById('sIC').value.trim(),
+                Jawatan: document.getElementById('sJawatan').value.trim(),
+                TarikhMasukKerja: document.getElementById('sTarikhMasukKerja').value,
+                TelefonNo: document.getElementById('sTelefonNo').value.trim(),
                 Email: document.getElementById('sEmail').value.trim(),
-                Group: document.getElementById('sGroup').value,
-                Shift: document.getElementById('sShift').value,
+                ShiftType: shiftVal,
                 OffDay: document.getElementById('sOffDay').value,
-                Bank: document.getElementById('sBank').value,
-                Account: document.getElementById('sAccount').value.trim(),
+                AlamatTetap: document.getElementById('sAlamatTetap').value.trim(),
+                NamaWaris: document.getElementById('sNamaWaris').value.trim(),
+                AlamatWaris: document.getElementById('sAlamatWaris').value.trim(),
+                BankNama: bankVal,
+                BankAccountNo: document.getElementById('sBankAccountNo').value.trim(),
                 EPF: document.getElementById('sEPF').value.trim(),
                 PERKESO: document.getElementById('sPERKESO').value.trim(),
                 EIS: document.getElementById('sEIS').value.trim(),
+                Lindungan: document.getElementById('sLindungan').value,
+                YellowCard: document.getElementById('sYellowCard').value,
+                LoginPassword: password,
+                PhoneType: phoneType,
             };
 
-            const btn = document.getElementById('signupBtn');
-            btn.dataset.originalText = btn.textContent;
-            setLoading('signupBtn', true, 'Registering...');
+            const btn = document.getElementById('signupSubmitBtn');
+            btn.dataset.originalText = btn.innerHTML;
+            setLoading('signupSubmitBtn', true, t('registering'));
 
             console.log('📤 Sending data:', data);
 
@@ -370,28 +1071,29 @@
                 body: new URLSearchParams(data)
             })
             .then(response => {
-                console.log('📥 Response status:', response.status);
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
+                if (!response.ok) throw new Error('HTTP ' + response.status);
                 return response.json();
             })
             .then(result => {
-                setLoading('signupBtn', false);
-                console.log('📥 Response data:', result);
+                setLoading('signupSubmitBtn', false);
+                console.log('📥 Response:', result);
                 
                 if (result.result === 'success') {
-                    showAlert('✅ Registration successful!', 'success');
+                    showAlert('✅ Pendaftaran berjaya!', 'success');
                     document.getElementById('registerForm').reset();
+                    document.getElementById('otherBankContainer').classList.add('hidden');
+                    document.getElementById('otherGroupContainer').classList.add('hidden');
+                    document.getElementById('otherShiftContainer').classList.add('hidden');
+                    document.getElementById('sBankAccountNo').readOnly = false;
                     setTimeout(showLogin, 1500);
                 } else {
-                    showAlert('❌ Error: ' + (result.error || result.message || 'Unknown error'));
+                    showAlert('❌ Ralat: ' + (result.error || result.message || 'Unknown error'));
                 }
             })
             .catch(err => {
-                setLoading('signupBtn', false);
+                setLoading('signupSubmitBtn', false);
                 console.error('❌ Fetch error:', err);
-                showAlert('❌ Network error: ' + err.message + '\nPlease check:\n1. URL is correct\n2. Apps Script is deployed\n3. Permission is set to "Anyone"');
+                showAlert('❌ ' + t('networkError') + ': ' + err.message);
             });
         });
 
@@ -401,54 +1103,46 @@
             const password = document.getElementById('lPassword').value.trim();
 
             if (!code || !password) {
-                showAlert('Please enter Code and Password!');
+                showAlert('Sila masukkan Code dan Password.');
                 return;
             }
 
-            if (!isConnected) {
-                showAlert('⚠️ Not connected to server. Please refresh and try again.');
-                return;
-            }
-
-            const btn = document.getElementById('loginBtn');
-            btn.dataset.originalText = btn.textContent;
-            setLoading('loginBtn', true, 'Logging in...');
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.dataset.originalText = btn.innerHTML;
+            setLoading('loginSubmitBtn', true, t('loggingIn'));
 
             fetch(SCRIPT_URL + '?action=getData')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
+                if (!response.ok) throw new Error('HTTP ' + response.status);
                 return response.json();
             })
             .then(data => {
-                setLoading('loginBtn', false);
+                setLoading('loginSubmitBtn', false);
                 console.log('📥 Login data:', data);
                 
                 if (data.error) {
-                    showAlert('❌ Server error: ' + data.error);
+                    showAlert('❌ ' + data.error);
                     return;
                 }
-
+                
                 if (!data || data.length === 0) {
-                    showAlert('No data found. Please register first.');
+                    showAlert(t('noData'));
                     return;
                 }
-
-                // 查找用户
-                const user = data.find(row => row.Code === code && row.Password === password);
+                
+                const user = data.find(row => row.Code === code && row.LoginPassword === password);
                 if (user) {
                     currentUser = user;
-                    showAlert('✅ Login successful!', 'success');
+                    showAlert('✅ ' + t('loginSuccess'), 'success');
                     displayProfile(user);
                 } else {
-                    showAlert('❌ Invalid Code or Password!');
+                    showAlert('❌ ' + t('loginFail'));
                 }
             })
             .catch(err => {
-                setLoading('loginBtn', false);
+                setLoading('loginSubmitBtn', false);
                 console.error('❌ Login error:', err);
-                showAlert('❌ Network error: ' + err.message);
+                showAlert('❌ ' + t('networkError') + ': ' + err.message);
             });
         }
 
@@ -462,15 +1156,34 @@
             const container = document.getElementById('profileFields');
             container.innerHTML = '';
 
-            const fields = ['Code', 'Name', 'Phone', 'Email', 'Group', 'Shift', 'OffDay', 'Bank', 'Account', 'EPF', 'PERKESO', 'EIS'];
+            // All fields to display (excluding hidden ones)
+            const fields = [
+                'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir', 'Salary',
+                'IC', 'Jawatan', 'TarikhMasukKerja', 'TelefonNo', 'Email',
+                'ShiftType', 'OffDay', 'AlamatTetap', 'NamaWaris', 'AlamatWaris',
+                'BankNama', 'BankAccountNo', 'EPF', 'PERKESO', 'EIS',
+                'Lindungan', 'YellowCard', 'LoginPassword', 'PhoneType',
+                'SignupDate', 'UpdateDate'
+            ];
+
             const labels = {
-                Code: 'Code', Name: 'Name', Phone: 'Phone', Email: 'Email',
-                Group: 'Group', Shift: 'Shift', OffDay: 'Off Day',
-                Bank: 'Bank', Account: 'Account No.', EPF: 'EPF No.',
-                PERKESO: 'PERKESO No.', EIS: 'EIS No.'
+                GroupName: 'Group Name', Code: 'Code', Name: 'Name',
+                Jantina: 'Jantina', TarikhLahir: 'Tarikh Lahir', Salary: 'Salary',
+                IC: 'IC/Passport/Doc.No', Jawatan: 'Jawatan',
+                TarikhMasukKerja: 'Tarikh Masuk Kerja', TelefonNo: 'Telefon No.',
+                Email: 'Email', ShiftType: 'Shift Type', OffDay: 'Off Day',
+                AlamatTetap: 'Alamat Tetap', NamaWaris: 'Nama Waris',
+                AlamatWaris: 'Alamat Waris', BankNama: 'Bank Nama',
+                BankAccountNo: 'Bank Account No.', EPF: 'EPF (kwsp) No.',
+                PERKESO: 'PERKESO NO.', EIS: 'EIS NO.',
+                Lindungan: '24Jam Lindungan',
+                YellowCard: 'Kad Kebersihan (Yellow Card)',
+                LoginPassword: 'Login Password', PhoneType: 'Phone Type',
+                SignupDate: 'Signup Date', UpdateDate: 'Update Date'
             };
 
             for (let key of fields) {
+                const val = user[key] || '';
                 const div = document.createElement('div');
                 div.className = 'profile-field';
                 
@@ -478,14 +1191,15 @@
                 label.textContent = labels[key] || key + ':';
                 
                 const input = document.createElement('input');
-                input.type = 'text';
-                input.value = user[key] || '';
+                input.type = (key === 'LoginPassword') ? 'password' : 'text';
+                input.value = val;
                 input.dataset.field = key;
-                input.placeholder = 'Click to edit';
                 input.id = 'prof_' + key;
+                input.placeholder = 'Klik untuk sunting';
                 
                 input.addEventListener('change', function() {
                     currentUser[key] = this.value;
+                    currentUser.UpdateDate = new Date().toISOString();
                     saveProfile();
                 });
                 
@@ -514,25 +1228,30 @@
             .then(response => response.json())
             .then(result => {
                 if (result.result === 'success') {
-                    showAlert('✅ Data saved!', 'success');
+                    showAlert('✅ ' + t('saveSuccess'), 'success');
                 } else {
-                    showAlert('⚠️ Save error: ' + (result.message || ''));
+                    showAlert('⚠️ ' + t('saveFail') + ': ' + (result.message || ''));
                 }
             })
             .catch(err => {
                 console.error('❌ Save error:', err);
-                showAlert('⚠️ Network error while saving: ' + err.message);
+                showAlert('⚠️ ' + t('saveFail') + ': ' + err.message);
             });
         }
 
         // ============= INIT =============
-        // 页面加载后自动测试连接
         window.addEventListener('load', function() {
+            // Detect phone type on load
+            detectPhoneType();
+            // Test connection
             setTimeout(testConnection, 500);
+            // Set initial language
+            setLanguage('ms');
         });
 
         console.log('🚀 Staff System loaded');
         console.log('📡 SCRIPT_URL:', SCRIPT_URL);
+        console.log('📱 Phone Type:', document.getElementById('sPhoneType')?.value || 'Not detected');
     </script>
 </body>
 </html>
