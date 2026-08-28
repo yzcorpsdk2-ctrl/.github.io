@@ -412,7 +412,7 @@
     <script>
         // ============= CONFIG =============
         // Ganti dengan URL deployment web app anda
-        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'; 
+        const https://script.google.com/macros/s/AKfycbx1M6fyGFL3GcQAS-6egY_nk3iJDH-Dbx8wiBihlcsa8wdTWVt2HwmftF_e85Sn0JoWuw/exec = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'; 
         // Pastikan 'STAFF LOGIN RECORD' sebagai sheet name, dan header dari B2 (iaitu column B = index 1)
         // Untuk kesederhanaan, kita hantar dengan parameter nama column. Pastikan column di sheet sepadan.
 
@@ -677,7 +677,7 @@
             };
 
             // Send to Google Sheets via POST
-            fetch(SCRIPT_URL, {
+            fetch(https://script.google.com/macros/s/AKfycbx1M6fyGFL3GcQAS-6egY_nk3iJDH-Dbx8wiBihlcsa8wdTWVt2HwmftF_e85Sn0JoWuw/exec, {
                 method: 'POST',
                 mode: 'no-cors', // because CORS not enabled on GAS
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -716,8 +716,8 @@
             // Here we simulate by fetching from a JSON endpoint (if available)
             // We'll assume the Apps Script has doGet that returns all records.
             // For demo, we'll do a mock check (but we'll replace with actual fetch)
-            // Actually we'll use the SCRIPT_URL with ?action=getData
-            fetch(SCRIPT_URL + '?action=getData')
+            // Actually we'll use the https://script.google.com/macros/s/AKfycbx1M6fyGFL3GcQAS-6egY_nk3iJDH-Dbx8wiBihlcsa8wdTWVt2HwmftF_e85Sn0JoWuw/exec with ?action=getData
+            fetch(https://script.google.com/macros/s/AKfycbx1M6fyGFL3GcQAS-6egY_nk3iJDH-Dbx8wiBihlcsa8wdTWVt2HwmftF_e85Sn0JoWuw/exec + '?action=getData')
             .then(res => res.json())
             .then(data => {
                 if (!data || !data.length) {
@@ -826,7 +826,7 @@
             // For demo, we show alert.
             showAlert('Data dikemas kini (simulasi) / Data updated (simulation)', false);
             // In real, you'd call fetch with POST and action=update
-            // e.g. fetch(SCRIPT_URL, {method:'POST', body: new URLSearchParams({action:'update', ...currentUser})})
+            // e.g. fetch(https://script.google.com/macros/s/AKfycbx1M6fyGFL3GcQAS-6egY_nk3iJDH-Dbx8wiBihlcsa8wdTWVt2HwmftF_e85Sn0JoWuw/exec, {method:'POST', body: new URLSearchParams({action:'update', ...currentUser})})
             // We'll implement in Apps Script section.
         }
 
