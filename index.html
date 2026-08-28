@@ -200,6 +200,23 @@
             font-weight: 600;
             color: #4a5568;
         }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a3a5c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn-submit:disabled {
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -208,7 +225,7 @@
 
         <!-- Language Bar -->
         <div class="lang-bar">
-            <button class="lang-btn" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
+            <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
             <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
             <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
         </div>
@@ -475,7 +492,7 @@
                 <label class="field-required" id="lblLoginPassword2">Password</label>
                 <input type="password" id="loginPassword" placeholder="Kata Laluan">
             </div>
-            <button class="btn-submit" onclick="performLogin()">🔓 Log Masuk</button>
+            <button class="btn-submit" id="loginSubmitBtn" onclick="performLogin()">🔓 Log Masuk</button>
             <div id="loginResult" style="margin-top:12px; font-weight:600;"></div>
         </div>
 
@@ -490,7 +507,8 @@
 
     <script>
         // ============= CONFIG =============
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyC6vOxMHpXTgxUSmZas1YLtkllSdH6Wvz_yCn7hRPD2eTYSAxDMu-4IBT3dItBNgdQyw/exec';
+        // ⚠️ 重要：替换为您的实际部署 URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzG17aXd44YOUzQP1zJQSgmGWUa2_9WRbUpp9ko_rXG7sMw3kSV_G3pBoVqE5Up223JXg/exec';
 
         let currentLanguage = 'ms';
         let currentUser = null;
@@ -525,6 +543,10 @@
                 loginSuccess: 'Log masuk berjaya!', loginFail: 'Code atau Password salah.',
                 saveSuccess: 'Data berjaya disimpan.', saveFail: 'Ralat menyimpan data.',
                 confirmLogout: 'Anda pasti mahu log keluar?',
+                noData: 'Tiada data. Sila daftar terlebih dahulu.',
+                networkError: 'Ralat rangkaian. Pastikan Apps Script sudah dideploy.',
+                registering: 'Mendaftar...',
+                loggingIn: 'Log masuk...',
             },
             en: {
                 title: 'Staff Management System',
@@ -549,6 +571,10 @@
                 loginSuccess: 'Login successful!', loginFail: 'Incorrect Code or Password.',
                 saveSuccess: 'Data saved successfully.', saveFail: 'Error saving data.',
                 confirmLogout: 'Are you sure you want to logout?',
+                noData: 'No data. Please register first.',
+                networkError: 'Network error. Make sure Apps Script is deployed.',
+                registering: 'Registering...',
+                loggingIn: 'Logging in...',
             },
             zh: {
                 title: '员工管理系统',
@@ -573,6 +599,10 @@
                 loginSuccess: '登录成功！', loginFail: '代码或密码错误。',
                 saveSuccess: '数据保存成功。', saveFail: '保存数据出错。',
                 confirmLogout: '您确定要退出登录吗？',
+                noData: '暂无数据，请先注册。',
+                networkError: '网络错误，请确保 Apps Script 已部署。',
+                registering: '注册中...',
+                loggingIn: '登录中...',
             }
         };
 
@@ -590,6 +620,8 @@
             document.getElementById('editIndicator').textContent = t('editHint');
             document.querySelector('#profileView .btn-submit').textContent = t('logout');
             document.getElementById('signupSubmitBtn').textContent = t('submit');
+            document.getElementById('loginSubmitBtn').textContent = t('loginBtn');
+            
             const labelMap = {
                 'lblGroupName':'GroupName','lblCode':'Code','lblName':'Name','lblJantina':'Jantina',
                 'lblTarikhLahir':'TarikhLahir','lblSalary':'Salary','lblIC':'IC','lblJawatan':'Jawatan',
@@ -604,8 +636,6 @@
                 const el = document.getElementById(id);
                 if (el) el.textContent = t(key) + (el.classList.contains('field-required') ? ' *' : '');
             }
-            const loginBtn = document.querySelector('#loginForm .btn-submit');
-            if (loginBtn) loginBtn.textContent = t('loginBtn');
         }
 
         // ============= UI HELPERS =============
@@ -644,6 +674,17 @@
             document.getElementById('loginResult').textContent = '';
         }
 
+        function setLoading(buttonId, isLoading, loadingText) {
+            const btn = document.getElementById(buttonId);
+            if (isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="loading-spinner"></span>${loadingText}`;
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.originalText || btn.textContent;
+            }
+        }
+
         // ============= GROUP HANDLING =============
         function handleGroupChange() {
             const sel = document.getElementById('GroupName');
@@ -655,9 +696,7 @@
                 document.getElementById('OtherGroupInput').value = '';
             }
         }
-        function syncOtherGroup() {
-            // Just collect value during submit
-        }
+        function syncOtherGroup() {}
 
         // ============= SHIFT HANDLING =============
         function handleShiftChange() {
@@ -673,7 +712,6 @@
         function getShiftValue() {
             const sel = document.getElementById('ShiftType');
             if (sel.value !== 'Others') return sel.value;
-            // Build custom time
             const startAMPM = document.getElementById('ShiftStartAMPM').value;
             const startH = document.getElementById('ShiftStartHour').value.padStart(2, '0');
             const startM = document.getElementById('ShiftStartMin').value.padStart(2, '0');
@@ -712,10 +750,12 @@
         // ============= SUBMIT SIGNUP =============
         function submitSignup(e) {
             e.preventDefault();
+            
             const requiredIds = ['GroupName','Code','Name','Jantina','TarikhLahir','Salary','IC',
                 'Jawatan','TarikhMasukKerja','TelefonNo','ShiftType','OffDay','AlamatTetap',
                 'BankNama','BankAccountNo','EPF','PERKESO','EIS','Lindungan','YellowCard',
                 'PhoneType','LoginPassword'];
+            
             for (let id of requiredIds) {
                 const el = document.getElementById(id);
                 if (!el || !el.value.trim()) {
@@ -724,6 +764,7 @@
                     return;
                 }
             }
+            
             // Group Others
             let groupVal = document.getElementById('GroupName').value;
             if (groupVal === 'Others') {
@@ -731,6 +772,7 @@
                 if (!other) { showAlert('Sila nyatakan kumpulan lain / Please specify other group'); return; }
                 groupVal = other;
             }
+            
             // Bank Others
             let bankVal = document.getElementById('BankNama').value;
             if (bankVal === 'Others') {
@@ -738,6 +780,7 @@
                 if (!other) { showAlert('Sila nyatakan bank lain / Please specify other bank'); return; }
                 bankVal = other;
             }
+            
             // Shift
             const shiftVal = getShiftValue();
 
@@ -770,25 +813,42 @@
                 SignupDate: new Date().toISOString(),
                 UpdateDate: new Date().toISOString(),
                 AgreementSituation: 'Default',
-                // Situation & Holidays are not submitted from UI, but columns exist in sheet
             };
+
+            // Set loading state
+            const submitBtn = document.getElementById('signupSubmitBtn');
+            submitBtn.dataset.originalText = submitBtn.textContent;
+            setLoading('signupSubmitBtn', true, t('registering'));
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(data)
-            }).then(() => {
-                showAlert('Pendaftaran berjaya! / Registration successful!', false);
-                document.getElementById('staffForm').reset();
-                document.getElementById('BankAccountNo').readOnly = false;
-                document.getElementById('BankAccountNo').required = true;
-                document.getElementById('otherBankContainer').classList.add('hidden');
-                document.getElementById('otherGroupContainer').classList.add('hidden');
-                document.getElementById('otherShiftContainer').classList.add('hidden');
-                showLogin();
-            }).catch(err => {
-                showAlert('Ralat: ' + err.message);
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(result => {
+                setLoading('signupSubmitBtn', false);
+                if (result.result === 'success') {
+                    showAlert('Pendaftaran berjaya! / Registration successful!', false);
+                    document.getElementById('staffForm').reset();
+                    document.getElementById('BankAccountNo').readOnly = false;
+                    document.getElementById('BankAccountNo').required = true;
+                    document.getElementById('otherBankContainer').classList.add('hidden');
+                    document.getElementById('otherGroupContainer').classList.add('hidden');
+                    document.getElementById('otherShiftContainer').classList.add('hidden');
+                    setTimeout(() => showLogin(), 1500);
+                } else {
+                    showAlert('Ralat: ' + (result.error || 'Unknown error'));
+                }
+            })
+            .catch(err => {
+                setLoading('signupSubmitBtn', false);
+                showAlert(t('networkError') + ': ' + err.message);
             });
         }
 
@@ -796,48 +856,48 @@
         function performLogin() {
             const code = document.getElementById('loginCode').value.trim();
             const pwd = document.getElementById('loginPassword').value.trim();
+            
             if (!code || !pwd) {
                 showAlert('Sila masukkan Code dan Password.');
                 return;
             }
+            
+            const loginBtn = document.getElementById('loginSubmitBtn');
+            loginBtn.dataset.originalText = loginBtn.textContent;
+            setLoading('loginSubmitBtn', true, t('loggingIn'));
+
             fetch(SCRIPT_URL + '?action=getData')
-            .then(res => res.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                if (!data || !data.length) {
-                    showAlert('Tiada data / No data');
+                setLoading('loginSubmitBtn', false);
+                
+                if (data.error) {
+                    showAlert('Ralat: ' + data.error);
                     return;
                 }
+                
+                if (!data || !data.length) {
+                    showAlert(t('noData'));
+                    return;
+                }
+                
                 const user = data.find(row => row.Code === code && row.LoginPassword === pwd);
                 if (user) {
                     currentUser = user;
-                    showAlert('Log masuk berjaya!', false);
+                    showAlert(t('loginSuccess'), false);
                     displayProfile(user);
                 } else {
-                    showAlert('Code atau Password salah.');
+                    showAlert(t('loginFail'));
                 }
             })
             .catch(err => {
-                // Demo fallback
-                if (code === 'test' && pwd === '123') {
-                    const mockUser = {
-                        Code: 'test', Name: 'Ahmad Bin Ali', Jantina: 'Lelaki',
-                        TarikhLahir: '1990-01-01', Salary: '3000',
-                        IC: '900101-10-1234', Jawatan: 'Supervisor', TarikhMasukKerja: '2020-01-01',
-                        TelefonNo: '012-3456789', Email: 'ahmad@email.com', ShiftType: '8AM-4.30PM',
-                        OffDay: 'Ahad', AlamatTetap: 'No. 1, Jalan 1, KL',
-                        NamaWaris: 'Ali', AlamatWaris: 'No. 2, Jalan 2, KL',
-                        BankNama: 'MAYBANK', BankAccountNo: '1234567890',
-                        EPF: 'EPF123', PERKESO: 'PER123', EIS: 'EIS123',
-                        Lindungan: 'YES', YellowCard: 'NO', PhoneType: 'Android',
-                        LoginPassword: '123', SignupDate: '2025-01-01T00:00:00Z',
-                        UpdateDate: '2025-01-01T00:00:00Z', GroupName: 'SIANG SIANG RESTAURANT(BANDAR)'
-                    };
-                    currentUser = mockUser;
-                    displayProfile(mockUser);
-                    showAlert('Login berjaya (demo)', false);
-                } else {
-                    showAlert('Ralat: ' + err.message + ' (Pastikan doGet di Apps Script disediakan)');
-                }
+                setLoading('loginSubmitBtn', false);
+                showAlert(t('networkError') + ': ' + err.message);
             });
         }
 
@@ -847,14 +907,17 @@
             document.getElementById('signupForm').classList.add('hidden');
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('authSection').classList.add('hidden');
+            
             const container = document.getElementById('profileFields');
             container.innerHTML = '';
+            
             const fields = [
                 'GroupName','Code','Name','Jantina','TarikhLahir','Salary','IC','Jawatan',
                 'TarikhMasukKerja','TelefonNo','Email','ShiftType','OffDay','AlamatTetap',
                 'NamaWaris','AlamatWaris','BankNama','BankAccountNo','EPF','PERKESO','EIS',
                 'Lindungan','YellowCard','PhoneType','LoginPassword','SignupDate','UpdateDate'
             ];
+            
             const labelMap = {
                 GroupName:'Group Name', Code:'Code', Name:'Name', Jantina:'Jantina',
                 TarikhLahir:'Tarikh Lahir', Salary:'Salary', IC:'IC/Passport/Doc.No',
@@ -867,6 +930,7 @@
                 PhoneType:'Phone type', LoginPassword:'Login Password',
                 SignupDate:'Signup Date', UpdateDate:'Update Date'
             };
+
             for (let key of fields) {
                 const val = user[key] || '';
                 const div = document.createElement('div');
@@ -891,14 +955,44 @@
         }
 
         function saveProfile() {
-            showAlert('Data dikemas kini (simulasi) / Data updated (simulation)', false);
-            // Uncomment below for real update:
-            // const payload = { action: 'update', ...currentUser };
-            // fetch(SCRIPT_URL, { method:'POST', body: new URLSearchParams(payload) });
+            if (!currentUser || !currentUser.Code) return;
+            
+            const payload = {
+                action: 'update',
+                ...currentUser
+            };
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(payload)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.result === 'success') {
+                    showAlert(t('saveSuccess'), false);
+                } else {
+                    showAlert(t('saveFail') + ': ' + (result.message || ''));
+                }
+            })
+            .catch(err => {
+                showAlert(t('saveFail') + ': ' + err.message);
+            });
         }
 
         // ============= INIT =============
         setLanguage('ms');
+        
+        // Test connection on load
+        fetch(SCRIPT_URL + '?action=getData')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Connection successful! Data count:', data.length || 0);
+        })
+        .catch(err => {
+            console.warn('Connection test failed:', err.message);
+            // Don't show alert here, let user try login/register first
+        });
     </script>
 </body>
 </html>
