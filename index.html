@@ -41,6 +41,8 @@
         .btn-danger { background: #c53030; color: white; }
         .btn-danger:hover { background: #9b2c2c; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-success:hover { background: #2f855a; }
         .form-group { margin-bottom: 12px; }
         .form-group label {
             display: block;
@@ -70,6 +72,7 @@
         }
         .alert.error { background: #fed7d7; color: #9b2c2c; display: block; }
         .alert.success { background: #c6f6d5; color: #22543d; display: block; }
+        .alert.info { background: #bee3f8; color: #2a4365; display: block; }
         .auth-section { display: flex; gap: 10px; margin-bottom: 20px; }
         .auth-section .btn { margin-bottom: 0; }
         .field-required::after { content: " *"; color: #e53e3e; }
@@ -78,26 +81,42 @@
             justify-content: space-between; 
             padding: 8px 0;
             border-bottom: 1px solid #e2e8f0;
+            align-items: center;
         }
-        .profile-field label { font-weight: 600; color: #4a5568; }
+        .profile-field label { font-weight: 600; color: #4a5568; font-size: 14px; flex: 0 0 100px; }
         .profile-field input {
             border: none;
             text-align: right;
             font-size: 14px;
             background: transparent;
-            width: 60%;
+            flex: 1;
+            padding: 4px 8px;
         }
         .profile-field input:focus {
             outline: 2px solid #1a3a5c;
             background: white;
             border-radius: 4px;
         }
+        .status-bar {
+            background: #edf2f7;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #4a5568;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .status-bar.success { background: #c6f6d5; color: #22543d; }
+        .status-bar.error { background: #fed7d7; color: #9b2c2c; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>👤 Staff System</h1>
         
+        <!-- 状态栏 -->
+        <div id="statusBar" class="status-bar">🔌 Checking connection...</div>
+
         <!-- 按钮区域 -->
         <div class="auth-section" id="authSection">
             <button class="btn btn-primary" onclick="showSignup()">📝 Register</button>
@@ -110,7 +129,7 @@
         <!-- ========== 注册表单 ========== -->
         <div id="signupForm" class="hidden">
             <h2>📋 Register Staff</h2>
-            <form onsubmit="submitSignup(event)">
+            <form id="registerForm">
                 <div class="form-group">
                     <label class="field-required">Code</label>
                     <input type="text" id="sCode" placeholder="e.g. 0001" required>
@@ -191,7 +210,7 @@
                     <label>EIS No.</label>
                     <input type="text" id="sEIS" placeholder="EIS Number">
                 </div>
-                <button type="submit" class="btn btn-primary" id="signupBtn">📤 Register</button>
+                <button type="submit" class="btn btn-success" id="signupBtn">📤 Register</button>
                 <button type="button" class="btn" onclick="goBack()" style="background:#e2e8f0;">← Back</button>
             </form>
         </div>
@@ -207,7 +226,7 @@
                 <label class="field-required">Password</label>
                 <input type="password" id="lPassword" placeholder="Enter your Password">
             </div>
-            <button class="btn btn-primary" onclick="performLogin()">🔓 Login</button>
+            <button class="btn btn-primary" id="loginBtn" onclick="performLogin()">🔓 Login</button>
             <button type="button" class="btn" onclick="goBack()" style="background:#e2e8f0;">← Back</button>
             <div id="loginResult" style="margin-top:12px; text-align:center; font-weight:600;"></div>
         </div>
@@ -222,10 +241,11 @@
 
     <script>
         // ============= CONFIG =============
-        // ⚠️ 替换成您的 Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7F44pmzGVQbAc_BnLlJzOx65tHPUr5Lgrdma30UmJDofEP4vWQX0GLMTe0zNQLGSt1A/exec';
+        // ⚠️ 重要：替换成您的 Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn0Yb7XLio68sW0Y_4-FO6EmYJJBaaqP8t_76M3zslDXXcl6SzJF1ULQ8rO6xVDlagtg/exec';
 
         let currentUser = null;
+        let isConnected = false;
 
         // ============= UI FUNCTIONS =============
         function showAlert(msg, type = 'error') {
@@ -233,6 +253,12 @@
             el.textContent = msg;
             el.className = 'alert ' + type;
             setTimeout(() => { el.className = 'alert'; }, 5000);
+        }
+
+        function updateStatus(msg, type = '') {
+            const el = document.getElementById('statusBar');
+            el.textContent = msg;
+            el.className = 'status-bar ' + type;
         }
 
         function showSignup() {
@@ -273,8 +299,32 @@
             }
         }
 
+        // ============= TEST CONNECTION =============
+        function testConnection() {
+            updateStatus('🔌 Testing connection...');
+            
+            fetch(SCRIPT_URL + '?action=getData')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                isConnected = true;
+                const count = data.length || 0;
+                updateStatus('✅ Connected! ' + count + ' records found.', 'success');
+                console.log('✅ Connection successful. Data:', data);
+            })
+            .catch(err => {
+                isConnected = false;
+                updateStatus('❌ Connection failed: ' + err.message + ' - Check URL and deployment', 'error');
+                console.error('❌ Connection error:', err);
+            });
+        }
+
         // ============= REGISTER =============
-        function submitSignup(e) {
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const code = document.getElementById('sCode').value.trim();
@@ -283,6 +333,12 @@
             
             if (!code || !name || !password) {
                 showAlert('Please fill in Code, Name and Password!');
+                return;
+            }
+
+            // 检查连接
+            if (!isConnected) {
+                showAlert('⚠️ Not connected to server. Please refresh and try again.');
                 return;
             }
 
@@ -306,27 +362,38 @@
             btn.dataset.originalText = btn.textContent;
             setLoading('signupBtn', true, 'Registering...');
 
+            console.log('📤 Sending data:', data);
+
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(data)
             })
-            .then(res => res.json())
+            .then(response => {
+                console.log('📥 Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
             .then(result => {
                 setLoading('signupBtn', false);
+                console.log('📥 Response data:', result);
+                
                 if (result.result === 'success') {
                     showAlert('✅ Registration successful!', 'success');
-                    document.querySelector('form').reset();
+                    document.getElementById('registerForm').reset();
                     setTimeout(showLogin, 1500);
                 } else {
-                    showAlert('❌ Error: ' + (result.error || 'Unknown error'));
+                    showAlert('❌ Error: ' + (result.error || result.message || 'Unknown error'));
                 }
             })
             .catch(err => {
                 setLoading('signupBtn', false);
-                showAlert('❌ Network error: ' + err.message + '\nCheck if Apps Script is deployed correctly.');
+                console.error('❌ Fetch error:', err);
+                showAlert('❌ Network error: ' + err.message + '\nPlease check:\n1. URL is correct\n2. Apps Script is deployed\n3. Permission is set to "Anyone"');
             });
-        }
+        });
 
         // ============= LOGIN =============
         function performLogin() {
@@ -338,17 +405,28 @@
                 return;
             }
 
+            if (!isConnected) {
+                showAlert('⚠️ Not connected to server. Please refresh and try again.');
+                return;
+            }
+
             const btn = document.getElementById('loginBtn');
             btn.dataset.originalText = btn.textContent;
             setLoading('loginBtn', true, 'Logging in...');
 
             fetch(SCRIPT_URL + '?action=getData')
-            .then(res => res.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 setLoading('loginBtn', false);
+                console.log('📥 Login data:', data);
                 
                 if (data.error) {
-                    showAlert('❌ ' + data.error);
+                    showAlert('❌ Server error: ' + data.error);
                     return;
                 }
 
@@ -357,6 +435,7 @@
                     return;
                 }
 
+                // 查找用户
                 const user = data.find(row => row.Code === code && row.Password === password);
                 if (user) {
                     currentUser = user;
@@ -368,7 +447,8 @@
             })
             .catch(err => {
                 setLoading('loginBtn', false);
-                showAlert('❌ Network error: ' + err.message + '\nCheck if Apps Script is deployed correctly.');
+                console.error('❌ Login error:', err);
+                showAlert('❌ Network error: ' + err.message);
             });
         }
 
@@ -402,6 +482,7 @@
                 input.value = user[key] || '';
                 input.dataset.field = key;
                 input.placeholder = 'Click to edit';
+                input.id = 'prof_' + key;
                 
                 input.addEventListener('change', function() {
                     currentUser[key] = this.value;
@@ -423,12 +504,14 @@
                 ...currentUser
             };
 
+            console.log('💾 Saving profile:', payload);
+
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(payload)
             })
-            .then(res => res.json())
+            .then(response => response.json())
             .then(result => {
                 if (result.result === 'success') {
                     showAlert('✅ Data saved!', 'success');
@@ -437,23 +520,19 @@
                 }
             })
             .catch(err => {
+                console.error('❌ Save error:', err);
                 showAlert('⚠️ Network error while saving: ' + err.message);
             });
         }
 
-        // ============= TEST CONNECTION =============
-        // 页面加载后自动测试
+        // ============= INIT =============
+        // 页面加载后自动测试连接
         window.addEventListener('load', function() {
-            fetch(SCRIPT_URL + '?action=getData')
-            .then(res => res.json())
-            .then(data => {
-                console.log('✅ Connected! Data count:', data.length || 0);
-            })
-            .catch(err => {
-                console.warn('⚠️ Connection test failed:', err.message);
-                console.log('Please check: 1. URL is correct 2. Apps Script is deployed 3. Permission is set to "Anyone"');
-            });
+            setTimeout(testConnection, 500);
         });
+
+        console.log('🚀 Staff System loaded');
+        console.log('📡 SCRIPT_URL:', SCRIPT_URL);
     </script>
 </body>
 </html>
