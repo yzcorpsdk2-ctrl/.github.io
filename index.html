@@ -72,6 +72,8 @@
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-gray { background: #e2e8f0; color: #4a5568; }
         .btn-gray:hover { background: #cbd5e0; }
+        .btn-menu { background: #2b6cb0; color: white; }
+        .btn-menu:hover { background: #1a4f8b; }
 
         .auth-section {
             display: flex;
@@ -185,11 +187,80 @@
             margin-top: 6px;
         }
 
+        /* Menu Styles */
+        .menu-section {
+            margin-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 16px;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .menu-grid .btn {
+            margin-bottom: 0;
+            font-size: 14px;
+            padding: 14px 8px;
+        }
+        .menu-title {
+            text-align: center;
+            color: #1a3a5c;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        /* Auth Overlay for protected pages */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .auth-overlay .auth-box {
+            background: white;
+            padding: 30px 24px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .auth-overlay .auth-box h3 {
+            text-align: center;
+            color: #1a3a5c;
+            margin-bottom: 16px;
+        }
+        .auth-overlay .auth-box .form-group {
+            margin-bottom: 12px;
+        }
+        .auth-overlay .auth-box .btn {
+            margin-top: 8px;
+        }
+        .auth-overlay .auth-box .error-msg {
+            color: #c53030;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .profile-field label { flex: 0 0 90px; font-size: 12px; }
             .profile-field input { font-size: 13px; }
             .lang-btn { font-size: 12px; padding: 4px 12px; }
+            .menu-grid { grid-template-columns: 1fr 1fr; }
+            .menu-grid .btn { font-size: 12px; padding: 12px 6px; }
+        }
+        @media (max-width: 380px) {
+            .menu-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -459,6 +530,38 @@
             <div id="profileFields"></div>
             <button class="btn btn-danger" onclick="logout()">🚪 Update & Log Keluar</button>
         </div>
+
+        <!-- ========== MENU SECTION (下半部分) ========== -->
+        <div class="menu-section" id="menuSection">
+            <div class="menu-title">📋 MENU NAVIGASI</div>
+            <div class="menu-grid">
+                <button class="btn btn-menu" onclick="navigateTo('staffinfo')">📇 Staff Info</button>
+                <button class="btn btn-menu" onclick="navigateTo('staffmanagement')">👥 Staff Management</button>
+                <button class="btn btn-menu" onclick="navigateTo('xxx1')">📁 Menu 1</button>
+                <button class="btn btn-menu" onclick="navigateTo('xxx2')">📁 Menu 2</button>
+                <button class="btn btn-menu" onclick="navigateTo('xxx3')">📁 Menu 3</button>
+                <button class="btn btn-menu" onclick="navigateTo('xxx4')">📁 Menu 4</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== AUTH OVERLAY ========== -->
+    <div class="auth-overlay hidden" id="authOverlay">
+        <div class="auth-box">
+            <h3>🔐 Akses Dilindungi</h3>
+            <p style="text-align:center; color:#718096; margin-bottom:16px; font-size:14px;">Sila log masuk untuk mengakses halaman ini</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="overlayUsername" placeholder="Masukkan username" value="SIANGSIANG">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="overlayPassword" placeholder="Masukkan password">
+            </div>
+            <button class="btn btn-primary" onclick="authenticateOverlay()">🔓 Log Masuk</button>
+            <button class="btn btn-gray" onclick="closeOverlay()">Batal</button>
+            <div class="error-msg" id="overlayError">Username atau Password salah!</div>
+        </div>
     </div>
 
     <script>
@@ -469,6 +572,7 @@
         let currentUser = null;
         let isConnected = false;
         let currentLanguage = 'ms';
+        let pendingNavigation = null; // 用于存储待跳转的目标
 
         // ============= TRANSLATIONS =============
         const translations = {
@@ -483,6 +587,9 @@
                 register: '📤 Daftar',
                 loginBtn: '🔓 Log Masuk',
                 back: '← Kembali',
+                menuTitle: '📋 MENU NAVIGASI',
+                staffInfo: '📇 Staff Info',
+                staffManagement: '👥 Staff Management',
                 // Labels
                 lblGroupName: 'Group Name',
                 lblCode: 'Code',
@@ -548,6 +655,14 @@
                 friday: 'Jumaat (Friday)',
                 saturday: 'Sabtu (Saturday)',
                 sunday: 'Ahad (Sunday)',
+                authTitle: '🔐 Akses Dilindungi',
+                authSub: 'Sila log masuk untuk mengakses halaman ini',
+                authUser: 'Username',
+                authPass: 'Password',
+                authLogin: '🔓 Log Masuk',
+                authCancel: 'Batal',
+                authError: 'Username atau Password salah!',
+                authRequired: 'Sila masukkan username dan password',
             },
             en: {
                 title: '👤 Staff Management System',
@@ -560,6 +675,9 @@
                 register: '📤 Register',
                 loginBtn: '🔓 Login',
                 back: '← Back',
+                menuTitle: '📋 MENU NAVIGATION',
+                staffInfo: '📇 Staff Info',
+                staffManagement: '👥 Staff Management',
                 lblGroupName: 'Group Name',
                 lblCode: 'Code',
                 lblName: 'Name',
@@ -622,6 +740,14 @@
                 friday: 'Friday',
                 saturday: 'Saturday',
                 sunday: 'Sunday',
+                authTitle: '🔐 Protected Access',
+                authSub: 'Please login to access this page',
+                authUser: 'Username',
+                authPass: 'Password',
+                authLogin: '🔓 Login',
+                authCancel: 'Cancel',
+                authError: 'Incorrect username or password!',
+                authRequired: 'Please enter username and password',
             },
             zh: {
                 title: '👤 员工管理系统',
@@ -634,6 +760,9 @@
                 register: '📤 注册',
                 loginBtn: '🔓 登录',
                 back: '← 返回',
+                menuTitle: '📋 菜单导航',
+                staffInfo: '📇 员工信息',
+                staffManagement: '👥 员工管理',
                 lblGroupName: '组名',
                 lblCode: '代码',
                 lblName: '姓名',
@@ -696,6 +825,14 @@
                 friday: '星期五',
                 saturday: '星期六',
                 sunday: '星期日',
+                authTitle: '🔐 受保护访问',
+                authSub: '请登录以访问此页面',
+                authUser: '用户名',
+                authPass: '密码',
+                authLogin: '🔓 登录',
+                authCancel: '取消',
+                authError: '用户名或密码错误！',
+                authRequired: '请输入用户名和密码',
             }
         };
 
@@ -721,6 +858,24 @@
             document.getElementById('profileTitle').textContent = t('profileTitle');
             document.getElementById('signupSubmitBtn').textContent = t('register');
             document.getElementById('loginSubmitBtn').textContent = t('loginBtn');
+            
+            // Menu translations
+            document.querySelector('.menu-title').textContent = t('menuTitle');
+            const menuBtns = document.querySelectorAll('.menu-grid .btn');
+            if (menuBtns.length >= 2) {
+                menuBtns[0].textContent = t('staffInfo');
+                menuBtns[1].textContent = t('staffManagement');
+            }
+            // Update overlay
+            document.querySelector('#authOverlay h3').textContent = t('authTitle');
+            document.querySelector('#authOverlay .auth-box p').textContent = t('authSub');
+            const overlayLabels = document.querySelectorAll('#authOverlay .form-group label');
+            if (overlayLabels.length >= 2) {
+                overlayLabels[0].textContent = t('authUser');
+                overlayLabels[1].textContent = t('authPass');
+            }
+            document.querySelector('#authOverlay .btn-primary').textContent = t('authLogin');
+            document.querySelector('#authOverlay .btn-gray').textContent = t('authCancel');
 
             const labelMap = {
                 'lblGroupName': 'GroupName',
@@ -757,7 +912,6 @@
                     el.textContent = label + (el.classList.contains('field-required') ? ' *' : '');
                 }
             }
-            // Update select placeholders
             updateSelectPlaceholders();
         }
 
@@ -777,7 +931,6 @@
                     el.options[0].text = text;
                 }
             });
-            // Update option texts
             const groupSel = document.getElementById('sGroupName');
             if (groupSel) {
                 const opt = groupSel.querySelector('option[value="Others"]');
@@ -793,7 +946,6 @@
                 const opt = shiftSel.querySelector('option[value="Others"]');
                 if (opt) opt.text = t('otherShift');
             }
-            // Update placeholders
             const placeholders = [
                 { id: 'OtherGroupInput', text: t('groupOthers') },
                 { id: 'OtherBankInput', text: t('bankOthers') },
@@ -824,7 +976,6 @@
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('profileView').classList.add('hidden');
             document.getElementById('authSection').classList.add('hidden');
-            // Auto detect phone type
             detectPhoneType();
         }
 
@@ -878,13 +1029,11 @@
                 device = 'Linux';
             }
             
-            // Get more details if possible
             if (navigator.userAgentData && navigator.userAgentData.platform) {
                 device = navigator.userAgentData.platform;
             }
             
             document.getElementById('sPhoneType').value = device;
-            console.log('📱 Phone Type detected:', device);
         }
 
         // ============= GROUP HANDLING =============
@@ -899,7 +1048,6 @@
             }
         }
 
-        // ============= SHIFT HANDLING =============
         function handleShiftChange() {
             const sel = document.getElementById('sShiftType');
             const container = document.getElementById('otherShiftContainer');
@@ -911,7 +1059,6 @@
             }
         }
 
-        // ============= BANK HANDLING =============
         function handleBankChange() {
             const bank = document.getElementById('sBankNama').value;
             const otherContainer = document.getElementById('otherBankContainer');
@@ -960,12 +1107,10 @@
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get values
             const code = document.getElementById('sCode').value.trim();
             const name = document.getElementById('sName').value.trim();
             const password = document.getElementById('sLoginPassword').value.trim();
             
-            // Check required fields
             const requiredIds = [
                 'sGroupName', 'sCode', 'sName', 'sJantina', 'sTarikhLahir',
                 'sSalary', 'sIC', 'sJawatan', 'sTarikhMasukKerja', 'sTelefonNo',
@@ -983,7 +1128,6 @@
                 }
             }
             
-            // Check if BankAccountNo is required (not CASH or MECHANTRADE)
             const bank = document.getElementById('sBankNama').value;
             const accInput = document.getElementById('sBankAccountNo');
             if (bank !== 'CASH' && bank !== 'MECHANTRADE' && !accInput.value.trim()) {
@@ -992,7 +1136,6 @@
                 return;
             }
             
-            // Group Others
             let groupVal = document.getElementById('sGroupName').value;
             if (groupVal === 'Others') {
                 const other = document.getElementById('OtherGroupInput').value.trim();
@@ -1004,7 +1147,6 @@
                 groupVal = other;
             }
             
-            // Bank Others
             let bankVal = document.getElementById('sBankNama').value;
             if (bankVal === 'Others') {
                 const other = document.getElementById('OtherBankInput').value.trim();
@@ -1016,7 +1158,6 @@
                 bankVal = other;
             }
             
-            // Shift Others
             let shiftVal = document.getElementById('sShiftType').value;
             if (shiftVal === 'Others') {
                 const other = document.getElementById('OtherShiftInput').value.trim();
@@ -1028,7 +1169,6 @@
                 shiftVal = other;
             }
 
-            // Get phone type from hidden field
             const phoneType = document.getElementById('sPhoneType').value || 'Unknown';
 
             const data = {
@@ -1156,7 +1296,6 @@
             const container = document.getElementById('profileFields');
             container.innerHTML = '';
 
-            // All fields to display (excluding hidden ones)
             const fields = [
                 'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir', 'Salary',
                 'IC', 'Jawatan', 'TarikhMasukKerja', 'TelefonNo', 'Email',
@@ -1239,19 +1378,111 @@
             });
         }
 
+        // ============= MENU NAVIGATION =============
+        const protectedPages = ['staffinfo', 'xxx1', 'xxx2', 'xxx3', 'xxx4'];
+        const unprotectedPages = ['staffmanagement'];
+
+        function navigateTo(page) {
+            if (page === 'staffmanagement') {
+                // 当前页面，不做跳转，只是滚动到顶部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showAlert('📍 Anda berada di halaman Staff Management', 'info');
+                return;
+            }
+
+            if (page === 'staffinfo') {
+                // 直接跳转到 staffinfo.html（同一仓库下）
+                window.location.href = 'staffinfo.html';
+                return;
+            }
+
+            // 其他受保护的页面 (xxx1, xxx2, xxx3, xxx4)
+            // 显示认证弹窗
+            pendingNavigation = page;
+            showAuthOverlay();
+        }
+
+        // ============= AUTH OVERLAY =============
+        function showAuthOverlay() {
+            const overlay = document.getElementById('authOverlay');
+            overlay.classList.remove('hidden');
+            document.getElementById('overlayUsername').value = 'SIANGSIANG';
+            document.getElementById('overlayPassword').value = '';
+            document.getElementById('overlayError').style.display = 'none';
+            document.getElementById('overlayPassword').focus();
+        }
+
+        function closeOverlay() {
+            document.getElementById('authOverlay').classList.add('hidden');
+            pendingNavigation = null;
+        }
+
+        function authenticateOverlay() {
+            const username = document.getElementById('overlayUsername').value.trim();
+            const password = document.getElementById('overlayPassword').value.trim();
+
+            if (!username || !password) {
+                document.getElementById('overlayError').textContent = t('authRequired');
+                document.getElementById('overlayError').style.display = 'block';
+                return;
+            }
+
+            // 验证用户名和密码
+            if (username === 'SIANGSIANG' && password === '0000') {
+                // 认证成功
+                document.getElementById('overlayError').style.display = 'none';
+                closeOverlay();
+                
+                // 执行跳转
+                if (pendingNavigation) {
+                    if (pendingNavigation === 'staffinfo') {
+                        window.location.href = 'staffinfo.html';
+                    } else {
+                        // 其他页面 - 显示提示信息（模拟跳转）
+                        showAlert('📍 Halaman "' + pendingNavigation + '" akan dibuka (demo)', 'success');
+                        // 在实际项目中，这里可以跳转到对应的页面
+                        // window.location.href = pendingNavigation + '.html';
+                    }
+                    pendingNavigation = null;
+                }
+            } else {
+                document.getElementById('overlayError').textContent = t('authError');
+                document.getElementById('overlayError').style.display = 'block';
+                document.getElementById('overlayPassword').value = '';
+                document.getElementById('overlayPassword').focus();
+            }
+        }
+
+        // 按 Enter 键提交认证
+        document.getElementById('overlayPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                authenticateOverlay();
+            }
+        });
+        document.getElementById('overlayUsername').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('overlayPassword').focus();
+            }
+        });
+
+        // 点击 overlay 背景关闭
+        document.getElementById('authOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeOverlay();
+            }
+        });
+
         // ============= INIT =============
         window.addEventListener('load', function() {
-            // Detect phone type on load
             detectPhoneType();
-            // Test connection
             setTimeout(testConnection, 500);
-            // Set initial language
             setLanguage('ms');
         });
 
         console.log('🚀 Staff System loaded');
         console.log('📡 SCRIPT_URL:', SCRIPT_URL);
         console.log('📱 Phone Type:', document.getElementById('sPhoneType')?.value || 'Not detected');
+        console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
     </script>
 </body>
 </html>
