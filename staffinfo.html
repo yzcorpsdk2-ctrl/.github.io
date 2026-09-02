@@ -1,273 +1,507 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>设置 · 小实验</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Staff Info - Pilih & Lihat</title>
     <style>
-        /* 同样的主题变量，保持和主页一致 */
-        :root {
-            --bg: #f9f9f9;
-            --text: #222;
-            --card: #fff;
-            --border: #ddd;
-            --input-bg: #fff;
-        }
-        body.dark {
-            --bg: #1e1e1e;
-            --text: #eee;
-            --card: #2d2d2d;
-            --border: #444;
-            --input-bg: #3a3a3a;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 16px;
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            transition: background 0.3s, color 0.3s;
         }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 2rem 2.5rem;
-            border-radius: 2rem;
-            max-width: 460px;
+        .container {
+            max-width: 600px;
             width: 100%;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            transition: background 0.3s, border 0.3s;
+            background: white;
+            border-radius: 20px;
+            padding: 20px 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-        h2 {
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        h1, h2 {
+            text-align: center;
+            color: #1a3a5c;
+            margin-bottom: 16px;
+            font-size: 22px;
+        }
+        .sub-title {
+            text-align: center;
+            color: #4a5568;
+            font-size: 14px;
+            margin-bottom: 16px;
         }
         .form-group {
-            margin: 1.5rem 0;
+            margin-bottom: 16px;
         }
-        label {
+        .form-group label {
             display: block;
-            font-weight: 500;
-            margin-bottom: 0.3rem;
-        }
-        input {
-            width: 100%;
-            padding: 0.7rem 1rem;
-            border-radius: 3rem;
-            border: 1px solid var(--border);
-            background: var(--input-bg);
-            color: var(--text);
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-        .theme-options {
-            display: flex;
-            gap: 1rem;
-            margin: 0.5rem 0 1.5rem 0;
-        }
-        .theme-btn {
-            flex: 1;
-            padding: 0.7rem;
-            border-radius: 3rem;
-            border: 2px solid var(--border);
-            background: var(--card);
-            color: var(--text);
             font-weight: 600;
-            cursor: pointer;
-            transition: 0.15s;
-            text-align: center;
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 6px;
         }
-        .theme-btn.active {
-            border-color: #2b6c94;
-            background: #2b6c9410;
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #fafcfd;
+            transition: 0.2s;
         }
-        .theme-btn:hover {
-            background: var(--border);
-        }
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-            flex-wrap: wrap;
+        .form-group select:focus, .form-group input:focus {
+            border-color: #1a3a5c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
         }
         .btn {
-            padding: 0.7rem 2rem;
-            border-radius: 3rem;
+            width: 100%;
+            padding: 12px;
             border: none;
-            font-size: 1rem;
-            font-weight: 500;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: 0.15s;
+            transition: 0.2s;
+            margin-bottom: 8px;
         }
-        .btn-primary {
-            background: #2b6c94;
-            color: white;
+        .btn-primary { background: #1a3a5c; color: white; }
+        .btn-primary:hover { background: #0f2a44; }
+        .btn-secondary { background: #e2e8f0; color: #2d3748; }
+        .btn-secondary:hover { background: #cbd5e0; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-success:hover { background: #2f855a; }
+        .btn-danger { background: #c53030; color: white; }
+        .btn-danger:hover { background: #9b2c2c; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-back {
+            background: #edf2f7;
+            color: #4a5568;
         }
-        .btn-primary:hover {
-            background: #1f4f6e;
-        }
-        .btn-secondary {
-            background: var(--border);
-            color: var(--text);
-        }
-        .btn-secondary:hover {
-            opacity: 0.7;
-        }
-        .status-msg {
-            margin-top: 1.2rem;
-            padding: 0.8rem;
-            border-radius: 2rem;
-            background: #2b6c9415;
-            color: #1f4f6e;
+        .btn-back:hover { background: #e2e8f0; }
+
+        .status-bar {
+            background: #edf2f7;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 16px;
             text-align: center;
+        }
+        .status-bar.success { background: #c6f6d5; color: #22543d; }
+        .status-bar.error { background: #fed7d7; color: #9b2c2c; }
+        .status-bar.info { background: #bee3f8; color: #2a4365; }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .filter-section .form-group {
+            flex: 1;
+            min-width: 140px;
+            margin-bottom: 0;
+        }
+        .filter-section .form-group select {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+
+        .staff-list {
+            margin-top: 8px;
+        }
+        .staff-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: #f7fafc;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 5px solid #1a3a5c;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .staff-item:hover {
+            background: #edf2f7;
+            transform: scale(1.01);
+        }
+        .staff-item .info {
+            display: flex;
+            flex-direction: column;
+        }
+        .staff-item .name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a3a5c;
+        }
+        .staff-item .code {
+            font-size: 13px;
+            color: #718096;
+        }
+        .staff-item .status-badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.active { background: #c6f6d5; color: #22543d; }
+        .status-badge.inactive { background: #fed7d7; color: #9b2c2c; }
+        .status-badge.pending { background: #fefcbf; color: #975a16; }
+        .status-badge.unknown { background: #e2e8f0; color: #4a5568; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a0aec0;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a3a5c;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden { display: none !important; }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-weight: 500;
             display: none;
         }
-        body.dark .status-msg {
-            background: #2b6c9430;
-            color: #8bb9d9;
-        }
-        .status-msg.show {
-            display: block;
+        .alert.error { background: #fed7d7; color: #9b2c2c; display: block; }
+        .alert.success { background: #c6f6d5; color: #22543d; display: block; }
+        .alert.info { background: #bee3f8; color: #2a4365; display: block; }
+
+        @media (max-width: 480px) {
+            .container { padding: 16px 12px; }
+            .filter-section { flex-direction: column; }
+            .filter-section .form-group { min-width: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>⚙️ 偏好设置</h2>
-        <p style="opacity:0.7; margin-bottom:1.8rem;">修改后会自动保存，回到主页就能看到变化。</p>
+<div class="container">
+    <h1>📇 Staff Info</h1>
+    <p class="sub-title">Pilih cawangan & lihat senarai staf</p>
 
-        <!-- 名字输入 -->
-        <div class="form-group">
-            <label for="nameInput">👤 你的名字</label>
-            <input type="text" id="nameInput" placeholder="例如：林一" />
-        </div>
+    <!-- Status Bar -->
+    <div id="statusBar" class="status-bar">🔌 Menyambung ke pangkalan data...</div>
 
-        <!-- 主题选择 -->
-        <div class="form-group">
-            <label>🎨 颜色主题</label>
-            <div class="theme-options">
-                <div class="theme-btn" data-theme="light" id="themeLight">☀️ 亮色</div>
-                <div class="theme-btn" data-theme="dark" id="themeDark">🌙 暗色</div>
-            </div>
-        </div>
+    <!-- Alert -->
+    <div id="alert" class="alert"></div>
 
-        <!-- 操作按钮 -->
-        <div class="btn-group">
-            <button class="btn btn-primary" id="saveBtn">💾 保存并回到主页</button>
-            <button class="btn btn-secondary" id="resetBtn">↩️ 重置</button>
-        </div>
-
-        <!-- 状态提示 -->
-        <div class="status-msg" id="statusMsg">✅ 已保存！</div>
+    <!-- Step 1: Pilih Cawangan -->
+    <div id="stepBranch" class="form-group">
+        <label for="branchSelect">🏢 Pilih Cawangan / Branch</label>
+        <select id="branchSelect" onchange="onBranchChange()">
+            <option value="">-- Sila Pilih --</option>
+        </select>
     </div>
 
-    <script>
-        // 获取页面元素
-        const nameInput = document.getElementById('nameInput');
-        const themeLight = document.getElementById('themeLight');
-        const themeDark = document.getElementById('themeDark');
-        const saveBtn = document.getElementById('saveBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const statusMsg = document.getElementById('statusMsg');
+    <!-- Step 2: Filter Status (muncul selepas pilih cawangan) -->
+    <div id="stepFilter" class="hidden">
+        <div class="filter-section">
+            <div class="form-group">
+                <label for="statusFilter">📌 Status</label>
+                <select id="statusFilter" onchange="renderStaffList()">
+                    <option value="all">Semua / All</option>
+                    <option value="Aktif">Aktif</option>
+                    <option value="Tidak Aktif">Tidak Aktif</option>
+                    <option value="Dalam Proses">Dalam Proses</option>
+                    <option value="Berhenti">Berhenti</option>
+                    <option value="Cuti">Cuti</option>
+                </select>
+            </div>
+            <div class="form-group" style="flex:0 0 auto; display:flex; align-items:flex-end;">
+                <button class="btn btn-secondary" onclick="resetFilters()" style="margin-bottom:0; padding:10px 18px;">↺ Reset</button>
+            </div>
+        </div>
+    </div>
 
-        // --- 1. 加载已保存的数据，填充到表单 ---
-        function loadSettings() {
-            const savedName = localStorage.getItem('userName');
-            const savedTheme = localStorage.getItem('theme');
+    <!-- Staff List -->
+    <div id="staffListContainer" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-weight:600; color:#2d3748;" id="staffCount">0 staf</span>
+            <span style="font-size:13px; color:#718096;">Klik pada nama untuk login</span>
+        </div>
+        <div id="staffList"></div>
+    </div>
 
-            if (savedName) {
-                nameInput.value = savedName;
+    <!-- Buttons -->
+    <button class="btn btn-back" onclick="goBack()">← Kembali ke Menu</button>
+</div>
+
+<script>
+    // ============= CONFIG =============
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
+
+    // Sheet column mapping (based on header: B1=Situation, AB1=LoginPassword, E1=Name, D1=Code, C1=GroupName)
+    const COL_SITUATION = 'B';
+    const COL_PASSWORD = 'AB';
+    const COL_NAME = 'E';
+    const COL_CODE = 'D';
+    const COL_GROUP = 'C';
+
+    let allStaffData = [];          // Data asli dari sheet
+    let filteredStaff = [];         // Data setelah ditapis branch + status
+    let selectedBranch = '';
+    let selectedStatus = 'all';
+    let isLoading = false;
+
+    // ============= DOM REFS =============
+    const statusBar = document.getElementById('statusBar');
+    const alertBox = document.getElementById('alert');
+    const branchSelect = document.getElementById('branchSelect');
+    const stepFilter = document.getElementById('stepFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const staffListContainer = document.getElementById('staffListContainer');
+    const staffList = document.getElementById('staffList');
+    const staffCount = document.getElementById('staffCount');
+
+    // ============= UTILITY =============
+    function showAlert(msg, type = 'error') {
+        alertBox.textContent = msg;
+        alertBox.className = 'alert ' + type;
+        setTimeout(() => { alertBox.className = 'alert'; }, 4000);
+    }
+
+    function updateStatus(msg, type = '') {
+        statusBar.textContent = msg;
+        statusBar.className = 'status-bar ' + type;
+    }
+
+    function goBack() {
+        window.location.href = 'index.html';
+    }
+
+    // ============= FETCH DATA =============
+    async function fetchStaffData() {
+        if (isLoading) return;
+        isLoading = true;
+        updateStatus('⏳ Memuat data...', 'info');
+
+        try {
+            const response = await fetch(SCRIPT_URL + '?action=getData');
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error);
             }
 
-            // 高亮当前选中的主题按钮
-            if (savedTheme === 'dark') {
-                themeDark.classList.add('active');
-                themeLight.classList.remove('active');
-                document.body.classList.add('dark'); // 预览暗色效果
-            } else {
-                themeLight.classList.add('active');
-                themeDark.classList.remove('active');
-                document.body.classList.remove('dark');
+            if (!Array.isArray(data) || data.length === 0) {
+                updateStatus('⚠️ Tiada rekod ditemui.', 'error');
+                allStaffData = [];
+                return;
             }
+
+            // Parse data: tukar kepada object dengan key berdasarkan header
+            // data[0] = header, data[1:] = rows
+            const headers = data[0] || [];
+            const rows = data.slice(1);
+
+            // Cari index column berdasarkan header
+            const colMap = {};
+            headers.forEach((h, idx) => {
+                const upper = String(h).trim().toUpperCase();
+                if (upper.includes('GROUP') || upper.includes('CAWANGAN')) colMap.group = idx;
+                if (upper.includes('CODE') || upper.includes('ID')) colMap.code = idx;
+                if (upper.includes('NAME') || upper.includes('NAMA')) colMap.name = idx;
+                if (upper.includes('SITUATION') || upper.includes('STATUS')) colMap.situation = idx;
+                if (upper.includes('PASSWORD') || upper.includes('PWD')) colMap.password = idx;
+            });
+
+            // Jika tidak jumpa, guna mapping fixed berdasarkan posisi (C=2, D=3, E=4, B=1, AB=27)
+            // Tapi kita cuba guna header dulu, fallback ke position
+            const getIndex = (key, defaultIdx) => {
+                return (colMap[key] !== undefined) ? colMap[key] : defaultIdx;
+            };
+
+            const idxGroup = getIndex('group', 2);   // C
+            const idxCode = getIndex('code', 3);     // D
+            const idxName = getIndex('name', 4);     // E
+            const idxSituation = getIndex('situation', 1); // B
+            const idxPassword = getIndex('password', 27); // AB
+
+            allStaffData = rows.map(row => {
+                // Pastikan row cukup panjang
+                const get = (idx) => (row && row[idx] !== undefined && row[idx] !== null) ? String(row[idx]).trim() : '';
+                return {
+                    GroupName: get(idxGroup),
+                    Code: get(idxCode),
+                    Name: get(idxName),
+                    Situation: get(idxSituation),
+                    LoginPassword: get(idxPassword)
+                };
+            }).filter(item => item.Code && item.Name); // Buang yang kosong
+
+            // Populate branch dropdown
+            populateBranchDropdown();
+
+            updateStatus(`✅ ${allStaffData.length} rekod staf dimuatkan.`, 'success');
+            console.log('📥 Data loaded:', allStaffData);
+
+        } catch (err) {
+            console.error('❌ Fetch error:', err);
+            updateStatus('❌ Gagal memuat data: ' + err.message, 'error');
+            showAlert('Ralat sambungan: ' + err.message, 'error');
+            allStaffData = [];
+        } finally {
+            isLoading = false;
         }
+    }
 
-        // --- 2. 保存设置 ---
-        function saveSettings() {
-            const name = nameInput.value.trim();
-            let theme = 'light';
-            if (themeDark.classList.contains('active')) {
-                theme = 'dark';
-            }
-
-            // 存入 localStorage
-            if (name) {
-                localStorage.setItem('userName', name);
-            } else {
-                localStorage.removeItem('userName'); // 如果名字为空，就删除它
-            }
-            localStorage.setItem('theme', theme);
-
-            // 显示保存成功提示
-            statusMsg.textContent = `✅ 已保存！${name ? '欢迎 ' + name : ''}`;
-            statusMsg.classList.add('show');
-            setTimeout(() => {
-                statusMsg.classList.remove('show');
-            }, 2500);
-        }
-
-        // --- 3. 重置所有设置 ---
-        function resetSettings() {
-            if (confirm('重置所有偏好设置吗？')) {
-                localStorage.removeItem('userName');
-                localStorage.removeItem('theme');
-                // 清空输入框
-                nameInput.value = '';
-                // 恢复默认主题（亮色）
-                themeLight.classList.add('active');
-                themeDark.classList.remove('active');
-                document.body.classList.remove('dark');
-                statusMsg.textContent = '🔄 已重置为默认设置';
-                statusMsg.classList.add('show');
-                setTimeout(() => {
-                    statusMsg.classList.remove('show');
-                }, 2000);
-            }
-        }
-
-        // --- 4. 主题按钮切换逻辑 ---
-        themeLight.addEventListener('click', function() {
-            themeLight.classList.add('active');
-            themeDark.classList.remove('active');
-            document.body.classList.remove('dark');
+    // ============= POPULATE BRANCH DROPDOWN =============
+    function populateBranchDropdown() {
+        const branches = [...new Set(allStaffData.map(item => item.GroupName).filter(Boolean))].sort();
+        branchSelect.innerHTML = '<option value="">-- Sila Pilih --</option>';
+        branches.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b;
+            opt.textContent = b;
+            branchSelect.appendChild(opt);
         });
 
-        themeDark.addEventListener('click', function() {
-            themeDark.classList.add('active');
-            themeLight.classList.remove('active');
-            document.body.classList.add('dark');
+        // Reset other UI
+        stepFilter.classList.add('hidden');
+        staffListContainer.classList.add('hidden');
+        staffList.innerHTML = '';
+        staffCount.textContent = '0 staf';
+        selectedBranch = '';
+        selectedStatus = 'all';
+        statusFilter.value = 'all';
+    }
+
+    // ============= ON BRANCH CHANGE =============
+    function onBranchChange() {
+        selectedBranch = branchSelect.value;
+        if (!selectedBranch) {
+            stepFilter.classList.add('hidden');
+            staffListContainer.classList.add('hidden');
+            return;
+        }
+        stepFilter.classList.remove('hidden');
+        renderStaffList();
+    }
+
+    // ============= RENDER STAFF LIST =============
+    function renderStaffList() {
+        selectedStatus = statusFilter.value;
+
+        // Filter by branch
+        let list = allStaffData.filter(item => item.GroupName === selectedBranch);
+
+        // Filter by status
+        if (selectedStatus !== 'all') {
+            list = list.filter(item => item.Situation === selectedStatus);
+        }
+
+        filteredStaff = list;
+        displayStaffList(list);
+    }
+
+    // ============= DISPLAY STAFF LIST =============
+    function displayStaffList(list) {
+        staffListContainer.classList.remove('hidden');
+        staffCount.textContent = `${list.length} staf`;
+
+        if (list.length === 0) {
+            staffList.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">📭</div>
+                    <p>Tiada staf untuk paparan ini.</p>
+                    <p style="font-size:13px; color:#a0aec0;">Cuba tukar penapis status.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        list.forEach(item => {
+            const statusClass = getStatusClass(item.Situation);
+            const statusDisplay = item.Situation || 'Tidak diketahui';
+            html += `
+                <div class="staff-item" onclick="onStaffClick('${item.Code}', '${item.Name}')">
+                    <div class="info">
+                        <div class="name">${item.Name}</div>
+                        <div class="code">#${item.Code}</div>
+                    </div>
+                    <span class="status-badge ${statusClass}">${statusDisplay}</span>
+                </div>
+            `;
         });
+        staffList.innerHTML = html;
+    }
 
-        // --- 5. 绑定按钮事件 ---
-        saveBtn.addEventListener('click', function() {
-            saveSettings();
-            // 延迟跳转，让用户看到保存成功的提示
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 800);
-        });
+    // ============= STATUS CLASS =============
+    function getStatusClass(status) {
+        const s = String(status).toLowerCase();
+        if (s.includes('aktif') || s === 'active') return 'active';
+        if (s.includes('tidak aktif') || s.includes('inactive')) return 'inactive';
+        if (s.includes('proses') || s.includes('pending')) return 'pending';
+        if (s.includes('berhenti')) return 'inactive';
+        if (s.includes('cuti')) return 'pending';
+        return 'unknown';
+    }
 
-        resetBtn.addEventListener('click', resetSettings);
+    // ============= RESET FILTERS =============
+    function resetFilters() {
+        statusFilter.value = 'all';
+        renderStaffList();
+    }
 
-        // 页面加载时读取已有设置
-        loadSettings();
-    </script>
+    // ============= STAFF CLICK -> REDIRECT TO LOGIN =============
+    function onStaffClick(code, name) {
+        if (!code) {
+            showAlert('Kod staf tidak sah.', 'error');
+            return;
+        }
+
+        // Cari password untuk staff ini
+        const staff = allStaffData.find(item => item.Code === code);
+        const password = staff ? staff.LoginPassword : '';
+
+        // Redirect ke index.html dengan parameter
+        // Bina URL: index.html?code=XXX&password=YYY (password optional, user perlu taip)
+        // Kita akan isi code secara auto di login form
+        const params = new URLSearchParams();
+        params.set('code', code);
+        if (password) {
+            params.set('pwd_hint', password); // Boleh guna untuk auto isi? Tapi lebih selamat user taip sendiri
+            // Kita hantar juga untuk rujukan, tapi di login form kita akan isi code sahaja
+        }
+        // Untuk memudahkan, kita redirect ke index.html dengan parameter code
+        // Di index.html, kita akan detect parameter dan auto isi field code
+        window.location.href = `index.html?code=${encodeURIComponent(code)}`;
+    }
+
+    // ============= INIT =============
+    window.addEventListener('load', function() {
+        fetchStaffData();
+    });
+
+    console.log('📇 Staff Info page loaded.');
+    console.log('🔗 SCRIPT_URL:', SCRIPT_URL);
+</script>
 </body>
 </html>
