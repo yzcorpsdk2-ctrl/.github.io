@@ -40,6 +40,33 @@
             border-bottom: 1px solid #e2e8f0;
             padding-bottom: 12px;
         }
+
+        /* Language Bar */
+        .lang-bar {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            padding: 6px 16px;
+            border: 2px solid #1a3a5c;
+            background: transparent;
+            color: #1a3a5c;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+        .lang-btn.active,
+        .lang-btn:hover {
+            background: #1a3a5c;
+            color: white;
+        }
+
+        /* Filter Section - Hidden after login */
         .filter-section {
             background: #f7fafc;
             border-radius: 16px;
@@ -64,8 +91,7 @@
             margin-bottom: 4px;
             letter-spacing: 0.3px;
         }
-        .filter-group select,
-        .filter-group input {
+        .filter-group select {
             width: 100%;
             padding: 10px 12px;
             border: 2px solid #e2e8f0;
@@ -75,14 +101,10 @@
             transition: 0.2s;
             appearance: auto;
         }
-        .filter-group select:focus,
-        .filter-group input:focus {
+        .filter-group select:focus {
             border-color: #1a3a5c;
             outline: none;
             box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
-        }
-        .filter-group input {
-            appearance: none;
         }
         .btn-back {
             background: #e2e8f0;
@@ -102,30 +124,6 @@
         }
         .btn-back:hover {
             background: #cbd5e0;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .status-badge.active {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-        .status-badge.inactive {
-            background: #fed7d7;
-            color: #9b2c2c;
-        }
-        .status-badge.pending {
-            background: #fefcbf;
-            color: #975a16;
-        }
-        .status-badge.unknown {
-            background: #e2e8f0;
-            color: #4a5568;
         }
 
         .staff-list {
@@ -212,50 +210,20 @@
             display: none !important;
         }
 
-        .other-input-container {
-            margin-top: 8px;
-            transition: 0.3s;
-        }
-        .other-input-container input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 14px;
-            background: #fafcfd;
-        }
-        .other-input-container input:focus {
-            border-color: #1a3a5c;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
-        }
-
-        /* Debug console */
-        .debug-box {
-            background: #1a202c;
-            color: #68d391;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 16px;
-            max-height: 250px;
-            overflow: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-            line-height: 1.5;
-        }
-
-        /* ===== PROFILE VIEW (like index.html) ===== */
+        /* ===== PROFILE VIEW ===== */
         .profile-view {
             margin-top: 16px;
-            border-top: 2px solid #e2e8f0;
-            padding-top: 16px;
         }
         .profile-view h2 {
             text-align: center;
             color: #1a3a5c;
             font-size: 20px;
+            margin-bottom: 12px;
+        }
+        .profile-edit-hint {
+            text-align: center;
+            font-size: 13px;
+            color: #718096;
             margin-bottom: 12px;
         }
         .profile-field {
@@ -294,6 +262,10 @@
             text-align: right;
             text-align-last: right;
         }
+        .profile-field input:read-only {
+            background: #f7fafc;
+        }
+
         .btn-danger {
             background: #c53030;
             color: white;
@@ -342,6 +314,22 @@
         .btn-gray:hover {
             background: #cbd5e0;
         }
+        .btn-primary {
+            background: #1a3a5c;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn-primary:hover {
+            background: #0f2a44;
+        }
 
         .loading-spinner {
             display: inline-block;
@@ -359,79 +347,115 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Auth Overlay */
-        .auth-overlay {
+        /* ===== LOGIN OVERLAY (Popup) ===== */
+        .login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            backdrop-filter: blur(4px);
         }
-        .auth-overlay .auth-box {
+        .login-overlay .login-box {
             background: white;
-            padding: 30px 24px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 32px 28px;
+            border-radius: 24px;
+            max-width: 420px;
+            width: 92%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease;
         }
-        .auth-overlay .auth-box h3 {
+        @keyframes fadeIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .login-overlay .login-box h3 {
             text-align: center;
             color: #1a3a5c;
-            margin-bottom: 16px;
+            font-size: 22px;
+            margin-bottom: 6px;
         }
-        .auth-overlay .auth-box .form-group {
-            margin-bottom: 12px;
+        .login-overlay .login-box .login-sub {
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
-        .auth-overlay .auth-box .form-group label {
+        .login-overlay .login-box .form-group {
+            margin-bottom: 14px;
+        }
+        .login-overlay .login-box .form-group label {
             display: block;
             font-weight: 600;
             font-size: 13px;
             color: #2d3748;
             margin-bottom: 4px;
         }
-        .auth-overlay .auth-box .form-group input {
+        .login-overlay .login-box .form-group input {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px 14px;
             border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 15px;
+            transition: 0.2s;
         }
-        .auth-overlay .auth-box .btn {
+        .login-overlay .login-box .form-group input:focus {
+            border-color: #1a3a5c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1);
+        }
+        .login-overlay .login-box .btn {
             width: 100%;
             padding: 12px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
-            margin-top: 8px;
+            margin-top: 6px;
         }
-        .auth-overlay .auth-box .btn-primary {
+        .login-overlay .login-box .btn-primary {
             background: #1a3a5c;
             color: white;
         }
-        .auth-overlay .auth-box .btn-primary:hover {
+        .login-overlay .login-box .btn-primary:hover {
             background: #0f2a44;
         }
-        .auth-overlay .auth-box .btn-gray {
+        .login-overlay .login-box .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .login-overlay .login-box .btn-gray {
             background: #e2e8f0;
             color: #4a5568;
         }
-        .auth-overlay .auth-box .btn-gray:hover {
+        .login-overlay .login-box .btn-gray:hover {
             background: #cbd5e0;
         }
-        .auth-overlay .auth-box .error-msg {
+        .login-overlay .login-box .error-msg {
             color: #c53030;
             font-size: 14px;
             text-align: center;
-            margin-top: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        .login-overlay .login-box .success-msg {
+            color: #22543d;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
             display: none;
         }
 
@@ -442,45 +466,61 @@
             display: none;
             font-weight: 500;
         }
-        .alert.error { background: #fed7d7; color: #9b2c2c; display: block; }
-        .alert.success { background: #c6f6d5; color: #22543d; display: block; }
-        .alert.info { background: #bee3f8; color: #2a4365; display: block; }
+        .alert.error {
+            background: #fed7d7;
+            color: #9b2c2c;
+            display: block;
+        }
+        .alert.success {
+            background: #c6f6d5;
+            color: #22543d;
+            display: block;
+        }
+        .alert.info {
+            background: #bee3f8;
+            color: #2a4365;
+            display: block;
+        }
 
         @media (max-width: 480px) {
-            .container { padding: 16px 12px; }
-            .filter-row { flex-direction: column; gap: 10px; }
-            .filter-group { flex: 1 1 100%; }
-            .staff-item { padding: 12px 14px; }
-            .debug-box { font-size: 10px; max-height: 150px; }
-            .profile-field label { flex: 0 0 90px; font-size: 12px; }
-            .profile-field input { font-size: 13px; }
+            .container {
+                padding: 16px 12px;
+            }
+            .filter-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .filter-group {
+                flex: 1 1 100%;
+            }
+            .staff-item {
+                padding: 12px 14px;
+            }
+            .profile-field label {
+                flex: 0 0 90px;
+                font-size: 12px;
+            }
+            .profile-field input,
+            .profile-field select {
+                font-size: 13px;
+            }
+            .login-overlay .login-box {
+                padding: 24px 18px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- ===== AUTH OVERLAY ===== -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-box">
-            <h3>🔐 Akses Dilindungi</h3>
-            <p style="text-align:center; color:#718096; margin-bottom:16px; font-size:14px;">Sila log masuk untuk mengakses halaman ini</p>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="authUsername" placeholder="Masukkan username" value="SIANGSIANG">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="authPassword" placeholder="Masukkan password">
-            </div>
-            <button class="btn btn-primary" onclick="authenticateUser()">🔓 Log Masuk</button>
-            <button class="btn btn-gray" onclick="goBackToIndex()">← Kembali ke Index</button>
-            <div class="error-msg" id="authError">Username atau Password salah!</div>
+    <div class="container" id="mainContainer">
+        <!-- Language Bar -->
+        <div class="lang-bar">
+            <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
+            <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
+            <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
         </div>
-    </div>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <div class="container" id="mainContent">
-        <h1>📇 Staff Info</h1>
-        <div class="subtitle">Pilih cawangan & lihat senarai staf</div>
+        <h1 id="mainTitle">👤 Sistem Pengurusan Staf</h1>
+        <div class="subtitle" id="subTitle">Pilih cawangan & lihat senarai staf</div>
 
         <!-- Status Bar -->
         <div id="statusBar" class="status-bar">🔌 Memuatkan data...</div>
@@ -488,8 +528,8 @@
         <!-- Alert -->
         <div id="alert" class="alert"></div>
 
-        <!-- Filter Section -->
-        <div class="filter-section">
+        <!-- Filter Section (hidden after profile view) -->
+        <div id="filterSection" class="filter-section">
             <div class="filter-row">
                 <div class="filter-group">
                     <label for="branchSelect">🏢 Cawangan (GroupName)</label>
@@ -504,8 +544,8 @@
                         <option value="CC TELESHOP (MESRA)">CC TELESHOP (MESRA)</option>
                         <option value="Others">Others (Lain-lain)</option>
                     </select>
-                    <div id="otherBranchContainer" class="other-input-container hidden">
-                        <input type="text" id="otherBranchInput" placeholder="Sila nyatakan cawangan lain...">
+                    <div id="otherBranchContainer" class="other-input-container hidden" style="margin-top:8px;">
+                        <input type="text" id="otherBranchInput" placeholder="Sila nyatakan cawangan lain..." style="width:100%; padding:10px 12px; border:2px solid #e2e8f0; border-radius:12px; font-size:14px;">
                     </div>
                 </div>
                 <div class="filter-group">
@@ -523,26 +563,41 @@
             </div>
         </div>
 
-        <!-- Staff List -->
+        <!-- Staff List (hidden after profile view) -->
         <div id="staffListContainer">
             <div class="staff-list" id="staffList">
                 <!-- Dynamic content -->
             </div>
         </div>
 
-        <!-- ===== PROFILE VIEW (like index.html) ===== -->
+        <!-- ===== PROFILE VIEW ===== -->
         <div id="profileView" class="profile-view hidden">
             <h2 id="profileTitle">👤 Profil Staf</h2>
-            <div style="text-align:center; font-size:13px; color:#718096; margin-bottom:12px;">
-                ✏️ Klik pada mana-mana medan untuk sunting
-            </div>
+            <div class="profile-edit-hint">✏️ Klik pada mana-mana medan untuk sunting</div>
             <div id="profileFields"></div>
-            <button class="btn btn-success" onclick="saveProfile()">💾 Simpan Perubahan</button>
-            <button class="btn btn-gray" onclick="closeProfile()">✖ Tutup</button>
+            <button class="btn btn-success" id="saveProfileBtn" onclick="saveProfile()">💾 Simpan Perubahan</button>
+            <button class="btn btn-danger" onclick="logoutAndGoBack()">🚪 Log Keluar & Kembali</button>
         </div>
+    </div>
 
-        <!-- Debug Console -->
-        <div id="debugBox" class="debug-box" style="display:none;"></div>
+    <!-- ===== LOGIN OVERLAY (Popup) ===== -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h3>🔐 Log Masuk</h3>
+            <p class="login-sub">Masukkan Code dan Password untuk melihat profil</p>
+            <div class="form-group">
+                <label for="loginCode">Code</label>
+                <input type="text" id="loginCode" placeholder="Masukkan Code Staff" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Masukkan Password">
+            </div>
+            <button class="btn btn-primary" id="loginBtn" onclick="performLogin()">🔓 Log Masuk</button>
+            <button class="btn btn-gray" onclick="goBackToIndex()">← Kembali ke Index</button>
+            <div class="error-msg" id="loginError">Code atau Password salah!</div>
+            <div class="success-msg" id="loginSuccess">✅ Log masuk berjaya!</div>
+        </div>
     </div>
 
     <script>
@@ -551,8 +606,6 @@
         // ============================================================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
         const SHEET_NAME = 'STAFF LOGIN RECORD';
-        const AUTH_USERNAME = 'SIANGSIANG';
-        const AUTH_PASSWORD = '0000';
 
         // ============================================================
         //  STATE
@@ -560,61 +613,165 @@
         let allStaff = [];
         let branches = [];
         let isLoading = false;
-        let debugLogs = [];
-        let debugVisible = false;
-        let currentUser = null; // 当前查看的员工资料
-        let isAuthenticated = false;
+        let currentUser = null;
+        let isLoggedIn = false;
+        let currentLanguage = 'ms';
 
         // Elemen DOM
         const branchSelect = document.getElementById('branchSelect');
         const statusSelect = document.getElementById('statusSelect');
         const staffListEl = document.getElementById('staffList');
         const statusBar = document.getElementById('statusBar');
-        const debugBox = document.getElementById('debugBox');
         const otherBranchContainer = document.getElementById('otherBranchContainer');
         const otherBranchInput = document.getElementById('otherBranchInput');
-        const authOverlay = document.getElementById('authOverlay');
-        const authUsername = document.getElementById('authUsername');
-        const authPassword = document.getElementById('authPassword');
-        const authError = document.getElementById('authError');
-        const mainContent = document.getElementById('mainContent');
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginCode = document.getElementById('loginCode');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const loginSuccess = document.getElementById('loginSuccess');
+        const loginBtn = document.getElementById('loginBtn');
+        const alertBox = document.getElementById('alert');
         const profileView = document.getElementById('profileView');
         const profileFields = document.getElementById('profileFields');
-        const alertBox = document.getElementById('alert');
+        const filterSection = document.getElementById('filterSection');
+        const staffListContainer = document.getElementById('staffListContainer');
 
         // ============================================================
-        //  AUTHENTICATION
+        //  TRANSLATIONS
         // ============================================================
-        function authenticateUser() {
-            const username = authUsername.value.trim();
-            const password = authPassword.value.trim();
-
-            if (username === AUTH_USERNAME && password === AUTH_PASSWORD) {
-                isAuthenticated = true;
-                authOverlay.style.display = 'none';
-                mainContent.style.display = 'block';
-                debugLog('✅ Authentication successful');
-                // Load data after auth
-                init();
-            } else {
-                authError.style.display = 'block';
-                authPassword.value = '';
-                authPassword.focus();
-                debugLog('❌ Authentication failed', 'error');
+        const translations = {
+            ms: {
+                title: '👤 Sistem Pengurusan Staf',
+                subTitle: 'Pilih cawangan & lihat senarai staf',
+                profileTitle: '👤 Profil Staf',
+                loginTitle: '🔐 Log Masuk',
+                loginSub: 'Masukkan Code dan Password untuk melihat profil',
+                loginCode: 'Code',
+                loginPassword: 'Password',
+                loginBtn: '🔓 Log Masuk',
+                backBtn: '← Kembali ke Index',
+                saveBtn: '💾 Simpan Perubahan',
+                logoutBtn: '🚪 Log Keluar & Kembali',
+                editHint: '✏️ Klik pada mana-mana medan untuk sunting',
+                loginSuccess: '✅ Log masuk berjaya!',
+                loginError: 'Code atau Password salah!',
+                saveSuccess: '✅ Data berjaya disimpan!',
+                saveFail: '❌ Gagal menyimpan data.',
+                networkError: '⚠️ Ralat rangkaian',
+                noData: 'Tiada staf untuk paparan.',
+                selectBranch: '-- Pilih Cawangan --',
+                allStatus: 'Semua Status',
+                groupName: '🏢 Cawangan (GroupName)',
+                statusLabel: '📌 Status (Situation)',
+                loading: '🔌 Memuatkan data...',
+                connected: '✅ Bersambung! {count} rekod ditemui.',
+                othersPlaceholder: 'Sila nyatakan cawangan lain...',
+                emptyOthers: 'Sila nyatakan cawangan lain di ruangan yang disediakan.',
+                required: 'Sila isi semua medan yang wajib.'
+            },
+            en: {
+                title: '👤 Staff Management System',
+                subTitle: 'Select branch & view staff list',
+                profileTitle: '👤 Staff Profile',
+                loginTitle: '🔐 Login',
+                loginSub: 'Enter Code and Password to view profile',
+                loginCode: 'Code',
+                loginPassword: 'Password',
+                loginBtn: '🔓 Login',
+                backBtn: '← Back to Index',
+                saveBtn: '💾 Save Changes',
+                logoutBtn: '🚪 Logout & Back',
+                editHint: '✏️ Click on any field to edit',
+                loginSuccess: '✅ Login successful!',
+                loginError: 'Incorrect Code or Password!',
+                saveSuccess: '✅ Data saved successfully!',
+                saveFail: '❌ Failed to save data.',
+                networkError: '⚠️ Network error',
+                noData: 'No staff to display.',
+                selectBranch: '-- Select Branch --',
+                allStatus: 'All Status',
+                groupName: '🏢 Branch (GroupName)',
+                statusLabel: '📌 Status (Situation)',
+                loading: '🔌 Loading data...',
+                connected: '✅ Connected! {count} records found.',
+                othersPlaceholder: 'Please specify other branch...',
+                emptyOthers: 'Please specify other branch in the field provided.',
+                required: 'Please fill in all required fields.'
+            },
+            zh: {
+                title: '👤 员工管理系统',
+                subTitle: '选择分店并查看员工列表',
+                profileTitle: '👤 员工资料',
+                loginTitle: '🔐 登录',
+                loginSub: '输入代码和密码以查看资料',
+                loginCode: '员工代码',
+                loginPassword: '密码',
+                loginBtn: '🔓 登录',
+                backBtn: '← 返回主页',
+                saveBtn: '💾 保存修改',
+                logoutBtn: '🚪 退出并返回',
+                editHint: '✏️ 点击任意字段进行编辑',
+                loginSuccess: '✅ 登录成功！',
+                loginError: '代码或密码错误！',
+                saveSuccess: '✅ 数据保存成功！',
+                saveFail: '❌ 保存数据失败。',
+                networkError: '⚠️ 网络错误',
+                noData: '没有员工可显示。',
+                selectBranch: '-- 选择分店 --',
+                allStatus: '所有状态',
+                groupName: '🏢 分店 (GroupName)',
+                statusLabel: '📌 状态 (Situation)',
+                loading: '🔌 加载数据中...',
+                connected: '✅ 已连接！找到 {count} 条记录。',
+                othersPlaceholder: '请注明其他分店...',
+                emptyOthers: '请在提供的字段中注明其他分店。',
+                required: '请填写所有必填字段。'
             }
+        };
+
+        function t(key) {
+            return translations[currentLanguage]?.[key] || key;
         }
 
-        // Enter key for auth
-        authPassword.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                authenticateUser();
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.lang === lang);
+            });
+            updateAllTexts();
+        }
+
+        function updateAllTexts() {
+            document.getElementById('mainTitle').textContent = t('title');
+            document.getElementById('subTitle').textContent = t('subTitle');
+            document.getElementById('profileTitle').textContent = t('profileTitle');
+            document.querySelector('.profile-edit-hint').textContent = t('editHint');
+            document.getElementById('saveProfileBtn').textContent = t('saveBtn');
+            document.querySelector('.btn-danger').textContent = t('logoutBtn');
+
+            // Login overlay
+            document.querySelector('.login-box h3').textContent = t('loginTitle');
+            document.querySelector('.login-box .login-sub').textContent = t('loginSub');
+            document.querySelector('.login-box .form-group label').textContent = t('loginCode');
+            document.querySelectorAll('.login-box .form-group label')[1].textContent = t('loginPassword');
+            document.getElementById('loginBtn').textContent = t('loginBtn');
+            document.querySelector('.login-box .btn-gray').textContent = t('backBtn');
+
+            // Filter labels
+            document.querySelector('.filter-group label').textContent = t('groupName');
+            document.querySelectorAll('.filter-group label')[1].textContent = t('statusLabel');
+
+            // Update select placeholders
+            const branchSel = document.getElementById('branchSelect');
+            if (branchSel.options.length > 0) {
+                branchSel.options[0].text = t('selectBranch');
             }
-        });
-        authUsername.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                authPassword.focus();
+            const statusSel = document.getElementById('statusSelect');
+            if (statusSel.options.length > 0) {
+                statusSel.options[0].text = t('allStatus');
             }
-        });
+            document.getElementById('otherBranchInput').placeholder = t('othersPlaceholder');
+        }
 
         // ============================================================
         //  ALERT
@@ -626,46 +783,20 @@
         }
 
         // ============================================================
-        //  DEBUG
-        // ============================================================
-        function debugLog(msg, type = 'info') {
-            const timestamp = new Date().toLocaleTimeString();
-            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warn' ? '⚠️' : '📌';
-            const logMsg = `[${timestamp}] ${prefix} ${msg}`;
-            debugLogs.push(logMsg);
-            if (debugVisible) {
-                renderDebug();
-            }
-            console.log(logMsg);
-        }
-
-        function renderDebug() {
-            debugBox.innerHTML = debugLogs.join('\n');
-            debugBox.scrollTop = debugBox.scrollHeight;
-        }
-
-        function toggleDebug() {
-            debugVisible = !debugVisible;
-            debugBox.style.display = debugVisible ? 'block' : 'none';
-            if (debugVisible) renderDebug();
-        }
-
-        // ============================================================
         //  UTILITY
         // ============================================================
         function updateStatus(msg, type = '') {
             statusBar.textContent = msg;
             statusBar.className = 'status-bar ' + type;
-            debugLog(msg, type === 'error' ? 'error' : type === 'success' ? 'success' : 'info');
+            console.log(msg);
         }
 
         function getStatusBadge(status) {
             const s = (status || '').toLowerCase();
             let cls = 'unknown';
             let label = status || 'Unknown';
-            if (s === 'active') { cls = 'active'; label = 'Active'; }
-            else if (s === 'inactive') { cls = 'inactive'; label = 'Inactive'; }
-            else if (s === 'pending') { cls = 'pending'; label = 'Pending'; }
+            if (s === 'active') { cls = 'active'; label = 'Active'; } else if (s === 'inactive') { cls = 'inactive';
+                label = 'Inactive'; } else if (s === 'pending') { cls = 'pending'; label = 'Pending'; }
             return `<span class="status-badge ${cls}">${label}</span>`;
         }
 
@@ -684,102 +815,68 @@
                 renderStaffList();
             }
         }
-
-        otherBranchInput.addEventListener('input', function() {
-            renderStaffList();
-        });
+        otherBranchInput.addEventListener('input', renderStaffList);
 
         // ============================================================
         //  FETCH DATA
         // ============================================================
         async function fetchStaffData() {
             isLoading = true;
-            debugLog('🚀 Fetching staff data...');
             updateStatus('⏳ Menghubungi server...', 'info');
 
             try {
                 const url = `${SCRIPT_URL}?action=getData`;
-                debugLog(`📡 URL: ${url}`);
-
                 const response = await fetch(url);
-                debugLog(`📡 Response status: ${response.status}`);
-
                 if (!response.ok) throw new Error('HTTP ' + response.status);
 
                 const rawResult = await response.json();
-                debugLog(`📦 Raw response type: ${typeof rawResult}`);
-
                 let dataArray;
 
                 if (Array.isArray(rawResult)) {
                     dataArray = rawResult;
-                    debugLog('✅ Data is direct array');
                 } else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
                     dataArray = rawResult.data;
-                    debugLog('✅ Data extracted from result.data');
                 } else if (rawResult && rawResult.values && Array.isArray(rawResult.values)) {
                     dataArray = rawResult.values;
-                    debugLog('✅ Data extracted from result.values');
                 } else if (rawResult && rawResult.rows && Array.isArray(rawResult.rows)) {
                     dataArray = rawResult.rows;
-                    debugLog('✅ Data extracted from result.rows');
                 } else if (typeof rawResult === 'object' && rawResult !== null) {
                     const keys = Object.keys(rawResult);
                     if (keys.length > 0 && keys.every(k => !isNaN(parseInt(k)))) {
                         dataArray = Object.values(rawResult);
-                        debugLog('✅ Converted object with numeric keys to array');
                     } else {
-                        throw new Error('Format data tidak dikenali. Data adalah object dengan keys: ' + keys.join(', '));
+                        throw new Error('Format data tidak dikenali.');
                     }
                 } else {
-                    throw new Error('Format data tidak dikenali: ' + JSON.stringify(rawResult).substring(0, 200));
+                    throw new Error('Format data tidak dikenali.');
                 }
 
                 if (!dataArray || dataArray.length === 0) {
-                    throw new Error('Tiada data ditemui dalam sheet.');
+                    throw new Error('Tiada data ditemui.');
                 }
 
-                debugLog(`📊 Data length: ${dataArray.length} rows`);
-
                 const firstRow = dataArray[0];
-                debugLog(`📊 First row type: ${typeof firstRow}`);
-
                 let staff = [];
                 const branchSet = new Set();
 
                 if (Array.isArray(firstRow)) {
-                    debugLog('📊 Processing as 2D array');
-                    const idx = {
-                        situation: 1,    // B
-                        loginPwd: 28,    // AB
-                        name: 4,         // E
-                        code: 3,         // D
-                        group: 2         // C
-                    };
-                    debugLog(`📌 Using fixed indices: situation=${idx.situation}, loginPwd=${idx.loginPwd}, name=${idx.name}, code=${idx.code}, group=${idx.group}`);
-
+                    const idx = { situation: 1, loginPwd: 28, name: 4, code: 3, group: 2 };
                     for (let i = 1; i < dataArray.length; i++) {
                         const row = dataArray[i];
                         if (!Array.isArray(row)) continue;
                         if (row.length <= Math.max(idx.situation, idx.loginPwd, idx.name, idx.code, idx.group)) continue;
-
                         const group = (row[idx.group] || '').toString().trim();
                         const code = (row[idx.code] || '').toString().trim();
                         const name = (row[idx.name] || '').toString().trim();
                         const situation = (row[idx.situation] || '').toString().trim();
                         const loginPwd = (row[idx.loginPwd] || '').toString().trim();
-
                         if (!code || !name) continue;
-
-                        staff.push({ group: group || 'Tidak Diketahui', code, name, situation: situation || 'Unknown', loginPwd });
+                        staff.push({ group: group || 'Tidak Diketahui', code, name, situation: situation || 'Unknown',
+                            loginPwd });
                         if (group) branchSet.add(group);
                     }
                 } else if (typeof firstRow === 'object' && firstRow !== null) {
-                    debugLog('📊 Processing as array of objects');
-
                     const sampleKeys = Object.keys(firstRow);
-                    debugLog(`📊 Sample keys: ${sampleKeys.slice(0, 10).join(', ')}${sampleKeys.length > 10 ? '...' : ''}`);
-
                     const findKey = (possibleNames) => {
                         for (const name of possibleNames) {
                             const found = sampleKeys.find(k => k.toLowerCase() === name.toLowerCase());
@@ -791,76 +888,53 @@
                         }
                         return null;
                     };
-
                     const situationKey = findKey(['Situation', 'situation', 'STATUS', 'Status']);
-                    const loginPwdKey = findKey(['LoginPassword', 'loginPassword', 'Loginpassword', 'Password', 'password']);
+                    const loginPwdKey = findKey(['LoginPassword', 'loginPassword', 'Loginpassword', 'Password',
+                        'password'
+                    ]);
                     const nameKey = findKey(['Name', 'name', 'Nama', 'nama']);
                     const codeKey = findKey(['Code', 'code', 'Kod', 'kod', 'ID']);
                     const groupKey = findKey(['GroupName', 'groupName', 'Group', 'group', 'Cawangan', 'cawangan']);
 
-                    debugLog(`📌 Mapped keys: situation=${situationKey}, loginPwd=${loginPwdKey}, name=${nameKey}, code=${codeKey}, group=${groupKey}`);
-
-                    const missingKeys = [];
-                    if (!situationKey) missingKeys.push('Situation');
-                    if (!loginPwdKey) missingKeys.push('LoginPassword');
-                    if (!nameKey) missingKeys.push('Name');
-                    if (!codeKey) missingKeys.push('Code');
-                    if (!groupKey) missingKeys.push('GroupName');
-
-                    if (missingKeys.length > 0) {
-                        throw new Error(`Header tidak dijumpai: ${missingKeys.join(', ')}. Pastikan sheet mengandungi lajur: Situation, LoginPassword, Name, Code, GroupName`);
+                    if (!situationKey || !loginPwdKey || !nameKey || !codeKey || !groupKey) {
+                        throw new Error('Header tidak dijumpai.');
                     }
 
                     for (const row of dataArray) {
                         if (typeof row !== 'object' || row === null) continue;
-
                         const group = (row[groupKey] || '').toString().trim();
                         const code = (row[codeKey] || '').toString().trim();
                         const name = (row[nameKey] || '').toString().trim();
                         const situation = (row[situationKey] || '').toString().trim();
                         const loginPwd = (row[loginPwdKey] || '').toString().trim();
-
                         if (!code || !name) continue;
-
-                        staff.push({
-                            group: group || 'Tidak Diketahui',
-                            code,
-                            name,
-                            situation: situation || 'Unknown',
-                            loginPwd
-                        });
+                        staff.push({ group: group || 'Tidak Diketahui', code, name, situation: situation || 'Unknown',
+                            loginPwd });
                         if (group) branchSet.add(group);
                     }
                 } else {
-                    throw new Error('Format data tidak disokong: first row is ' + typeof firstRow);
+                    throw new Error('Format data tidak disokong.');
                 }
 
                 if (staff.length === 0) {
-                    throw new Error('Tiada rekod staf yang sah (perlukan Code dan Name).');
+                    throw new Error('Tiada rekod staf yang sah.');
                 }
 
                 allStaff = staff;
                 branches = Array.from(branchSet).sort((a, b) => a.localeCompare(b));
 
-                updateStatus(`✅ ${staff.length} rekod staf dimuatkan.`, 'success');
-                debugLog(`✅ ${staff.length} staf, ${branches.length} cawangan`);
-                debugLog(`📊 Sample staff: ${JSON.stringify(staff.slice(0, 2), null, 2)}`);
-
+                const msg = t('connected').replace('{count}', staff.length);
+                updateStatus(msg, 'success');
                 return true;
 
             } catch (err) {
                 console.error('❌ Ralat fetch:', err);
                 updateStatus(`❌ Gagal: ${err.message}`, 'error');
-                debugLog(`❌ ERROR: ${err.message}`, 'error');
-                debugLog(`❌ Stack: ${err.stack}`, 'error');
                 allStaff = [];
                 branches = [];
                 return false;
             } finally {
                 isLoading = false;
-                if (statusBar.classList.contains('error')) {
-                    toggleDebug();
-                }
             }
         }
 
@@ -869,7 +943,6 @@
         // ============================================================
         function renderStaffList() {
             let selectedBranch = branchSelect.value;
-
             if (selectedBranch === 'Others') {
                 const otherVal = otherBranchInput.value.trim();
                 if (otherVal) {
@@ -878,7 +951,7 @@
                     staffListEl.innerHTML = `
                         <div class="empty-state">
                             <span class="icon">✏️</span>
-                            Sila nyatakan cawangan lain di ruangan yang disediakan.
+                            ${t('emptyOthers')}
                         </div>
                     `;
                     return;
@@ -886,24 +959,16 @@
             }
 
             const selectedStatus = statusSelect.value;
-
             let filtered = allStaff;
-
-            if (selectedBranch) {
-                filtered = filtered.filter(s => s.group === selectedBranch);
-            }
-
-            if (selectedStatus) {
-                filtered = filtered.filter(s => s.situation.toLowerCase() === selectedStatus.toLowerCase());
-            }
-
+            if (selectedBranch) filtered = filtered.filter(s => s.group === selectedBranch);
+            if (selectedStatus) filtered = filtered.filter(s => s.situation.toLowerCase() === selectedStatus.toLowerCase());
             filtered.sort((a, b) => a.name.localeCompare(b.name));
 
             if (filtered.length === 0) {
                 staffListEl.innerHTML = `
                     <div class="empty-state">
                         <span class="icon">📭</span>
-                        Tiada staf untuk paparan.
+                        ${t('noData')}
                         ${selectedBranch ? `<br><small style="color:#a0aec0;">Cawangan: ${selectedBranch}</small>` : ''}
                         ${selectedStatus ? `<br><small style="color:#a0aec0;">Status: ${selectedStatus}</small>` : ''}
                     </div>
@@ -916,7 +981,7 @@
                 const statusBadge = getStatusBadge(staff.situation);
                 const safeCode = staff.code.replace(/'/g, "\\'");
                 html += `
-                    <div class="staff-item" onclick="viewProfile('${safeCode}')">
+                    <div class="staff-item" onclick="openLoginForStaff('${safeCode}')">
                         <div class="info">
                             <div class="name">${staff.name}</div>
                             <div class="code">🔑 ${staff.code}</div>
@@ -928,59 +993,128 @@
                     </div>
                 `;
             });
-
             staffListEl.innerHTML = html;
-            debugLog(`📋 Rendered ${filtered.length} staff items`);
         }
 
         // ============================================================
-        //  PROFILE VIEW (like index.html)
+        //  LOGIN - Popup Overlay
         // ============================================================
-        function viewProfile(code) {
-            debugLog(`👤 Viewing profile for: ${code}`);
-            const staff = allStaff.find(s => s.code === code);
-            if (!staff) {
-                showAlert('Staf tidak dijumpai.', 'error');
+        let pendingLoginCode = null;
+
+        function openLoginForStaff(code) {
+            pendingLoginCode = code;
+            loginCode.value = code;
+            loginPassword.value = '';
+            loginError.style.display = 'none';
+            loginSuccess.style.display = 'none';
+            loginBtn.disabled = false;
+            loginBtn.textContent = t('loginBtn');
+            loginOverlay.style.display = 'flex';
+            loginPassword.focus();
+        }
+
+        function performLogin() {
+            const code = loginCode.value.trim();
+            const password = loginPassword.value.trim();
+
+            if (!code || !password) {
+                loginError.textContent = 'Sila masukkan Code dan Password.';
+                loginError.style.display = 'block';
+                loginSuccess.style.display = 'none';
                 return;
             }
 
-            currentUser = { ...staff };
-            displayProfile(currentUser);
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = `<span class="loading-spinner"></span>Memproses...`;
+            loginError.style.display = 'none';
+            loginSuccess.style.display = 'none';
+
+            // Find staff by code
+            const staff = allStaff.find(s => s.code === code);
+
+            if (!staff) {
+                loginBtn.disabled = false;
+                loginBtn.textContent = t('loginBtn');
+                loginError.textContent = 'Code tidak dijumpai!';
+                loginError.style.display = 'block';
+                return;
+            }
+
+            // Check password
+            if (staff.loginPwd !== password) {
+                loginBtn.disabled = false;
+                loginBtn.textContent = t('loginBtn');
+                loginError.textContent = t('loginError');
+                loginError.style.display = 'block';
+                loginPassword.value = '';
+                loginPassword.focus();
+                return;
+            }
+
+            // Login success
+            loginSuccess.textContent = t('loginSuccess');
+            loginSuccess.style.display = 'block';
+            loginBtn.disabled = false;
+            loginBtn.textContent = t('loginBtn');
+
+            // Close overlay and show profile
+            setTimeout(() => {
+                loginOverlay.style.display = 'none';
+                isLoggedIn = true;
+                currentUser = { ...staff };
+                showProfile(currentUser);
+            }, 600);
         }
 
-        function displayProfile(user) {
+        // Enter key for login
+        loginPassword.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') performLogin();
+        });
+        loginCode.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') loginPassword.focus();
+        });
+
+        // ============================================================
+        //  SHOW PROFILE
+        // ============================================================
+        function showProfile(user) {
+            // Hide filter and staff list
+            filterSection.style.display = 'none';
+            staffListContainer.style.display = 'none';
+
+            // Show profile
             profileView.classList.remove('hidden');
             profileFields.innerHTML = '';
 
-            // All fields to display (matching index.html)
-            const fields = [
-                'group', 'code', 'name', 'situation', 'loginPwd'
-            ];
+            // Get all fields from the user data
+            const allKeys = Object.keys(user);
+            const excludeKeys = ['loginPwd']; // hide password from display
 
+            // Field labels
             const labels = {
                 group: 'Group Name',
                 code: 'Code',
                 name: 'Name',
                 situation: 'Situation',
-                loginPwd: 'Login Password'
+                // Add more as needed
             };
 
-            // For select fields
-            const selectOptions = {
-                situation: ['', 'Active', 'Inactive', 'Pending']
-            };
+            // Also include additional fields that might exist in the data
+            // We'll display all keys except loginPwd
+            const displayKeys = allKeys.filter(k => !excludeKeys.includes(k));
 
-            for (let key of fields) {
+            for (let key of displayKeys) {
                 const val = user[key] || '';
                 const div = document.createElement('div');
                 div.className = 'profile-field';
 
                 const label = document.createElement('label');
-                label.textContent = labels[key] || key + ':';
+                // Try to use friendly label, otherwise use key
+                const friendlyLabel = labels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                label.textContent = friendlyLabel + ':';
 
                 let input;
                 if (key === 'code') {
-                    // Code is read-only
                     input = document.createElement('input');
                     input.type = 'text';
                     input.value = val;
@@ -988,7 +1122,7 @@
                     input.style.background = '#f7fafc';
                 } else if (key === 'situation') {
                     input = document.createElement('select');
-                    selectOptions.situation.forEach(opt => {
+                    ['', 'Active', 'Inactive', 'Pending'].forEach(opt => {
                         const option = document.createElement('option');
                         option.value = opt;
                         option.textContent = opt || '-- Pilih --';
@@ -997,7 +1131,7 @@
                     });
                 } else {
                     input = document.createElement('input');
-                    input.type = (key === 'loginPwd') ? 'password' : 'text';
+                    input.type = 'text';
                     input.value = val;
                 }
 
@@ -1007,7 +1141,6 @@
                 if (key !== 'code') {
                     input.addEventListener('change', function() {
                         currentUser[key] = this.value;
-                        debugLog(`✏️ Updated ${key}: ${this.value}`);
                     });
                 }
 
@@ -1021,7 +1154,7 @@
         }
 
         // ============================================================
-        //  SAVE PROFILE (sync to Google Sheet)
+        //  SAVE PROFILE
         // ============================================================
         function saveProfile() {
             if (!currentUser || !currentUser.code) {
@@ -1029,74 +1162,68 @@
                 return;
             }
 
-            const btn = document.querySelector('.btn-success');
-            const originalText = btn.innerHTML;
+            const btn = document.getElementById('saveProfileBtn');
+            const originalText = btn.textContent;
             btn.innerHTML = `<span class="loading-spinner"></span>Menyimpan...`;
             btn.disabled = true;
 
-            // Get latest values from inputs
-            const fields = ['group', 'name', 'situation', 'loginPwd'];
-            for (let key of fields) {
-                const input = document.getElementById('prof_' + key);
-                if (input) {
-                    currentUser[key] = input.value;
+            // Get all values from inputs
+            const inputs = profileFields.querySelectorAll('input, select');
+            inputs.forEach(el => {
+                const field = el.dataset.field;
+                if (field && field !== 'code') {
+                    currentUser[field] = el.value;
                 }
-            }
+            });
 
             const payload = {
                 action: 'update',
                 Code: currentUser.code,
-                GroupName: currentUser.group,
-                Name: currentUser.name,
-                Situation: currentUser.situation,
-                LoginPassword: currentUser.loginPwd,
+                ...currentUser,
                 UpdateDate: new Date().toISOString()
             };
 
-            debugLog(`💾 Saving profile: ${JSON.stringify(payload)}`);
-
             fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(payload)
-            })
-            .then(response => response.json())
-            .then(result => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                if (result.result === 'success') {
-                    showAlert('✅ Data berjaya disimpan ke Google Sheet!', 'success');
-                    debugLog('✅ Save successful');
-                    // Update local data
-                    const idx = allStaff.findIndex(s => s.code === currentUser.code);
-                    if (idx !== -1) {
-                        allStaff[idx] = { ...currentUser };
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(payload)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    if (result.result === 'success') {
+                        showAlert('✅ ' + t('saveSuccess'), 'success');
+                        // Update local data
+                        const idx = allStaff.findIndex(s => s.code === currentUser.code);
+                        if (idx !== -1) {
+                            allStaff[idx] = { ...currentUser };
+                        }
+                    } else {
+                        showAlert('❌ ' + t('saveFail') + ': ' + (result.message || ''), 'error');
                     }
-                    renderStaffList();
-                } else {
-                    showAlert('❌ Gagal menyimpan: ' + (result.message || 'Unknown error'), 'error');
-                    debugLog(`❌ Save failed: ${result.message}`, 'error');
-                }
-            })
-            .catch(err => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                console.error('❌ Save error:', err);
-                showAlert('⚠️ Ralat rangkaian: ' + err.message, 'error');
-                debugLog(`❌ Save error: ${err.message}`, 'error');
-            });
+                })
+                .catch(err => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    console.error('❌ Save error:', err);
+                    showAlert('⚠️ ' + t('networkError') + ': ' + err.message, 'error');
+                });
         }
 
-        function closeProfile() {
-            profileView.classList.add('hidden');
+        // ============================================================
+        //  LOGOUT & BACK
+        // ============================================================
+        function logoutAndGoBack() {
+            isLoggedIn = false;
             currentUser = null;
-            // Scroll back to top
+            profileView.classList.add('hidden');
+            filterSection.style.display = 'block';
+            staffListContainer.style.display = 'block';
+            renderStaffList();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ============================================================
-        //  NAVIGATION
-        // ============================================================
         function goBackToIndex() {
             window.location.href = 'index.html';
         }
@@ -1105,46 +1232,61 @@
         //  INIT
         // ============================================================
         async function init() {
-            if (!isAuthenticated) return;
+            // Show login overlay by default
+            loginOverlay.style.display = 'flex';
+            loginCode.value = '';
+            loginPassword.value = '';
+            loginError.style.display = 'none';
+            loginSuccess.style.display = 'none';
 
+            // Set language
+            setLanguage('ms');
+
+            // Load data
             const success = await fetchStaffData();
 
             if (success && allStaff.length > 0) {
+                // Populate branch dropdown
+                branchSelect.innerHTML = '<option value="">-- Pilih Cawangan --</option>';
+                branches.forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b;
+                    opt.textContent = b;
+                    branchSelect.appendChild(opt);
+                });
                 renderStaffList();
-                setTimeout(() => {
-                    if (debugVisible) toggleDebug();
-                }, 3000);
             } else {
                 staffListEl.innerHTML = `
                     <div class="empty-state">
                         <span class="icon">⚠️</span>
                         Gagal memuatkan data. Sila semak semula sambungan atau sheet.
                         <br><small style="color:#a0aec0;">Pastikan sheet "${SHEET_NAME}" wujud dan mempunyai data.</small>
-                        <br><small style="color:#a0aec0;">👉 Klik pada status bar untuk lihat debug.</small>
                     </div>
                 `;
-                if (!debugVisible) toggleDebug();
             }
 
             branchSelect.addEventListener('change', handleBranchChange);
             statusSelect.addEventListener('change', renderStaffList);
-            statusBar.addEventListener('click', toggleDebug);
 
-            debugLog('✅ Initialization complete');
+            // If there's a pending login from sessionStorage (from index.html)
+            const savedCode = sessionStorage.getItem('staffCode');
+            if (savedCode) {
+                const staff = allStaff.find(s => s.code === savedCode);
+                if (staff) {
+                    sessionStorage.removeItem('staffCode');
+                    // Auto-fill and show login
+                    loginCode.value = savedCode;
+                    loginPassword.focus();
+                }
+            }
+
+            console.log('📋 Staff Info page loaded.');
+            console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
+            console.log('📌 Sheet: "STAFF LOGIN RECORD" | Column mapping: Situation=B1, LoginPassword=AB1, Name=E1, Code=D1, GroupName=C1');
         }
 
-        // ============================================================
-        //  START - Show auth first
-        // ============================================================
-        // Initially hide main content, show auth
-        mainContent.style.display = 'none';
-        authOverlay.style.display = 'flex';
-
-        console.log('📋 Staff Info page loaded.');
-        console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
-        console.log('📌 Sheet: "STAFF LOGIN RECORD" | Column mapping: Situation=B1, LoginPassword=AB1, Name=E1, Code=D1, GroupName=C1');
-        console.log('🔑 Username: SIANGSIANG | Password: 0000');
-        console.log('💡 Klik pada status bar untuk toggle debug console');
+        // Run
+        init();
     </script>
 </body>
 </html>
