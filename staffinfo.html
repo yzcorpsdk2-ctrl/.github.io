@@ -3,114 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Staff Info - Pilih & Lihat</title>
+    <title>Staff Info - Paparan Staf</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f0f4f8;
             padding: 16px;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
         }
         .container {
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             background: white;
-            border-radius: 20px;
-            padding: 20px 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 24px;
+            padding: 20px 16px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-        h1, h2 {
+        h1 {
             text-align: center;
             color: #1a3a5c;
-            margin-bottom: 16px;
-            font-size: 22px;
+            font-size: 24px;
+            margin-bottom: 8px;
         }
-        .sub-title {
+        .subtitle {
             text-align: center;
             color: #4a5568;
             font-size: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
         }
-        .form-group {
-            margin-bottom: 16px;
+        .filter-section {
+            background: #f7fafc;
+            border-radius: 16px;
+            padding: 16px 14px;
+            margin-bottom: 20px;
         }
-        .form-group label {
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            flex: 1 1 160px;
+            min-width: 130px;
+        }
+        .filter-group label {
             display: block;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
             color: #2d3748;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
         }
-        .form-group select, .form-group input {
+        .filter-group select, .filter-group input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 10px 12px;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            font-size: 15px;
-            background: #fafcfd;
+            font-size: 14px;
+            background: white;
             transition: 0.2s;
         }
-        .form-group select:focus, .form-group input:focus {
+        .filter-group select:focus, .filter-group input:focus {
             border-color: #1a3a5c;
             outline: none;
             box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
         }
-        .btn {
-            width: 100%;
-            padding: 12px;
+        .btn-back {
+            background: #e2e8f0;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            color: #2d3748;
             cursor: pointer;
             transition: 0.2s;
-            margin-bottom: 8px;
-        }
-        .btn-primary { background: #1a3a5c; color: white; }
-        .btn-primary:hover { background: #0f2a44; }
-        .btn-secondary { background: #e2e8f0; color: #2d3748; }
-        .btn-secondary:hover { background: #cbd5e0; }
-        .btn-success { background: #38a169; color: white; }
-        .btn-success:hover { background: #2f855a; }
-        .btn-danger { background: #c53030; color: white; }
-        .btn-danger:hover { background: #9b2c2c; }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn-back {
-            background: #edf2f7;
-            color: #4a5568;
-        }
-        .btn-back:hover { background: #e2e8f0; }
-
-        .status-bar {
-            background: #edf2f7;
-            padding: 10px 14px;
-            border-radius: 12px;
             font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-back:hover {
+            background: #cbd5e0;
+        }
+        .btn-back i {
+            font-size: 16px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status-badge.inactive {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+        .status-badge.pending {
+            background: #fefcbf;
+            color: #975a16;
+        }
+        .status-badge.unknown {
+            background: #e2e8f0;
             color: #4a5568;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        .status-bar.success { background: #c6f6d5; color: #22543d; }
-        .status-bar.error { background: #fed7d7; color: #9b2c2c; }
-        .status-bar.info { background: #bee3f8; color: #2a4365; }
-
-        .filter-section {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-        .filter-section .form-group {
-            flex: 1;
-            min-width: 140px;
-            margin-bottom: 0;
-        }
-        .filter-section .form-group select {
-            padding: 10px 12px;
-            font-size: 14px;
         }
 
         .staff-list {
@@ -121,20 +130,24 @@
             justify-content: space-between;
             align-items: center;
             padding: 14px 16px;
-            background: #f7fafc;
-            border-radius: 12px;
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #edf2f7;
             margin-bottom: 10px;
-            border-left: 5px solid #1a3a5c;
             transition: 0.2s;
             cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
         .staff-item:hover {
-            background: #edf2f7;
-            transform: scale(1.01);
+            border-color: #1a3a5c;
+            background: #f7fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .staff-item .info {
             display: flex;
             flex-direction: column;
+            gap: 4px;
         }
         .staff-item .name {
             font-weight: 700;
@@ -145,363 +158,387 @@
             font-size: 13px;
             color: #718096;
         }
-        .staff-item .status-badge {
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+        .staff-item .status-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .status-badge.active { background: #c6f6d5; color: #22543d; }
-        .status-badge.inactive { background: #fed7d7; color: #9b2c2c; }
-        .status-badge.pending { background: #fefcbf; color: #975a16; }
-        .status-badge.unknown { background: #e2e8f0; color: #4a5568; }
-
+        .staff-item .arrow {
+            color: #a0aec0;
+            font-size: 18px;
+        }
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 40px 10px;
             color: #a0aec0;
         }
-        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-
+        .empty-state i {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+        }
         .loading-spinner {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid #f3f3f3;
+            border: 3px solid #e2e8f0;
             border-top: 3px solid #1a3a5c;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin-right: 8px;
             vertical-align: middle;
+            margin-right: 10px;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        .hidden { display: none !important; }
-
-        .alert {
-            padding: 12px 16px;
+        .status-bar {
+            background: #edf2f7;
+            padding: 8px 14px;
             border-radius: 12px;
+            font-size: 13px;
+            color: #4a5568;
             margin-bottom: 16px;
-            font-weight: 500;
-            display: none;
+            text-align: center;
         }
-        .alert.error { background: #fed7d7; color: #9b2c2c; display: block; }
-        .alert.success { background: #c6f6d5; color: #22543d; display: block; }
-        .alert.info { background: #bee3f8; color: #2a4365; display: block; }
+        .status-bar.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status-bar.error {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+        .status-bar.info {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
 
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
-            .filter-section { flex-direction: column; }
-            .filter-section .form-group { min-width: 100%; }
+            .filter-row { flex-direction: column; gap: 10px; }
+            .filter-group { flex: 1 1 100%; }
+            .staff-item { padding: 12px 14px; }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>📇 Staff Info</h1>
-    <p class="sub-title">Pilih cawangan & lihat senarai staf</p>
+    <div class="container">
+        <h1>📇 Staff Info</h1>
+        <div class="subtitle">Pilih cawangan & lihat senarai staf</div>
 
-    <!-- Status Bar -->
-    <div id="statusBar" class="status-bar">🔌 Menyambung ke pangkalan data...</div>
+        <!-- Status Bar -->
+        <div id="statusBar" class="status-bar">🔌 Memuatkan data...</div>
 
-    <!-- Alert -->
-    <div id="alert" class="alert"></div>
-
-    <!-- Step 1: Pilih Cawangan -->
-    <div id="stepBranch" class="form-group">
-        <label for="branchSelect">🏢 Pilih Cawangan / Branch</label>
-        <select id="branchSelect" onchange="onBranchChange()">
-            <option value="">-- Sila Pilih --</option>
-        </select>
-    </div>
-
-    <!-- Step 2: Filter Status (muncul selepas pilih cawangan) -->
-    <div id="stepFilter" class="hidden">
+        <!-- Filter Section -->
         <div class="filter-section">
-            <div class="form-group">
-                <label for="statusFilter">📌 Status</label>
-                <select id="statusFilter" onchange="renderStaffList()">
-                    <option value="all">Semua / All</option>
-                    <option value="Aktif">Aktif</option>
-                    <option value="Tidak Aktif">Tidak Aktif</option>
-                    <option value="Dalam Proses">Dalam Proses</option>
-                    <option value="Berhenti">Berhenti</option>
-                    <option value="Cuti">Cuti</option>
-                </select>
-            </div>
-            <div class="form-group" style="flex:0 0 auto; display:flex; align-items:flex-end;">
-                <button class="btn btn-secondary" onclick="resetFilters()" style="margin-bottom:0; padding:10px 18px;">↺ Reset</button>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="branchSelect">🏢 Cawangan (GroupName)</label>
+                    <select id="branchSelect">
+                        <option value="">-- Pilih Cawangan --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusSelect">📌 Status (Situation)</label>
+                    <select id="statusSelect">
+                        <option value="">Semua Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex: 0 1 auto; min-width: 80px;">
+                    <button class="btn-back" onclick="goBackToIndex()">← Kembali</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Staff List -->
-    <div id="staffListContainer" class="hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span style="font-weight:600; color:#2d3748;" id="staffCount">0 staf</span>
-            <span style="font-size:13px; color:#718096;">Klik pada nama untuk login</span>
+        <!-- Staff List -->
+        <div id="staffListContainer">
+            <div class="staff-list" id="staffList">
+                <!-- Dynamic content -->
+            </div>
         </div>
-        <div id="staffList"></div>
+
+        <!-- Hidden input untuk menyimpan data penuh -->
+        <div id="rawDataStore" style="display:none;"></div>
     </div>
 
-    <!-- Buttons -->
-    <button class="btn btn-back" onclick="goBack()">← Kembali ke Menu</button>
-</div>
+    <script>
+        // ============================================================
+        //  KONFIGURASI
+        // ============================================================
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
 
-<script>
-    // ============= CONFIG =============
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
+        // Nama sheet dan pengepala (header)
+        const SHEET_NAME = 'STAFF LOGIN RECORD';
+        const HEADER_SITUATION = 'Situation';    // B
+        const HEADER_LOGIN_PWD = 'LoginPassword'; // AB
+        const HEADER_NAME = 'Name';              // E
+        const HEADER_CODE = 'Code';              // D
+        const HEADER_GROUP = 'GroupName';        // C
 
-    // Sheet column mapping (based on header: B1=Situation, AB1=LoginPassword, E1=Name, D1=Code, C1=GroupName)
-    const COL_SITUATION = 'B';
-    const COL_PASSWORD = 'AB';
-    const COL_NAME = 'E';
-    const COL_CODE = 'D';
-    const COL_GROUP = 'C';
+        // ============================================================
+        //  STATE
+        // ============================================================
+        let allStaff = [];              // array objek staf
+        let branches = [];             // senarai unik cawangan
+        let isLoading = false;
 
-    let allStaffData = [];          // Data asli dari sheet
-    let filteredStaff = [];         // Data setelah ditapis branch + status
-    let selectedBranch = '';
-    let selectedStatus = 'all';
-    let isLoading = false;
+        // Elemen DOM
+        const branchSelect = document.getElementById('branchSelect');
+        const statusSelect = document.getElementById('statusSelect');
+        const staffListEl = document.getElementById('staffList');
+        const statusBar = document.getElementById('statusBar');
 
-    // ============= DOM REFS =============
-    const statusBar = document.getElementById('statusBar');
-    const alertBox = document.getElementById('alert');
-    const branchSelect = document.getElementById('branchSelect');
-    const stepFilter = document.getElementById('stepFilter');
-    const statusFilter = document.getElementById('statusFilter');
-    const staffListContainer = document.getElementById('staffListContainer');
-    const staffList = document.getElementById('staffList');
-    const staffCount = document.getElementById('staffCount');
+        // ============================================================
+        //  UTILITY
+        // ============================================================
+        function updateStatus(msg, type = '') {
+            statusBar.textContent = msg;
+            statusBar.className = 'status-bar ' + type;
+        }
 
-    // ============= UTILITY =============
-    function showAlert(msg, type = 'error') {
-        alertBox.textContent = msg;
-        alertBox.className = 'alert ' + type;
-        setTimeout(() => { alertBox.className = 'alert'; }, 4000);
-    }
+        function getStatusBadge(status) {
+            const s = (status || '').toLowerCase();
+            let cls = 'unknown';
+            let label = status || 'Unknown';
+            if (s === 'active') { cls = 'active'; label = 'Active'; }
+            else if (s === 'inactive') { cls = 'inactive'; label = 'Inactive'; }
+            else if (s === 'pending') { cls = 'pending'; label = 'Pending'; }
+            return `<span class="status-badge ${cls}">${label}</span>`;
+        }
 
-    function updateStatus(msg, type = '') {
-        statusBar.textContent = msg;
-        statusBar.className = 'status-bar ' + type;
-    }
+        // ============================================================
+        //  AMBIL DATA DARI GOOGLE SHEETS
+        // ============================================================
+        async function fetchStaffData() {
+            isLoading = true;
+            updateStatus('⏳ Menghubungi server...', 'info');
 
-    function goBack() {
-        window.location.href = 'index.html';
-    }
+            try {
+                // Kita ambil semua data (tanpa filter) dan proses di client
+                const url = `${SCRIPT_URL}?action=getData&sheet=${encodeURIComponent(SHEET_NAME)}`;
+                const response = await fetch(url);
 
-    // ============= FETCH DATA =============
-    async function fetchStaffData() {
-        if (isLoading) return;
-        isLoading = true;
-        updateStatus('⏳ Memuat data...', 'info');
+                if (!response.ok) throw new Error('HTTP ' + response.status);
 
-        try {
-            const response = await fetch(SCRIPT_URL + '?action=getData');
-            if (!response.ok) throw new Error('HTTP ' + response.status);
-            const data = await response.json();
+                const data = await response.json();
 
-            if (data.error) {
-                throw new Error(data.error);
+                if (!data || !Array.isArray(data) || data.length === 0) {
+                    throw new Error('Tiada data ditemui dalam sheet.');
+                }
+
+                // data[0] ialah header, data[1:] ialah rows
+                // Tapi kita perlukan mapping header -> index
+                const headerRow = data[0];
+                // Cari indeks untuk setiap header yang kita perlukan
+                const idx = {
+                    situation: headerRow.indexOf(HEADER_SITUATION),
+                    loginPwd: headerRow.indexOf(HEADER_LOGIN_PWD),
+                    name: headerRow.indexOf(HEADER_NAME),
+                    code: headerRow.indexOf(HEADER_CODE),
+                    group: headerRow.indexOf(HEADER_GROUP)
+                };
+
+                // Semak semua header wajib wujud
+                const missing = [];
+                for (let [key, val] of Object.entries(idx)) {
+                    if (val === -1) missing.push(key);
+                }
+                if (missing.length > 0) {
+                    throw new Error(`Header tidak dijumpai: ${missing.join(', ')}. Pastikan sheet "${SHEET_NAME}" mengandungi lajur: Situation(B), LoginPassword(AB), Name(E), Code(D), GroupName(C)`);
+                }
+
+                // Bina array staf
+                const staff = [];
+                const branchSet = new Set();
+
+                for (let i = 1; i < data.length; i++) {
+                    const row = data[i];
+                    // Pastikan row mempunyai cukup elemen
+                    if (row.length <= Math.max(idx.situation, idx.loginPwd, idx.name, idx.code, idx.group)) continue;
+
+                    const group = (row[idx.group] || '').toString().trim();
+                    const code = (row[idx.code] || '').toString().trim();
+                    const name = (row[idx.name] || '').toString().trim();
+                    const situation = (row[idx.situation] || '').toString().trim();
+                    const loginPwd = (row[idx.loginPwd] || '').toString().trim();
+
+                    // Abaikan jika tiada code atau name
+                    if (!code || !name) continue;
+
+                    const staffObj = {
+                        group: group || 'Tidak Diketahui',
+                        code: code,
+                        name: name,
+                        situation: situation || 'Unknown',
+                        loginPwd: loginPwd
+                    };
+
+                    staff.push(staffObj);
+                    if (group) branchSet.add(group);
+                }
+
+                if (staff.length === 0) {
+                    throw new Error('Tiada rekod staf yang sah (perlukan Code dan Name).');
+                }
+
+                allStaff = staff;
+                branches = Array.from(branchSet).sort((a, b) => a.localeCompare(b));
+
+                updateStatus(`✅ ${staff.length} rekod staf dimuatkan.`, 'success');
+                console.log(`📥 ${staff.length} staf, ${branches.length} cawangan`);
+
+                return true;
+
+            } catch (err) {
+                console.error('❌ Ralat fetch:', err);
+                updateStatus(`❌ Gagal: ${err.message}`, 'error');
+                allStaff = [];
+                branches = [];
+                return false;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // ============================================================
+        //  RENDER UI
+        // ============================================================
+        function populateBranchDropdown() {
+            branchSelect.innerHTML = '<option value="">-- Pilih Cawangan --</option>';
+            branches.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b;
+                opt.textContent = b;
+                branchSelect.appendChild(opt);
+            });
+        }
+
+        function renderStaffList() {
+            const selectedBranch = branchSelect.value;
+            const selectedStatus = statusSelect.value;
+
+            let filtered = allStaff;
+
+            // Filter by branch
+            if (selectedBranch) {
+                filtered = filtered.filter(s => s.group === selectedBranch);
             }
 
-            if (!Array.isArray(data) || data.length === 0) {
-                updateStatus('⚠️ Tiada rekod ditemui.', 'error');
-                allStaffData = [];
+            // Filter by status
+            if (selectedStatus) {
+                filtered = filtered.filter(s => s.situation.toLowerCase() === selectedStatus.toLowerCase());
+            }
+
+            // Sort by name
+            filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+            if (filtered.length === 0) {
+                staffListEl.innerHTML = `
+                    <div class="empty-state">
+                        <span style="font-size:40px; display:block; margin-bottom:8px;">📭</span>
+                        Tiada staf untuk paparan.
+                        ${selectedBranch ? `<br><small style="color:#a0aec0;">Cawangan: ${selectedBranch}</small>` : ''}
+                        ${selectedStatus ? `<br><small style="color:#a0aec0;">Status: ${selectedStatus}</small>` : ''}
+                    </div>
+                `;
                 return;
             }
 
-            // Parse data: tukar kepada object dengan key berdasarkan header
-            // data[0] = header, data[1:] = rows
-            const headers = data[0] || [];
-            const rows = data.slice(1);
-
-            // Cari index column berdasarkan header
-            const colMap = {};
-            headers.forEach((h, idx) => {
-                const upper = String(h).trim().toUpperCase();
-                if (upper.includes('GROUP') || upper.includes('CAWANGAN')) colMap.group = idx;
-                if (upper.includes('CODE') || upper.includes('ID')) colMap.code = idx;
-                if (upper.includes('NAME') || upper.includes('NAMA')) colMap.name = idx;
-                if (upper.includes('SITUATION') || upper.includes('STATUS')) colMap.situation = idx;
-                if (upper.includes('PASSWORD') || upper.includes('PWD')) colMap.password = idx;
+            let html = '';
+            filtered.forEach(staff => {
+                const statusBadge = getStatusBadge(staff.situation);
+                html += `
+                    <div class="staff-item" data-code="${staff.code}" data-pwd="${staff.loginPwd}" onclick="onStaffClick('${staff.code}', '${staff.loginPwd}')">
+                        <div class="info">
+                            <div class="name">${staff.name}</div>
+                            <div class="code">🔑 ${staff.code}</div>
+                        </div>
+                        <div class="status-wrap">
+                            ${statusBadge}
+                            <span class="arrow">›</span>
+                        </div>
+                    </div>
+                `;
             });
 
-            // Jika tidak jumpa, guna mapping fixed berdasarkan posisi (C=2, D=3, E=4, B=1, AB=27)
-            // Tapi kita cuba guna header dulu, fallback ke position
-            const getIndex = (key, defaultIdx) => {
-                return (colMap[key] !== undefined) ? colMap[key] : defaultIdx;
-            };
-
-            const idxGroup = getIndex('group', 2);   // C
-            const idxCode = getIndex('code', 3);     // D
-            const idxName = getIndex('name', 4);     // E
-            const idxSituation = getIndex('situation', 1); // B
-            const idxPassword = getIndex('password', 27); // AB
-
-            allStaffData = rows.map(row => {
-                // Pastikan row cukup panjang
-                const get = (idx) => (row && row[idx] !== undefined && row[idx] !== null) ? String(row[idx]).trim() : '';
-                return {
-                    GroupName: get(idxGroup),
-                    Code: get(idxCode),
-                    Name: get(idxName),
-                    Situation: get(idxSituation),
-                    LoginPassword: get(idxPassword)
-                };
-            }).filter(item => item.Code && item.Name); // Buang yang kosong
-
-            // Populate branch dropdown
-            populateBranchDropdown();
-
-            updateStatus(`✅ ${allStaffData.length} rekod staf dimuatkan.`, 'success');
-            console.log('📥 Data loaded:', allStaffData);
-
-        } catch (err) {
-            console.error('❌ Fetch error:', err);
-            updateStatus('❌ Gagal memuat data: ' + err.message, 'error');
-            showAlert('Ralat sambungan: ' + err.message, 'error');
-            allStaffData = [];
-        } finally {
-            isLoading = false;
-        }
-    }
-
-    // ============= POPULATE BRANCH DROPDOWN =============
-    function populateBranchDropdown() {
-        const branches = [...new Set(allStaffData.map(item => item.GroupName).filter(Boolean))].sort();
-        branchSelect.innerHTML = '<option value="">-- Sila Pilih --</option>';
-        branches.forEach(b => {
-            const opt = document.createElement('option');
-            opt.value = b;
-            opt.textContent = b;
-            branchSelect.appendChild(opt);
-        });
-
-        // Reset other UI
-        stepFilter.classList.add('hidden');
-        staffListContainer.classList.add('hidden');
-        staffList.innerHTML = '';
-        staffCount.textContent = '0 staf';
-        selectedBranch = '';
-        selectedStatus = 'all';
-        statusFilter.value = 'all';
-    }
-
-    // ============= ON BRANCH CHANGE =============
-    function onBranchChange() {
-        selectedBranch = branchSelect.value;
-        if (!selectedBranch) {
-            stepFilter.classList.add('hidden');
-            staffListContainer.classList.add('hidden');
-            return;
-        }
-        stepFilter.classList.remove('hidden');
-        renderStaffList();
-    }
-
-    // ============= RENDER STAFF LIST =============
-    function renderStaffList() {
-        selectedStatus = statusFilter.value;
-
-        // Filter by branch
-        let list = allStaffData.filter(item => item.GroupName === selectedBranch);
-
-        // Filter by status
-        if (selectedStatus !== 'all') {
-            list = list.filter(item => item.Situation === selectedStatus);
+            staffListEl.innerHTML = html;
         }
 
-        filteredStaff = list;
-        displayStaffList(list);
-    }
+        // ============================================================
+        //  INTERAKSI
+        // ============================================================
+        function onStaffClick(code, loginPwd) {
+            // Simpan ke sessionStorage untuk diambil di index.html
+            try {
+                sessionStorage.setItem('staffCode', code);
+                sessionStorage.setItem('staffPwd', loginPwd);
+                console.log(`🔑 Staff dipilih: ${code}, pwd: ${loginPwd}`);
+            } catch (e) {
+                console.warn('Gagal simpan ke sessionStorage', e);
+            }
 
-    // ============= DISPLAY STAFF LIST =============
-    function displayStaffList(list) {
-        staffListContainer.classList.remove('hidden');
-        staffCount.textContent = `${list.length} staf`;
-
-        if (list.length === 0) {
-            staffList.innerHTML = `
-                <div class="empty-state">
-                    <div class="icon">📭</div>
-                    <p>Tiada staf untuk paparan ini.</p>
-                    <p style="font-size:13px; color:#a0aec0;">Cuba tukar penapis status.</p>
-                </div>
-            `;
-            return;
+            // Redirect ke index.html (halaman utama)
+            // Guna relative path, anggap index.html di direktori yang sama
+            window.location.href = 'index.html';
         }
 
-        let html = '';
-        list.forEach(item => {
-            const statusClass = getStatusClass(item.Situation);
-            const statusDisplay = item.Situation || 'Tidak diketahui';
-            html += `
-                <div class="staff-item" onclick="onStaffClick('${item.Code}', '${item.Name}')">
-                    <div class="info">
-                        <div class="name">${item.Name}</div>
-                        <div class="code">#${item.Code}</div>
+        function goBackToIndex() {
+            window.location.href = 'index.html';
+        }
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        async function init() {
+            // Muat data
+            const success = await fetchStaffData();
+
+            if (success && allStaff.length > 0) {
+                populateBranchDropdown();
+                // Pilih cawangan pertama sebagai default?
+                // Biarkan user pilih sendiri
+                // Tapi kalau nak auto pilih pertama, boleh:
+                // if (branches.length > 0) {
+                //     branchSelect.value = branches[0];
+                // }
+                renderStaffList();
+            } else {
+                staffListEl.innerHTML = `
+                    <div class="empty-state">
+                        <span style="font-size:40px; display:block; margin-bottom:8px;">⚠️</span>
+                        Gagal memuatkan data. Sila semak semula sambungan atau sheet.
                     </div>
-                    <span class="status-badge ${statusClass}">${statusDisplay}</span>
-                </div>
-            `;
-        });
-        staffList.innerHTML = html;
-    }
+                `;
+            }
 
-    // ============= STATUS CLASS =============
-    function getStatusClass(status) {
-        const s = String(status).toLowerCase();
-        if (s.includes('aktif') || s === 'active') return 'active';
-        if (s.includes('tidak aktif') || s.includes('inactive')) return 'inactive';
-        if (s.includes('proses') || s.includes('pending')) return 'pending';
-        if (s.includes('berhenti')) return 'inactive';
-        if (s.includes('cuti')) return 'pending';
-        return 'unknown';
-    }
-
-    // ============= RESET FILTERS =============
-    function resetFilters() {
-        statusFilter.value = 'all';
-        renderStaffList();
-    }
-
-    // ============= STAFF CLICK -> REDIRECT TO LOGIN =============
-    function onStaffClick(code, name) {
-        if (!code) {
-            showAlert('Kod staf tidak sah.', 'error');
-            return;
+            // Event listeners
+            branchSelect.addEventListener('change', renderStaffList);
+            statusSelect.addEventListener('change', renderStaffList);
         }
 
-        // Cari password untuk staff ini
-        const staff = allStaffData.find(item => item.Code === code);
-        const password = staff ? staff.LoginPassword : '';
+        // Jalankan
+        init();
 
-        // Redirect ke index.html dengan parameter
-        // Bina URL: index.html?code=XXX&password=YYY (password optional, user perlu taip)
-        // Kita akan isi code secara auto di login form
-        const params = new URLSearchParams();
-        params.set('code', code);
-        if (password) {
-            params.set('pwd_hint', password); // Boleh guna untuk auto isi? Tapi lebih selamat user taip sendiri
-            // Kita hantar juga untuk rujukan, tapi di login form kita akan isi code sahaja
-        }
-        // Untuk memudahkan, kita redirect ke index.html dengan parameter code
-        // Di index.html, kita akan detect parameter dan auto isi field code
-        window.location.href = `index.html?code=${encodeURIComponent(code)}`;
-    }
-
-    // ============= INIT =============
-    window.addEventListener('load', function() {
-        fetchStaffData();
-    });
-
-    console.log('📇 Staff Info page loaded.');
-    console.log('🔗 SCRIPT_URL:', SCRIPT_URL);
-</script>
+        // Debug: pamerkan data di console
+        console.log('📋 Staff Info page loaded.');
+        console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
+        console.log('📌 Pastikan sheet nama: "STAFF LOGIN RECORD" dengan header: Situation, LoginPassword, Name, Code, GroupName');
+    </script>
 </body>
 </html>
