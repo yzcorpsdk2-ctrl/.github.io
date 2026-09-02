@@ -229,11 +229,33 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Debug console */
+        .debug-box {
+            background: #1a202c;
+            color: #68d391;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 16px;
+            max-height: 200px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .debug-box .error-text {
+            color: #fc8181;
+        }
+        .debug-box .success-text {
+            color: #68d391;
+        }
+
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .filter-row { flex-direction: column; gap: 10px; }
             .filter-group { flex: 1 1 100%; }
             .staff-item { padding: 12px 14px; }
+            .debug-box { font-size: 10px; max-height: 150px; }
         }
     </style>
 </head>
@@ -275,6 +297,9 @@
                 <!-- Dynamic content -->
             </div>
         </div>
+
+        <!-- Debug Console -->
+        <div id="debugBox" class="debug-box" style="display:none;"></div>
     </div>
 
     <script>
@@ -294,15 +319,40 @@
         // ============================================================
         //  STATE
         // ============================================================
-        let allStaff = [];              // array objek staf
-        let branches = [];             // senarai unik cawangan
+        let allStaff = [];
+        let branches = [];
         let isLoading = false;
+        let debugLogs = [];
 
         // Elemen DOM
         const branchSelect = document.getElementById('branchSelect');
         const statusSelect = document.getElementById('statusSelect');
         const staffListEl = document.getElementById('staffList');
         const statusBar = document.getElementById('statusBar');
+        const debugBox = document.getElementById('debugBox');
+
+        // ============================================================
+        //  DEBUG
+        // ============================================================
+        function debugLog(msg, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '📌';
+            debugLogs.push(`[${timestamp}] ${prefix} ${msg}`);
+            if (debugBox.style.display !== 'none') {
+                renderDebug();
+            }
+            console.log(msg);
+        }
+
+        function renderDebug() {
+            debugBox.innerHTML = debugLogs.join('\n');
+            debugBox.scrollTop = debugBox.scrollHeight;
+        }
+
+        function showDebug(show) {
+            debugBox.style.display = show ? 'block' : 'none';
+            if (show) renderDebug();
+        }
 
         // ============================================================
         //  UTILITY
@@ -310,6 +360,7 @@
         function updateStatus(msg, type = '') {
             statusBar.textContent = msg;
             statusBar.className = 'status-bar ' + type;
+            debugLog(msg, type === 'error' ? 'error' : type === 'success' ? 'success' : 'info');
         }
 
         function getStatusBadge(status) {
@@ -327,24 +378,60 @@
         // ============================================================
         async function fetchStaffData() {
             isLoading = true;
+            debugLog('⏳ Menghubungi server...');
             updateStatus('⏳ Menghubungi server...', 'info');
 
             try {
-                // Gunakan parameter action=getData untuk ambil semua data
                 const url = `${SCRIPT_URL}?action=getData`;
+                debugLog(`📡 URL: ${url}`);
+                
                 const response = await fetch(url);
+                debugLog(`📡 Response status: ${response.status}`);
 
                 if (!response.ok) throw new Error('HTTP ' + response.status);
 
-                const data = await response.json();
+                const rawResult = await response.json();
+                debugLog(`📦 Raw response type: ${typeof rawResult}`);
+                debugLog(`📦 Raw response keys: ${Object.keys(rawResult).join(', ')}`);
 
-                if (!data || !Array.isArray(data) || data.length === 0) {
+                // 🔥 关键修复：处理不同的数据格式
+                let data;
+                if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
+                    data = rawResult.data;
+                    debugLog('✅ Data extracted from result.data (array)');
+                } else if (Array.isArray(rawResult)) {
+                    data = rawResult;
+                    debugLog('✅ Data is direct array');
+                } else {
+                    // 尝试看看是否有其他可能的格式
+                    const possibleData = rawResult.data || rawResult.values || rawResult.rows || rawResult;
+                    if (Array.isArray(possibleData)) {
+                        data = possibleData;
+                        debugLog('✅ Data extracted from alternative property');
+                    } else {
+                        throw new Error('Format data tidak dikenali. Lihat debug console.');
+                    }
+                }
+
+                if (!data || data.length === 0) {
                     throw new Error('Tiada data ditemui dalam sheet.');
                 }
 
-                // data[0] ialah header, data[1:] ialah rows
+                debugLog(`📊 Data length: ${data.length} rows`);
+                debugLog(`📊 First row type: ${Array.isArray(data[0]) ? 'array' : typeof data[0]}`);
+                if (Array.isArray(data[0])) {
+                    debugLog(`📊 First row sample: ${JSON.stringify(data[0]).substring(0, 200)}`);
+                } else {
+                    debugLog(`📊 First row sample: ${JSON.stringify(data[0]).substring(0, 200)}`);
+                }
+
+                // data[0] 应该是 header row
                 const headerRow = data[0];
-                // Cari indeks untuk setiap header yang kita perlukan
+                if (!Array.isArray(headerRow)) {
+                    throw new Error(`Header row bukan array: ${typeof headerRow}. Data mungkin dalam format object.`);
+                }
+
+                // Cari indeks untuk setiap header
                 const idx = {
                     situation: headerRow.indexOf(HEADER_SITUATION),
                     loginPwd: headerRow.indexOf(HEADER_LOGIN_PWD),
@@ -352,6 +439,8 @@
                     code: headerRow.indexOf(HEADER_CODE),
                     group: headerRow.indexOf(HEADER_GROUP)
                 };
+
+                debugLog(`📌 Header indices: situation=${idx.situation}, loginPwd=${idx.loginPwd}, name=${idx.name}, code=${idx.code}, group=${idx.group}`);
 
                 // Semak semua header wajib wujud
                 const missing = [];
@@ -368,8 +457,15 @@
 
                 for (let i = 1; i < data.length; i++) {
                     const row = data[i];
-                    // Pastikan row mempunyai cukup elemen
-                    if (row.length <= Math.max(idx.situation, idx.loginPwd, idx.name, idx.code, idx.group)) continue;
+                    if (!Array.isArray(row)) {
+                        debugLog(`⚠️ Row ${i} bukan array, skip`);
+                        continue;
+                    }
+                    
+                    if (row.length <= Math.max(idx.situation, idx.loginPwd, idx.name, idx.code, idx.group)) {
+                        debugLog(`⚠️ Row ${i} terlalu pendek, skip`);
+                        continue;
+                    }
 
                     const group = (row[idx.group] || '').toString().trim();
                     const code = (row[idx.code] || '').toString().trim();
@@ -377,8 +473,10 @@
                     const situation = (row[idx.situation] || '').toString().trim();
                     const loginPwd = (row[idx.loginPwd] || '').toString().trim();
 
-                    // Abaikan jika tiada code atau name
-                    if (!code || !name) continue;
+                    if (!code || !name) {
+                        debugLog(`⚠️ Row ${i} tiada code atau name, skip`);
+                        continue;
+                    }
 
                     const staffObj = {
                         group: group || 'Tidak Diketahui',
@@ -400,18 +498,26 @@
                 branches = Array.from(branchSet).sort((a, b) => a.localeCompare(b));
 
                 updateStatus(`✅ ${staff.length} rekod staf dimuatkan.`, 'success');
-                console.log(`📥 ${staff.length} staf, ${branches.length} cawangan`);
+                debugLog(`✅ ${staff.length} staf, ${branches.length} cawangan`);
+                debugLog(`📊 Sample staff: ${JSON.stringify(staff.slice(0, 3), null, 2)}`);
+                debugLog(`📊 Branches: ${branches.join(', ')}`);
 
                 return true;
 
             } catch (err) {
                 console.error('❌ Ralat fetch:', err);
                 updateStatus(`❌ Gagal: ${err.message}`, 'error');
+                debugLog(`❌ ERROR: ${err.message}`, 'error');
+                debugLog(`❌ Stack: ${err.stack}`, 'error');
                 allStaff = [];
                 branches = [];
                 return false;
             } finally {
                 isLoading = false;
+                // Tunjukkan debug box jika ada error
+                if (statusBar.classList.contains('error')) {
+                    showDebug(true);
+                }
             }
         }
 
@@ -426,6 +532,7 @@
                 opt.textContent = b;
                 branchSelect.appendChild(opt);
             });
+            debugLog(`📋 Populated ${branches.length} branches in dropdown`);
         }
 
         function renderStaffList() {
@@ -477,60 +584,96 @@
             });
 
             staffListEl.innerHTML = html;
+            debugLog(`📋 Rendered ${filtered.length} staff items`);
         }
 
         // ============================================================
         //  INTERAKSI
         // ============================================================
         function onStaffClick(code) {
-            // Simpan code ke sessionStorage untuk digunakan di index.html
+            debugLog(`👆 Staff clicked: ${code}`);
             try {
                 sessionStorage.setItem('staffCode', code);
-                console.log(`🔑 Staff dipilih: ${code}`);
+                debugLog(`✅ Code saved to sessionStorage: ${code}`);
             } catch (e) {
                 console.warn('Gagal simpan ke sessionStorage', e);
+                debugLog(`⚠️ Failed to save to sessionStorage: ${e.message}`, 'error');
             }
 
-            // Redirect ke index.html (halaman utama)
-            // Anggap index.html berada di direktori yang sama
+            // Redirect ke index.html
+            debugLog(`🚀 Redirecting to index.html`);
             window.location.href = 'index.html';
         }
 
         function goBackToIndex() {
+            debugLog(`🔙 Going back to index.html`);
             window.location.href = 'index.html';
         }
+
+        // Toggle debug with double-click on status bar
+        document.getElementById('statusBar').addEventListener('dblclick', function() {
+            const isVisible = debugBox.style.display !== 'none';
+            showDebug(!isVisible);
+        });
 
         // ============================================================
         //  INIT
         // ============================================================
         async function init() {
+            debugLog('🚀 Staff Info page initializing...');
+            debugLog(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
+            
             // Muat data
             const success = await fetchStaffData();
 
             if (success && allStaff.length > 0) {
                 populateBranchDropdown();
                 renderStaffList();
+                // Sembunyikan debug jika berjaya
+                setTimeout(() => { showDebug(false); }, 3000);
             } else {
                 staffListEl.innerHTML = `
                     <div class="empty-state">
                         <span class="icon">⚠️</span>
                         Gagal memuatkan data. Sila semak semula sambungan atau sheet.
                         <br><small style="color:#a0aec0;">Pastikan sheet "${SHEET_NAME}" wujud dan mempunyai data.</small>
+                        <br><small style="color:#a0aec0;">👉 Double-click pada status bar untuk lihat debug.</small>
                     </div>
                 `;
+                showDebug(true);
             }
 
             // Event listeners
-            branchSelect.addEventListener('change', renderStaffList);
-            statusSelect.addEventListener('change', renderStaffList);
+            branchSelect.addEventListener('change', () => {
+                debugLog(`📌 Branch changed to: ${branchSelect.value}`);
+                renderStaffList();
+            });
+            statusSelect.addEventListener('change', () => {
+                debugLog(`📌 Status changed to: ${statusSelect.value}`);
+                renderStaffList();
+            });
+
+            debugLog('✅ Initialization complete');
         }
 
         // Jalankan
         init();
 
+        // ============================================================
+        //  KEYBOARD SHORTCUT: Alt+D to toggle debug
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.altKey && e.key === 'd') {
+                const isVisible = debugBox.style.display !== 'none';
+                showDebug(!isVisible);
+                e.preventDefault();
+            }
+        });
+
         console.log('📋 Staff Info page loaded.');
         console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
         console.log('📌 Pastikan sheet nama: "STAFF LOGIN RECORD" dengan header: Situation, LoginPassword, Name, Code, GroupName');
+        console.log('💡 Double-click status bar atau tekan Alt+D untuk toggle debug console');
     </script>
 </body>
 </html>
