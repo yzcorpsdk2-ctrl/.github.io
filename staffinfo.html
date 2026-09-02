@@ -246,22 +246,247 @@
             line-height: 1.5;
         }
 
+        /* ===== PROFILE VIEW (like index.html) ===== */
+        .profile-view {
+            margin-top: 16px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 16px;
+        }
+        .profile-view h2 {
+            text-align: center;
+            color: #1a3a5c;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        .profile-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .profile-field label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 13px;
+            flex: 0 0 120px;
+        }
+        .profile-field input,
+        .profile-field select {
+            border: none;
+            text-align: right;
+            font-size: 14px;
+            background: transparent;
+            flex: 1;
+            padding: 4px 8px;
+            min-width: 100px;
+            border-radius: 4px;
+        }
+        .profile-field input:focus,
+        .profile-field select:focus {
+            outline: 2px solid #1a3a5c;
+            background: white;
+            border-radius: 4px;
+        }
+        .profile-field select {
+            appearance: auto;
+            text-align: right;
+            text-align-last: right;
+        }
+        .btn-danger {
+            background: #c53030;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .btn-danger:hover {
+            background: #9b2c2c;
+        }
+        .btn-success {
+            background: #38a169;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn-success:hover {
+            background: #2f855a;
+        }
+        .btn-gray {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn-gray:hover {
+            background: #cbd5e0;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a3a5c;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Auth Overlay */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .auth-overlay .auth-box {
+            background: white;
+            padding: 30px 24px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .auth-overlay .auth-box h3 {
+            text-align: center;
+            color: #1a3a5c;
+            margin-bottom: 16px;
+        }
+        .auth-overlay .auth-box .form-group {
+            margin-bottom: 12px;
+        }
+        .auth-overlay .auth-box .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        .auth-overlay .auth-box .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .auth-overlay .auth-box .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .auth-overlay .auth-box .btn-primary {
+            background: #1a3a5c;
+            color: white;
+        }
+        .auth-overlay .auth-box .btn-primary:hover {
+            background: #0f2a44;
+        }
+        .auth-overlay .auth-box .btn-gray {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .auth-overlay .auth-box .btn-gray:hover {
+            background: #cbd5e0;
+        }
+        .auth-overlay .auth-box .error-msg {
+            color: #c53030;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: none;
+            font-weight: 500;
+        }
+        .alert.error { background: #fed7d7; color: #9b2c2c; display: block; }
+        .alert.success { background: #c6f6d5; color: #22543d; display: block; }
+        .alert.info { background: #bee3f8; color: #2a4365; display: block; }
+
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .filter-row { flex-direction: column; gap: 10px; }
             .filter-group { flex: 1 1 100%; }
             .staff-item { padding: 12px 14px; }
             .debug-box { font-size: 10px; max-height: 150px; }
+            .profile-field label { flex: 0 0 90px; font-size: 12px; }
+            .profile-field input { font-size: 13px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- ===== AUTH OVERLAY ===== -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-box">
+            <h3>🔐 Akses Dilindungi</h3>
+            <p style="text-align:center; color:#718096; margin-bottom:16px; font-size:14px;">Sila log masuk untuk mengakses halaman ini</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="authUsername" placeholder="Masukkan username" value="SIANGSIANG">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="authPassword" placeholder="Masukkan password">
+            </div>
+            <button class="btn btn-primary" onclick="authenticateUser()">🔓 Log Masuk</button>
+            <button class="btn btn-gray" onclick="goBackToIndex()">← Kembali ke Index</button>
+            <div class="error-msg" id="authError">Username atau Password salah!</div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="container" id="mainContent">
         <h1>📇 Staff Info</h1>
         <div class="subtitle">Pilih cawangan & lihat senarai staf</div>
 
         <!-- Status Bar -->
         <div id="statusBar" class="status-bar">🔌 Memuatkan data...</div>
+
+        <!-- Alert -->
+        <div id="alert" class="alert"></div>
 
         <!-- Filter Section -->
         <div class="filter-section">
@@ -279,7 +504,6 @@
                         <option value="CC TELESHOP (MESRA)">CC TELESHOP (MESRA)</option>
                         <option value="Others">Others (Lain-lain)</option>
                     </select>
-                    <!-- Others input -->
                     <div id="otherBranchContainer" class="other-input-container hidden">
                         <input type="text" id="otherBranchInput" placeholder="Sila nyatakan cawangan lain...">
                     </div>
@@ -306,6 +530,17 @@
             </div>
         </div>
 
+        <!-- ===== PROFILE VIEW (like index.html) ===== -->
+        <div id="profileView" class="profile-view hidden">
+            <h2 id="profileTitle">👤 Profil Staf</h2>
+            <div style="text-align:center; font-size:13px; color:#718096; margin-bottom:12px;">
+                ✏️ Klik pada mana-mana medan untuk sunting
+            </div>
+            <div id="profileFields"></div>
+            <button class="btn btn-success" onclick="saveProfile()">💾 Simpan Perubahan</button>
+            <button class="btn btn-gray" onclick="closeProfile()">✖ Tutup</button>
+        </div>
+
         <!-- Debug Console -->
         <div id="debugBox" class="debug-box" style="display:none;"></div>
     </div>
@@ -315,9 +550,9 @@
         //  KONFIGURASI
         // ============================================================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
-
-        // Nama sheet - untuk rujukan
         const SHEET_NAME = 'STAFF LOGIN RECORD';
+        const AUTH_USERNAME = 'SIANGSIANG';
+        const AUTH_PASSWORD = '0000';
 
         // ============================================================
         //  STATE
@@ -327,6 +562,8 @@
         let isLoading = false;
         let debugLogs = [];
         let debugVisible = false;
+        let currentUser = null; // 当前查看的员工资料
+        let isAuthenticated = false;
 
         // Elemen DOM
         const branchSelect = document.getElementById('branchSelect');
@@ -336,6 +573,57 @@
         const debugBox = document.getElementById('debugBox');
         const otherBranchContainer = document.getElementById('otherBranchContainer');
         const otherBranchInput = document.getElementById('otherBranchInput');
+        const authOverlay = document.getElementById('authOverlay');
+        const authUsername = document.getElementById('authUsername');
+        const authPassword = document.getElementById('authPassword');
+        const authError = document.getElementById('authError');
+        const mainContent = document.getElementById('mainContent');
+        const profileView = document.getElementById('profileView');
+        const profileFields = document.getElementById('profileFields');
+        const alertBox = document.getElementById('alert');
+
+        // ============================================================
+        //  AUTHENTICATION
+        // ============================================================
+        function authenticateUser() {
+            const username = authUsername.value.trim();
+            const password = authPassword.value.trim();
+
+            if (username === AUTH_USERNAME && password === AUTH_PASSWORD) {
+                isAuthenticated = true;
+                authOverlay.style.display = 'none';
+                mainContent.style.display = 'block';
+                debugLog('✅ Authentication successful');
+                // Load data after auth
+                init();
+            } else {
+                authError.style.display = 'block';
+                authPassword.value = '';
+                authPassword.focus();
+                debugLog('❌ Authentication failed', 'error');
+            }
+        }
+
+        // Enter key for auth
+        authPassword.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                authenticateUser();
+            }
+        });
+        authUsername.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                authPassword.focus();
+            }
+        });
+
+        // ============================================================
+        //  ALERT
+        // ============================================================
+        function showAlert(msg, type = 'error') {
+            alertBox.textContent = msg;
+            alertBox.className = 'alert ' + type;
+            setTimeout(() => { alertBox.className = 'alert'; }, 5000);
+        }
 
         // ============================================================
         //  DEBUG
@@ -382,15 +670,13 @@
         }
 
         // ============================================================
-        //  GROUPNAME HANDLING (Others)
+        //  GROUPNAME HANDLING
         // ============================================================
         function handleBranchChange() {
             const selected = branchSelect.value;
             if (selected === 'Others') {
                 otherBranchContainer.classList.remove('hidden');
                 otherBranchInput.focus();
-                // 当 Others 被选时，使用 otherBranchInput 的值作为筛选条件
-                // 但需要触发重新渲染
                 renderStaffList();
             } else {
                 otherBranchContainer.classList.add('hidden');
@@ -399,18 +685,16 @@
             }
         }
 
-        // 监听 otherBranchInput 的变化
         otherBranchInput.addEventListener('input', function() {
             renderStaffList();
         });
 
         // ============================================================
-        //  AMBIL DATA DARI GOOGLE SHEETS
+        //  FETCH DATA
         // ============================================================
         async function fetchStaffData() {
             isLoading = true;
-            debugLog('🚀 Staff Info page initializing...');
-            debugLog(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
+            debugLog('🚀 Fetching staff data...');
             updateStatus('⏳ Menghubungi server...', 'info');
 
             try {
@@ -464,9 +748,7 @@
                 const branchSet = new Set();
 
                 if (Array.isArray(firstRow)) {
-                    // 二维数组格式 - 使用 column index
                     debugLog('📊 Processing as 2D array');
-                    // 直接从索引读取: Situation=B(1), LoginPassword=AB(28), Name=E(4), Code=D(3), GroupName=C(2)
                     const idx = {
                         situation: 1,    // B
                         loginPwd: 28,    // AB
@@ -493,7 +775,6 @@
                         if (group) branchSet.add(group);
                     }
                 } else if (typeof firstRow === 'object' && firstRow !== null) {
-                    // 对象数组格式 - 使用 key 映射
                     debugLog('📊 Processing as array of objects');
 
                     const sampleKeys = Object.keys(firstRow);
@@ -584,18 +865,16 @@
         }
 
         // ============================================================
-        //  RENDER UI
+        //  RENDER STAFF LIST
         // ============================================================
         function renderStaffList() {
             let selectedBranch = branchSelect.value;
-            
-            // 如果选择了 Others，使用 otherBranchInput 的值
+
             if (selectedBranch === 'Others') {
                 const otherVal = otherBranchInput.value.trim();
                 if (otherVal) {
                     selectedBranch = otherVal;
                 } else {
-                    // 如果 others 输入为空，不显示任何数据
                     staffListEl.innerHTML = `
                         <div class="empty-state">
                             <span class="icon">✏️</span>
@@ -610,12 +889,10 @@
 
             let filtered = allStaff;
 
-            // Filter by branch
             if (selectedBranch) {
                 filtered = filtered.filter(s => s.group === selectedBranch);
             }
 
-            // Filter by status
             if (selectedStatus) {
                 filtered = filtered.filter(s => s.situation.toLowerCase() === selectedStatus.toLowerCase());
             }
@@ -639,7 +916,7 @@
                 const statusBadge = getStatusBadge(staff.situation);
                 const safeCode = staff.code.replace(/'/g, "\\'");
                 html += `
-                    <div class="staff-item" onclick="onStaffClick('${safeCode}')">
+                    <div class="staff-item" onclick="viewProfile('${safeCode}')">
                         <div class="info">
                             <div class="name">${staff.name}</div>
                             <div class="code">🔑 ${staff.code}</div>
@@ -657,23 +934,170 @@
         }
 
         // ============================================================
-        //  INTERAKSI
+        //  PROFILE VIEW (like index.html)
         // ============================================================
-        function onStaffClick(code) {
-            debugLog(`👆 Staff clicked: ${code}`);
-            try {
-                sessionStorage.setItem('staffCode', code);
-                debugLog(`✅ Code saved to sessionStorage: ${code}`);
-            } catch (e) {
-                console.warn('Gagal simpan ke sessionStorage', e);
-                debugLog(`⚠️ Failed to save to sessionStorage: ${e.message}`, 'warn');
+        function viewProfile(code) {
+            debugLog(`👤 Viewing profile for: ${code}`);
+            const staff = allStaff.find(s => s.code === code);
+            if (!staff) {
+                showAlert('Staf tidak dijumpai.', 'error');
+                return;
             }
-            debugLog(`🚀 Redirecting to index.html`);
-            window.location.href = 'index.html';
+
+            currentUser = { ...staff };
+            displayProfile(currentUser);
         }
 
+        function displayProfile(user) {
+            profileView.classList.remove('hidden');
+            profileFields.innerHTML = '';
+
+            // All fields to display (matching index.html)
+            const fields = [
+                'group', 'code', 'name', 'situation', 'loginPwd'
+            ];
+
+            const labels = {
+                group: 'Group Name',
+                code: 'Code',
+                name: 'Name',
+                situation: 'Situation',
+                loginPwd: 'Login Password'
+            };
+
+            // For select fields
+            const selectOptions = {
+                situation: ['', 'Active', 'Inactive', 'Pending']
+            };
+
+            for (let key of fields) {
+                const val = user[key] || '';
+                const div = document.createElement('div');
+                div.className = 'profile-field';
+
+                const label = document.createElement('label');
+                label.textContent = labels[key] || key + ':';
+
+                let input;
+                if (key === 'code') {
+                    // Code is read-only
+                    input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = val;
+                    input.readOnly = true;
+                    input.style.background = '#f7fafc';
+                } else if (key === 'situation') {
+                    input = document.createElement('select');
+                    selectOptions.situation.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt || '-- Pilih --';
+                        if (opt === val) option.selected = true;
+                        input.appendChild(option);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.type = (key === 'loginPwd') ? 'password' : 'text';
+                    input.value = val;
+                }
+
+                input.dataset.field = key;
+                input.id = 'prof_' + key;
+
+                if (key !== 'code') {
+                    input.addEventListener('change', function() {
+                        currentUser[key] = this.value;
+                        debugLog(`✏️ Updated ${key}: ${this.value}`);
+                    });
+                }
+
+                div.appendChild(label);
+                div.appendChild(input);
+                profileFields.appendChild(div);
+            }
+
+            // Scroll to profile
+            profileView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ============================================================
+        //  SAVE PROFILE (sync to Google Sheet)
+        // ============================================================
+        function saveProfile() {
+            if (!currentUser || !currentUser.code) {
+                showAlert('Tiada data untuk disimpan.', 'error');
+                return;
+            }
+
+            const btn = document.querySelector('.btn-success');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="loading-spinner"></span>Menyimpan...`;
+            btn.disabled = true;
+
+            // Get latest values from inputs
+            const fields = ['group', 'name', 'situation', 'loginPwd'];
+            for (let key of fields) {
+                const input = document.getElementById('prof_' + key);
+                if (input) {
+                    currentUser[key] = input.value;
+                }
+            }
+
+            const payload = {
+                action: 'update',
+                Code: currentUser.code,
+                GroupName: currentUser.group,
+                Name: currentUser.name,
+                Situation: currentUser.situation,
+                LoginPassword: currentUser.loginPwd,
+                UpdateDate: new Date().toISOString()
+            };
+
+            debugLog(`💾 Saving profile: ${JSON.stringify(payload)}`);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(payload)
+            })
+            .then(response => response.json())
+            .then(result => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                if (result.result === 'success') {
+                    showAlert('✅ Data berjaya disimpan ke Google Sheet!', 'success');
+                    debugLog('✅ Save successful');
+                    // Update local data
+                    const idx = allStaff.findIndex(s => s.code === currentUser.code);
+                    if (idx !== -1) {
+                        allStaff[idx] = { ...currentUser };
+                    }
+                    renderStaffList();
+                } else {
+                    showAlert('❌ Gagal menyimpan: ' + (result.message || 'Unknown error'), 'error');
+                    debugLog(`❌ Save failed: ${result.message}`, 'error');
+                }
+            })
+            .catch(err => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                console.error('❌ Save error:', err);
+                showAlert('⚠️ Ralat rangkaian: ' + err.message, 'error');
+                debugLog(`❌ Save error: ${err.message}`, 'error');
+            });
+        }
+
+        function closeProfile() {
+            profileView.classList.add('hidden');
+            currentUser = null;
+            // Scroll back to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ============================================================
+        //  NAVIGATION
+        // ============================================================
         function goBackToIndex() {
-            debugLog(`🔙 Going back to index.html`);
             window.location.href = 'index.html';
         }
 
@@ -681,6 +1105,8 @@
         //  INIT
         // ============================================================
         async function init() {
+            if (!isAuthenticated) return;
+
             const success = await fetchStaffData();
 
             if (success && allStaff.length > 0) {
@@ -700,7 +1126,6 @@
                 if (!debugVisible) toggleDebug();
             }
 
-            // Event listeners
             branchSelect.addEventListener('change', handleBranchChange);
             statusSelect.addEventListener('change', renderStaffList);
             statusBar.addEventListener('click', toggleDebug);
@@ -708,12 +1133,17 @@
             debugLog('✅ Initialization complete');
         }
 
-        // Jalankan
-        init();
+        // ============================================================
+        //  START - Show auth first
+        // ============================================================
+        // Initially hide main content, show auth
+        mainContent.style.display = 'none';
+        authOverlay.style.display = 'flex';
 
         console.log('📋 Staff Info page loaded.');
         console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
         console.log('📌 Sheet: "STAFF LOGIN RECORD" | Column mapping: Situation=B1, LoginPassword=AB1, Name=E1, Code=D1, GroupName=C1');
+        console.log('🔑 Username: SIANGSIANG | Password: 0000');
         console.log('💡 Klik pada status bar untuk toggle debug console');
     </script>
 </body>
