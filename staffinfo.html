@@ -187,6 +187,8 @@
             color: #4a5568;
             margin-bottom: 16px;
             text-align: center;
+            cursor: default;
+            user-select: none;
         }
         .status-bar.success {
             background: #c6f6d5;
@@ -234,20 +236,24 @@
             background: #1a202c;
             color: #68d391;
             font-family: 'Courier New', monospace;
-            font-size: 12px;
+            font-size: 11px;
             padding: 12px;
             border-radius: 12px;
             margin-top: 16px;
-            max-height: 200px;
+            max-height: 250px;
             overflow: auto;
             white-space: pre-wrap;
             word-break: break-all;
+            line-height: 1.5;
         }
         .debug-box .error-text {
             color: #fc8181;
         }
         .debug-box .success-text {
             color: #68d391;
+        }
+        .debug-box .warn-text {
+            color: #f6ad55;
         }
 
         @media (max-width: 480px) {
@@ -308,13 +314,13 @@
         // ============================================================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
 
-        // Nama sheet dan pengepala (header)
+        // Nama sheet dan pengepala (header) - untuk rujukan
         const SHEET_NAME = 'STAFF LOGIN RECORD';
-        const HEADER_SITUATION = 'Situation';    // B
-        const HEADER_LOGIN_PWD = 'LoginPassword'; // AB
-        const HEADER_NAME = 'Name';              // E
-        const HEADER_CODE = 'Code';              // D
-        const HEADER_GROUP = 'GroupName';        // C
+        const HEADER_SITUATION = 'Situation';
+        const HEADER_LOGIN_PWD = 'LoginPassword';
+        const HEADER_NAME = 'Name';
+        const HEADER_CODE = 'Code';
+        const HEADER_GROUP = 'GroupName';
 
         // ============================================================
         //  STATE
@@ -323,6 +329,7 @@
         let branches = [];
         let isLoading = false;
         let debugLogs = [];
+        let debugVisible = false;
 
         // Elemen DOM
         const branchSelect = document.getElementById('branchSelect');
@@ -336,12 +343,13 @@
         // ============================================================
         function debugLog(msg, type = 'info') {
             const timestamp = new Date().toLocaleTimeString();
-            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '📌';
-            debugLogs.push(`[${timestamp}] ${prefix} ${msg}`);
-            if (debugBox.style.display !== 'none') {
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warn' ? '⚠️' : '📌';
+            const logMsg = `[${timestamp}] ${prefix} ${msg}`;
+            debugLogs.push(logMsg);
+            if (debugVisible) {
                 renderDebug();
             }
-            console.log(msg);
+            console.log(logMsg);
         }
 
         function renderDebug() {
@@ -349,9 +357,10 @@
             debugBox.scrollTop = debugBox.scrollHeight;
         }
 
-        function showDebug(show) {
-            debugBox.style.display = show ? 'block' : 'none';
-            if (show) renderDebug();
+        function toggleDebug() {
+            debugVisible = !debugVisible;
+            debugBox.style.display = debugVisible ? 'block' : 'none';
+            if (debugVisible) renderDebug();
         }
 
         // ============================================================
@@ -378,7 +387,8 @@
         // ============================================================
         async function fetchStaffData() {
             isLoading = true;
-            debugLog('⏳ Menghubungi server...');
+            debugLog('🚀 Staff Info page initializing...');
+            debugLog(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
             updateStatus('⏳ Menghubungi server...', 'info');
 
             try {
@@ -392,102 +402,157 @@
 
                 const rawResult = await response.json();
                 debugLog(`📦 Raw response type: ${typeof rawResult}`);
-                debugLog(`📦 Raw response keys: ${Object.keys(rawResult).join(', ')}`);
-
-                // 🔥 关键修复：处理不同的数据格式
-                let data;
-                if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
-                    data = rawResult.data;
-                    debugLog('✅ Data extracted from result.data (array)');
-                } else if (Array.isArray(rawResult)) {
-                    data = rawResult;
+                
+                // 🔥 关键修复：处理对象数组格式
+                let dataArray;
+                
+                // 情况1: 直接是数组
+                if (Array.isArray(rawResult)) {
+                    dataArray = rawResult;
                     debugLog('✅ Data is direct array');
-                } else {
-                    // 尝试看看是否有其他可能的格式
-                    const possibleData = rawResult.data || rawResult.values || rawResult.rows || rawResult;
-                    if (Array.isArray(possibleData)) {
-                        data = possibleData;
-                        debugLog('✅ Data extracted from alternative property');
+                } 
+                // 情况2: 有 data 属性
+                else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
+                    dataArray = rawResult.data;
+                    debugLog('✅ Data extracted from result.data');
+                }
+                // 情况3: 有 values 属性
+                else if (rawResult && rawResult.values && Array.isArray(rawResult.values)) {
+                    dataArray = rawResult.values;
+                    debugLog('✅ Data extracted from result.values');
+                }
+                // 情况4: 有 rows 属性
+                else if (rawResult && rawResult.rows && Array.isArray(rawResult.rows)) {
+                    dataArray = rawResult.rows;
+                    debugLog('✅ Data extracted from result.rows');
+                }
+                // 情况5: 尝试将对象转为数组 (如果 keys 是数字)
+                else if (typeof rawResult === 'object' && rawResult !== null) {
+                    const keys = Object.keys(rawResult);
+                    if (keys.length > 0 && keys.every(k => !isNaN(parseInt(k)))) {
+                        dataArray = Object.values(rawResult);
+                        debugLog('✅ Converted object with numeric keys to array');
                     } else {
-                        throw new Error('Format data tidak dikenali. Lihat debug console.');
+                        throw new Error('Format data tidak dikenali. Data adalah object dengan keys: ' + keys.join(', '));
                     }
+                } else {
+                    throw new Error('Format data tidak dikenali: ' + JSON.stringify(rawResult).substring(0, 200));
                 }
 
-                if (!data || data.length === 0) {
+                if (!dataArray || dataArray.length === 0) {
                     throw new Error('Tiada data ditemui dalam sheet.');
                 }
 
-                debugLog(`📊 Data length: ${data.length} rows`);
-                debugLog(`📊 First row type: ${Array.isArray(data[0]) ? 'array' : typeof data[0]}`);
-                if (Array.isArray(data[0])) {
-                    debugLog(`📊 First row sample: ${JSON.stringify(data[0]).substring(0, 200)}`);
-                } else {
-                    debugLog(`📊 First row sample: ${JSON.stringify(data[0]).substring(0, 200)}`);
-                }
+                debugLog(`📊 Data length: ${dataArray.length} rows`);
 
-                // data[0] 应该是 header row
-                const headerRow = data[0];
-                if (!Array.isArray(headerRow)) {
-                    throw new Error(`Header row bukan array: ${typeof headerRow}. Data mungkin dalam format object.`);
-                }
+                // 🔥 检查第一行是 array 还是 object
+                const firstRow = dataArray[0];
+                debugLog(`📊 First row type: ${typeof firstRow}`);
 
-                // Cari indeks untuk setiap header
-                const idx = {
-                    situation: headerRow.indexOf(HEADER_SITUATION),
-                    loginPwd: headerRow.indexOf(HEADER_LOGIN_PWD),
-                    name: headerRow.indexOf(HEADER_NAME),
-                    code: headerRow.indexOf(HEADER_CODE),
-                    group: headerRow.indexOf(HEADER_GROUP)
-                };
-
-                debugLog(`📌 Header indices: situation=${idx.situation}, loginPwd=${idx.loginPwd}, name=${idx.name}, code=${idx.code}, group=${idx.group}`);
-
-                // Semak semua header wajib wujud
-                const missing = [];
-                for (let [key, val] of Object.entries(idx)) {
-                    if (val === -1) missing.push(key);
-                }
-                if (missing.length > 0) {
-                    throw new Error(`Header tidak dijumpai: ${missing.join(', ')}. Pastikan sheet "${SHEET_NAME}" mengandungi lajur: Situation(B), LoginPassword(AB), Name(E), Code(D), GroupName(C)`);
-                }
-
-                // Bina array staf
-                const staff = [];
+                let staff = [];
                 const branchSet = new Set();
 
-                for (let i = 1; i < data.length; i++) {
-                    const row = data[i];
-                    if (!Array.isArray(row)) {
-                        debugLog(`⚠️ Row ${i} bukan array, skip`);
-                        continue;
+                if (Array.isArray(firstRow)) {
+                    // 二维数组格式
+                    debugLog('📊 Processing as 2D array');
+                    const headerRow = firstRow;
+                    const idx = {
+                        situation: headerRow.indexOf(HEADER_SITUATION),
+                        loginPwd: headerRow.indexOf(HEADER_LOGIN_PWD),
+                        name: headerRow.indexOf(HEADER_NAME),
+                        code: headerRow.indexOf(HEADER_CODE),
+                        group: headerRow.indexOf(HEADER_GROUP)
+                    };
+                    debugLog(`📌 Header indices: situation=${idx.situation}, loginPwd=${idx.loginPwd}, name=${idx.name}, code=${idx.code}, group=${idx.group}`);
+
+                    const missing = [];
+                    for (let [key, val] of Object.entries(idx)) {
+                        if (val === -1) missing.push(key);
                     }
+                    if (missing.length > 0) {
+                        throw new Error(`Header tidak dijumpai: ${missing.join(', ')}`);
+                    }
+
+                    for (let i = 1; i < dataArray.length; i++) {
+                        const row = dataArray[i];
+                        if (!Array.isArray(row)) continue;
+                        if (row.length <= Math.max(idx.situation, idx.loginPwd, idx.name, idx.code, idx.group)) continue;
+
+                        const group = (row[idx.group] || '').toString().trim();
+                        const code = (row[idx.code] || '').toString().trim();
+                        const name = (row[idx.name] || '').toString().trim();
+                        const situation = (row[idx.situation] || '').toString().trim();
+                        const loginPwd = (row[idx.loginPwd] || '').toString().trim();
+
+                        if (!code || !name) continue;
+
+                        staff.push({ group: group || 'Tidak Diketahui', code, name, situation: situation || 'Unknown', loginPwd });
+                        if (group) branchSet.add(group);
+                    }
+                } else if (typeof firstRow === 'object' && firstRow !== null) {
+                    // 对象数组格式 (您当前的数据格式)
+                    debugLog('📊 Processing as array of objects');
                     
-                    if (row.length <= Math.max(idx.situation, idx.loginPwd, idx.name, idx.code, idx.group)) {
-                        debugLog(`⚠️ Row ${i} terlalu pendek, skip`);
-                        continue;
-                    }
-
-                    const group = (row[idx.group] || '').toString().trim();
-                    const code = (row[idx.code] || '').toString().trim();
-                    const name = (row[idx.name] || '').toString().trim();
-                    const situation = (row[idx.situation] || '').toString().trim();
-                    const loginPwd = (row[idx.loginPwd] || '').toString().trim();
-
-                    if (!code || !name) {
-                        debugLog(`⚠️ Row ${i} tiada code atau name, skip`);
-                        continue;
-                    }
-
-                    const staffObj = {
-                        group: group || 'Tidak Diketahui',
-                        code: code,
-                        name: name,
-                        situation: situation || 'Unknown',
-                        loginPwd: loginPwd
+                    // 获取所有对象的 keys 作为参考
+                    const sampleKeys = Object.keys(firstRow);
+                    debugLog(`📊 Sample keys: ${sampleKeys.slice(0, 10).join(', ')}${sampleKeys.length > 10 ? '...' : ''}`);
+                    
+                    // 查找对应的 header
+                    const findKey = (possibleNames) => {
+                        for (const name of possibleNames) {
+                            const found = sampleKeys.find(k => k.toLowerCase() === name.toLowerCase());
+                            if (found) return found;
+                        }
+                        // 尝试部分匹配
+                        for (const name of possibleNames) {
+                            const found = sampleKeys.find(k => k.toLowerCase().includes(name.toLowerCase()));
+                            if (found) return found;
+                        }
+                        return null;
                     };
 
-                    staff.push(staffObj);
-                    if (group) branchSet.add(group);
+                    const situationKey = findKey(['Situation', 'situation', 'STATUS', 'Status']);
+                    const loginPwdKey = findKey(['LoginPassword', 'loginPassword', 'Loginpassword', 'Password', 'password']);
+                    const nameKey = findKey(['Name', 'name', 'Nama', 'nama']);
+                    const codeKey = findKey(['Code', 'code', 'Kod', 'kod', 'ID']);
+                    const groupKey = findKey(['GroupName', 'groupName', 'Group', 'group', 'Cawangan', 'cawangan']);
+
+                    debugLog(`📌 Mapped keys: situation=${situationKey}, loginPwd=${loginPwdKey}, name=${nameKey}, code=${codeKey}, group=${groupKey}`);
+
+                    // 检查是否找到了所有必需的 key
+                    const missingKeys = [];
+                    if (!situationKey) missingKeys.push('Situation');
+                    if (!loginPwdKey) missingKeys.push('LoginPassword');
+                    if (!nameKey) missingKeys.push('Name');
+                    if (!codeKey) missingKeys.push('Code');
+                    if (!groupKey) missingKeys.push('GroupName');
+
+                    if (missingKeys.length > 0) {
+                        throw new Error(`Header tidak dijumpai: ${missingKeys.join(', ')}. Pastikan sheet mengandungi lajur: Situation, LoginPassword, Name, Code, GroupName`);
+                    }
+
+                    for (const row of dataArray) {
+                        if (typeof row !== 'object' || row === null) continue;
+                        
+                        const group = (row[groupKey] || '').toString().trim();
+                        const code = (row[codeKey] || '').toString().trim();
+                        const name = (row[nameKey] || '').toString().trim();
+                        const situation = (row[situationKey] || '').toString().trim();
+                        const loginPwd = (row[loginPwdKey] || '').toString().trim();
+
+                        if (!code || !name) continue;
+
+                        staff.push({ 
+                            group: group || 'Tidak Diketahui', 
+                            code, 
+                            name, 
+                            situation: situation || 'Unknown', 
+                            loginPwd 
+                        });
+                        if (group) branchSet.add(group);
+                    }
+                } else {
+                    throw new Error('Format data tidak disokong: first row is ' + typeof firstRow);
                 }
 
                 if (staff.length === 0) {
@@ -499,7 +564,7 @@
 
                 updateStatus(`✅ ${staff.length} rekod staf dimuatkan.`, 'success');
                 debugLog(`✅ ${staff.length} staf, ${branches.length} cawangan`);
-                debugLog(`📊 Sample staff: ${JSON.stringify(staff.slice(0, 3), null, 2)}`);
+                debugLog(`📊 Sample staff: ${JSON.stringify(staff.slice(0, 2), null, 2)}`);
                 debugLog(`📊 Branches: ${branches.join(', ')}`);
 
                 return true;
@@ -516,7 +581,7 @@
                 isLoading = false;
                 // Tunjukkan debug box jika ada error
                 if (statusBar.classList.contains('error')) {
-                    showDebug(true);
+                    toggleDebug();
                 }
             }
         }
@@ -541,17 +606,14 @@
 
             let filtered = allStaff;
 
-            // Filter by branch
             if (selectedBranch) {
                 filtered = filtered.filter(s => s.group === selectedBranch);
             }
 
-            // Filter by status
             if (selectedStatus) {
                 filtered = filtered.filter(s => s.situation.toLowerCase() === selectedStatus.toLowerCase());
             }
 
-            // Sort by name
             filtered.sort((a, b) => a.name.localeCompare(b.name));
 
             if (filtered.length === 0) {
@@ -569,8 +631,10 @@
             let html = '';
             filtered.forEach(staff => {
                 const statusBadge = getStatusBadge(staff.situation);
+                // Escape code untuk keselamatan
+                const safeCode = staff.code.replace(/'/g, "\\'");
                 html += `
-                    <div class="staff-item" onclick="onStaffClick('${staff.code}')">
+                    <div class="staff-item" onclick="onStaffClick('${safeCode}')">
                         <div class="info">
                             <div class="name">${staff.name}</div>
                             <div class="code">🔑 ${staff.code}</div>
@@ -597,10 +661,8 @@
                 debugLog(`✅ Code saved to sessionStorage: ${code}`);
             } catch (e) {
                 console.warn('Gagal simpan ke sessionStorage', e);
-                debugLog(`⚠️ Failed to save to sessionStorage: ${e.message}`, 'error');
+                debugLog(`⚠️ Failed to save to sessionStorage: ${e.message}`, 'warn');
             }
-
-            // Redirect ke index.html
             debugLog(`🚀 Redirecting to index.html`);
             window.location.href = 'index.html';
         }
@@ -610,37 +672,31 @@
             window.location.href = 'index.html';
         }
 
-        // Toggle debug with double-click on status bar
-        document.getElementById('statusBar').addEventListener('dblclick', function() {
-            const isVisible = debugBox.style.display !== 'none';
-            showDebug(!isVisible);
-        });
-
         // ============================================================
         //  INIT
         // ============================================================
         async function init() {
-            debugLog('🚀 Staff Info page initializing...');
-            debugLog(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
-            
             // Muat data
             const success = await fetchStaffData();
 
             if (success && allStaff.length > 0) {
                 populateBranchDropdown();
                 renderStaffList();
-                // Sembunyikan debug jika berjaya
-                setTimeout(() => { showDebug(false); }, 3000);
+                // Auto hide debug after 3 seconds if successful
+                setTimeout(() => {
+                    if (debugVisible) toggleDebug();
+                }, 3000);
             } else {
                 staffListEl.innerHTML = `
                     <div class="empty-state">
                         <span class="icon">⚠️</span>
                         Gagal memuatkan data. Sila semak semula sambungan atau sheet.
                         <br><small style="color:#a0aec0;">Pastikan sheet "${SHEET_NAME}" wujud dan mempunyai data.</small>
-                        <br><small style="color:#a0aec0;">👉 Double-click pada status bar untuk lihat debug.</small>
+                        <br><small style="color:#a0aec0;">👉 Klik pada status bar untuk lihat debug.</small>
                     </div>
                 `;
-                showDebug(true);
+                // Tunjukkan debug jika ada error
+                if (!debugVisible) toggleDebug();
             }
 
             // Event listeners
@@ -653,27 +709,19 @@
                 renderStaffList();
             });
 
+            // Click on status bar to toggle debug
+            statusBar.addEventListener('click', toggleDebug);
+
             debugLog('✅ Initialization complete');
         }
 
         // Jalankan
         init();
 
-        // ============================================================
-        //  KEYBOARD SHORTCUT: Alt+D to toggle debug
-        // ============================================================
-        document.addEventListener('keydown', function(e) {
-            if (e.altKey && e.key === 'd') {
-                const isVisible = debugBox.style.display !== 'none';
-                showDebug(!isVisible);
-                e.preventDefault();
-            }
-        });
-
         console.log('📋 Staff Info page loaded.');
         console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
         console.log('📌 Pastikan sheet nama: "STAFF LOGIN RECORD" dengan header: Situation, LoginPassword, Name, Code, GroupName');
-        console.log('💡 Double-click status bar atau tekan Alt+D untuk toggle debug console');
+        console.log('💡 Klik pada status bar untuk toggle debug console');
     </script>
 </body>
 </html>
