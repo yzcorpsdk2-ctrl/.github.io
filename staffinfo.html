@@ -64,7 +64,8 @@
             margin-bottom: 4px;
             letter-spacing: 0.3px;
         }
-        .filter-group select {
+        .filter-group select,
+        .filter-group input {
             width: 100%;
             padding: 10px 12px;
             border: 2px solid #e2e8f0;
@@ -74,10 +75,14 @@
             transition: 0.2s;
             appearance: auto;
         }
-        .filter-group select:focus {
+        .filter-group select:focus,
+        .filter-group input:focus {
             border-color: #1a3a5c;
             outline: none;
             box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
+        }
+        .filter-group input {
+            appearance: none;
         }
         .btn-back {
             background: #e2e8f0;
@@ -206,29 +211,23 @@
         .hidden {
             display: none !important;
         }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
 
-        /* Loading spinner */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #e2e8f0;
-            border-top: 3px solid #1a3a5c;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            vertical-align: middle;
-            margin-right: 10px;
+        .other-input-container {
+            margin-top: 8px;
+            transition: 0.3s;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .other-input-container input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #fafcfd;
+        }
+        .other-input-container input:focus {
+            border-color: #1a3a5c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
         }
 
         /* Debug console */
@@ -245,15 +244,6 @@
             white-space: pre-wrap;
             word-break: break-all;
             line-height: 1.5;
-        }
-        .debug-box .error-text {
-            color: #fc8181;
-        }
-        .debug-box .success-text {
-            color: #68d391;
-        }
-        .debug-box .warn-text {
-            color: #f6ad55;
         }
 
         @media (max-width: 480px) {
@@ -280,7 +270,19 @@
                     <label for="branchSelect">🏢 Cawangan (GroupName)</label>
                     <select id="branchSelect">
                         <option value="">-- Pilih Cawangan --</option>
+                        <option value="SIANG SIANG RESTAURANT(BANDAR)">SIANG SIANG RESTAURANT (BANDAR)</option>
+                        <option value="SIANG SIANG RESTAURANT(BATU 4)">SIANG SIANG RESTAURANT (BATU 4)</option>
+                        <option value="YZ UFO">YZ UFO</option>
+                        <option value="YZ CYBER CAFE(BANDAR)">YZ CYBER CAFE (BANDAR)</option>
+                        <option value="YZ CYBER CAFE(SEJATI)">YZ CYBER CAFE (SEJATI)</option>
+                        <option value="CC TELESHOP (KIMFUNG)">CC TELESHOP (KIMFUNG)</option>
+                        <option value="CC TELESHOP (MESRA)">CC TELESHOP (MESRA)</option>
+                        <option value="Others">Others (Lain-lain)</option>
                     </select>
+                    <!-- Others input -->
+                    <div id="otherBranchContainer" class="other-input-container hidden">
+                        <input type="text" id="otherBranchInput" placeholder="Sila nyatakan cawangan lain...">
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label for="statusSelect">📌 Status (Situation)</label>
@@ -314,13 +316,8 @@
         // ============================================================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
 
-        // Nama sheet dan pengepala (header) - untuk rujukan
+        // Nama sheet - untuk rujukan
         const SHEET_NAME = 'STAFF LOGIN RECORD';
-        const HEADER_SITUATION = 'Situation';
-        const HEADER_LOGIN_PWD = 'LoginPassword';
-        const HEADER_NAME = 'Name';
-        const HEADER_CODE = 'Code';
-        const HEADER_GROUP = 'GroupName';
 
         // ============================================================
         //  STATE
@@ -337,6 +334,8 @@
         const staffListEl = document.getElementById('staffList');
         const statusBar = document.getElementById('statusBar');
         const debugBox = document.getElementById('debugBox');
+        const otherBranchContainer = document.getElementById('otherBranchContainer');
+        const otherBranchInput = document.getElementById('otherBranchInput');
 
         // ============================================================
         //  DEBUG
@@ -383,6 +382,29 @@
         }
 
         // ============================================================
+        //  GROUPNAME HANDLING (Others)
+        // ============================================================
+        function handleBranchChange() {
+            const selected = branchSelect.value;
+            if (selected === 'Others') {
+                otherBranchContainer.classList.remove('hidden');
+                otherBranchInput.focus();
+                // 当 Others 被选时，使用 otherBranchInput 的值作为筛选条件
+                // 但需要触发重新渲染
+                renderStaffList();
+            } else {
+                otherBranchContainer.classList.add('hidden');
+                otherBranchInput.value = '';
+                renderStaffList();
+            }
+        }
+
+        // 监听 otherBranchInput 的变化
+        otherBranchInput.addEventListener('input', function() {
+            renderStaffList();
+        });
+
+        // ============================================================
         //  AMBIL DATA DARI GOOGLE SHEETS
         // ============================================================
         async function fetchStaffData() {
@@ -394,7 +416,7 @@
             try {
                 const url = `${SCRIPT_URL}?action=getData`;
                 debugLog(`📡 URL: ${url}`);
-                
+
                 const response = await fetch(url);
                 debugLog(`📡 Response status: ${response.status}`);
 
@@ -402,32 +424,22 @@
 
                 const rawResult = await response.json();
                 debugLog(`📦 Raw response type: ${typeof rawResult}`);
-                
-                // 🔥 关键修复：处理对象数组格式
+
                 let dataArray;
-                
-                // 情况1: 直接是数组
+
                 if (Array.isArray(rawResult)) {
                     dataArray = rawResult;
                     debugLog('✅ Data is direct array');
-                } 
-                // 情况2: 有 data 属性
-                else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
+                } else if (rawResult && rawResult.data && Array.isArray(rawResult.data)) {
                     dataArray = rawResult.data;
                     debugLog('✅ Data extracted from result.data');
-                }
-                // 情况3: 有 values 属性
-                else if (rawResult && rawResult.values && Array.isArray(rawResult.values)) {
+                } else if (rawResult && rawResult.values && Array.isArray(rawResult.values)) {
                     dataArray = rawResult.values;
                     debugLog('✅ Data extracted from result.values');
-                }
-                // 情况4: 有 rows 属性
-                else if (rawResult && rawResult.rows && Array.isArray(rawResult.rows)) {
+                } else if (rawResult && rawResult.rows && Array.isArray(rawResult.rows)) {
                     dataArray = rawResult.rows;
                     debugLog('✅ Data extracted from result.rows');
-                }
-                // 情况5: 尝试将对象转为数组 (如果 keys 是数字)
-                else if (typeof rawResult === 'object' && rawResult !== null) {
+                } else if (typeof rawResult === 'object' && rawResult !== null) {
                     const keys = Object.keys(rawResult);
                     if (keys.length > 0 && keys.every(k => !isNaN(parseInt(k)))) {
                         dataArray = Object.values(rawResult);
@@ -445,7 +457,6 @@
 
                 debugLog(`📊 Data length: ${dataArray.length} rows`);
 
-                // 🔥 检查第一行是 array 还是 object
                 const firstRow = dataArray[0];
                 debugLog(`📊 First row type: ${typeof firstRow}`);
 
@@ -453,25 +464,17 @@
                 const branchSet = new Set();
 
                 if (Array.isArray(firstRow)) {
-                    // 二维数组格式
+                    // 二维数组格式 - 使用 column index
                     debugLog('📊 Processing as 2D array');
-                    const headerRow = firstRow;
+                    // 直接从索引读取: Situation=B(1), LoginPassword=AB(28), Name=E(4), Code=D(3), GroupName=C(2)
                     const idx = {
-                        situation: headerRow.indexOf(HEADER_SITUATION),
-                        loginPwd: headerRow.indexOf(HEADER_LOGIN_PWD),
-                        name: headerRow.indexOf(HEADER_NAME),
-                        code: headerRow.indexOf(HEADER_CODE),
-                        group: headerRow.indexOf(HEADER_GROUP)
+                        situation: 1,    // B
+                        loginPwd: 28,    // AB
+                        name: 4,         // E
+                        code: 3,         // D
+                        group: 2         // C
                     };
-                    debugLog(`📌 Header indices: situation=${idx.situation}, loginPwd=${idx.loginPwd}, name=${idx.name}, code=${idx.code}, group=${idx.group}`);
-
-                    const missing = [];
-                    for (let [key, val] of Object.entries(idx)) {
-                        if (val === -1) missing.push(key);
-                    }
-                    if (missing.length > 0) {
-                        throw new Error(`Header tidak dijumpai: ${missing.join(', ')}`);
-                    }
+                    debugLog(`📌 Using fixed indices: situation=${idx.situation}, loginPwd=${idx.loginPwd}, name=${idx.name}, code=${idx.code}, group=${idx.group}`);
 
                     for (let i = 1; i < dataArray.length; i++) {
                         const row = dataArray[i];
@@ -490,20 +493,17 @@
                         if (group) branchSet.add(group);
                     }
                 } else if (typeof firstRow === 'object' && firstRow !== null) {
-                    // 对象数组格式 (您当前的数据格式)
+                    // 对象数组格式 - 使用 key 映射
                     debugLog('📊 Processing as array of objects');
-                    
-                    // 获取所有对象的 keys 作为参考
+
                     const sampleKeys = Object.keys(firstRow);
                     debugLog(`📊 Sample keys: ${sampleKeys.slice(0, 10).join(', ')}${sampleKeys.length > 10 ? '...' : ''}`);
-                    
-                    // 查找对应的 header
+
                     const findKey = (possibleNames) => {
                         for (const name of possibleNames) {
                             const found = sampleKeys.find(k => k.toLowerCase() === name.toLowerCase());
                             if (found) return found;
                         }
-                        // 尝试部分匹配
                         for (const name of possibleNames) {
                             const found = sampleKeys.find(k => k.toLowerCase().includes(name.toLowerCase()));
                             if (found) return found;
@@ -519,7 +519,6 @@
 
                     debugLog(`📌 Mapped keys: situation=${situationKey}, loginPwd=${loginPwdKey}, name=${nameKey}, code=${codeKey}, group=${groupKey}`);
 
-                    // 检查是否找到了所有必需的 key
                     const missingKeys = [];
                     if (!situationKey) missingKeys.push('Situation');
                     if (!loginPwdKey) missingKeys.push('LoginPassword');
@@ -533,7 +532,7 @@
 
                     for (const row of dataArray) {
                         if (typeof row !== 'object' || row === null) continue;
-                        
+
                         const group = (row[groupKey] || '').toString().trim();
                         const code = (row[codeKey] || '').toString().trim();
                         const name = (row[nameKey] || '').toString().trim();
@@ -542,12 +541,12 @@
 
                         if (!code || !name) continue;
 
-                        staff.push({ 
-                            group: group || 'Tidak Diketahui', 
-                            code, 
-                            name, 
-                            situation: situation || 'Unknown', 
-                            loginPwd 
+                        staff.push({
+                            group: group || 'Tidak Diketahui',
+                            code,
+                            name,
+                            situation: situation || 'Unknown',
+                            loginPwd
                         });
                         if (group) branchSet.add(group);
                     }
@@ -565,7 +564,6 @@
                 updateStatus(`✅ ${staff.length} rekod staf dimuatkan.`, 'success');
                 debugLog(`✅ ${staff.length} staf, ${branches.length} cawangan`);
                 debugLog(`📊 Sample staff: ${JSON.stringify(staff.slice(0, 2), null, 2)}`);
-                debugLog(`📊 Branches: ${branches.join(', ')}`);
 
                 return true;
 
@@ -579,7 +577,6 @@
                 return false;
             } finally {
                 isLoading = false;
-                // Tunjukkan debug box jika ada error
                 if (statusBar.classList.contains('error')) {
                     toggleDebug();
                 }
@@ -589,27 +586,36 @@
         // ============================================================
         //  RENDER UI
         // ============================================================
-        function populateBranchDropdown() {
-            branchSelect.innerHTML = '<option value="">-- Pilih Cawangan --</option>';
-            branches.forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b;
-                opt.textContent = b;
-                branchSelect.appendChild(opt);
-            });
-            debugLog(`📋 Populated ${branches.length} branches in dropdown`);
-        }
-
         function renderStaffList() {
-            const selectedBranch = branchSelect.value;
+            let selectedBranch = branchSelect.value;
+            
+            // 如果选择了 Others，使用 otherBranchInput 的值
+            if (selectedBranch === 'Others') {
+                const otherVal = otherBranchInput.value.trim();
+                if (otherVal) {
+                    selectedBranch = otherVal;
+                } else {
+                    // 如果 others 输入为空，不显示任何数据
+                    staffListEl.innerHTML = `
+                        <div class="empty-state">
+                            <span class="icon">✏️</span>
+                            Sila nyatakan cawangan lain di ruangan yang disediakan.
+                        </div>
+                    `;
+                    return;
+                }
+            }
+
             const selectedStatus = statusSelect.value;
 
             let filtered = allStaff;
 
+            // Filter by branch
             if (selectedBranch) {
                 filtered = filtered.filter(s => s.group === selectedBranch);
             }
 
+            // Filter by status
             if (selectedStatus) {
                 filtered = filtered.filter(s => s.situation.toLowerCase() === selectedStatus.toLowerCase());
             }
@@ -631,7 +637,6 @@
             let html = '';
             filtered.forEach(staff => {
                 const statusBadge = getStatusBadge(staff.situation);
-                // Escape code untuk keselamatan
                 const safeCode = staff.code.replace(/'/g, "\\'");
                 html += `
                     <div class="staff-item" onclick="onStaffClick('${safeCode}')">
@@ -676,13 +681,10 @@
         //  INIT
         // ============================================================
         async function init() {
-            // Muat data
             const success = await fetchStaffData();
 
             if (success && allStaff.length > 0) {
-                populateBranchDropdown();
                 renderStaffList();
-                // Auto hide debug after 3 seconds if successful
                 setTimeout(() => {
                     if (debugVisible) toggleDebug();
                 }, 3000);
@@ -695,21 +697,12 @@
                         <br><small style="color:#a0aec0;">👉 Klik pada status bar untuk lihat debug.</small>
                     </div>
                 `;
-                // Tunjukkan debug jika ada error
                 if (!debugVisible) toggleDebug();
             }
 
             // Event listeners
-            branchSelect.addEventListener('change', () => {
-                debugLog(`📌 Branch changed to: ${branchSelect.value}`);
-                renderStaffList();
-            });
-            statusSelect.addEventListener('change', () => {
-                debugLog(`📌 Status changed to: ${statusSelect.value}`);
-                renderStaffList();
-            });
-
-            // Click on status bar to toggle debug
+            branchSelect.addEventListener('change', handleBranchChange);
+            statusSelect.addEventListener('change', renderStaffList);
             statusBar.addEventListener('click', toggleDebug);
 
             debugLog('✅ Initialization complete');
@@ -720,7 +713,7 @@
 
         console.log('📋 Staff Info page loaded.');
         console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
-        console.log('📌 Pastikan sheet nama: "STAFF LOGIN RECORD" dengan header: Situation, LoginPassword, Name, Code, GroupName');
+        console.log('📌 Sheet: "STAFF LOGIN RECORD" | Column mapping: Situation=B1, LoginPassword=AB1, Name=E1, Code=D1, GroupName=C1');
         console.log('💡 Klik pada status bar untuk toggle debug console');
     </script>
 </body>
