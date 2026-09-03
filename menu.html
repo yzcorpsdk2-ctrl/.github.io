@@ -303,9 +303,9 @@
                 <span class="icon">🕐</span>
                 <span class="label" id="menuPunch">Punch Card Record</span>
             </button>
-            <button class="menu-btn purple" onclick="navigateTo('menu1')">
-                <span class="icon">📁</span>
-                <span class="label" id="menu1">Menu 1</span>
+            <button class="menu-btn purple" onclick="navigateTo('payroll')">
+                <span class="icon">💰</span>
+                <span class="label" id="menuPayroll">Payroll</span>
             </button>
             <button class="menu-btn teal" onclick="navigateTo('menu2')">
                 <span class="icon">📁</span>
@@ -343,13 +343,18 @@
 
     <script>
         // ============= CONFIG =============
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMwpE6zvWupu3H-0R333JqQqb3aVIprNJHjY8BgxDdtRLZoO0pXyPvzMhucTlzS85YIQ/exec';
+        // 使用你提供的 Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
         
         // ============= GET BASE PATH =============
         function getBasePath() {
-            // 修复：硬编码路径，因为你的部署在 .github.io 子目录下
-            // 这样无论在哪里访问，都能正确跳转
-            return '/.github.io/';
+            // 获取当前路径的目录部分
+            const path = window.location.pathname;
+            const lastSlash = path.lastIndexOf('/');
+            if (lastSlash > 0) {
+                return path.substring(0, lastSlash + 1);
+            }
+            return '/';
         }
 
         let currentLanguage = 'ms';
@@ -363,7 +368,7 @@
                 signlog: '📝 Daftar / Log Masuk',
                 staffInfo: '📇 Staff Info',
                 punch: '🕐 Punch Card Record',
-                menu1: '📁 Menu 1',
+                payroll: '💰 Payroll',
                 menu2: '📁 Menu 2',
                 menu3: '📁 Menu 3',
                 footer: '© 2026 Sistem Pengurusan Staf',
@@ -386,7 +391,7 @@
                 signlog: '📝 Sign Up / Login',
                 staffInfo: '📇 Staff Info',
                 punch: '🕐 Punch Card Record',
-                menu1: '📁 Menu 1',
+                payroll: '💰 Payroll',
                 menu2: '📁 Menu 2',
                 menu3: '📁 Menu 3',
                 footer: '© 2026 Staff Management System',
@@ -409,7 +414,7 @@
                 signlog: '📝 注册 / 登录',
                 staffInfo: '📇 员工信息',
                 punch: '🕐 打卡记录',
-                menu1: '📁 菜单 1',
+                payroll: '💰 薪资管理',
                 menu2: '📁 菜单 2',
                 menu3: '📁 菜单 3',
                 footer: '© 2026 员工管理系统',
@@ -447,7 +452,7 @@
             document.getElementById('menuSignLog').textContent = t('signlog');
             document.getElementById('menuStaffInfo').textContent = t('staffInfo');
             document.getElementById('menuPunch').textContent = t('punch');
-            document.getElementById('menu1').textContent = t('menu1');
+            document.getElementById('menuPayroll').textContent = t('payroll');
             document.getElementById('menu2').textContent = t('menu2');
             document.getElementById('menu3').textContent = t('menu3');
             document.getElementById('footerText').textContent = t('footer');
@@ -507,33 +512,33 @@
             const basePath = getBasePath();
             console.log('📁 Base path:', basePath);
 
-            // 需要直接跳转的页面（不需要认证）
+            // 页面映射表：页面标识 -> 实际文件名
+            const pageMap = {
+                'signlog': 'index.html',      // Daftar / Log Masuk
+                'staffinfo': 'staffinfo.html',
+                'punch': 'punch.html',
+                'payroll': 'payroll.html'
+            };
+
+            // 检查是否是直接跳转的页面（不需要认证）
             if (page === 'signlog') {
-                console.log('➡️ Redirecting to signlog page');
-                const targetUrl = basePath + 'signlog.html';
+                console.log('➡️ Redirecting to signlog page (index.html)');
+                const targetUrl = basePath + 'index.html';
                 console.log('📍 Full URL:', targetUrl);
                 window.location.href = targetUrl;
                 return;
             }
 
-            // Staff Info - 需要认证
-            if (page === 'staffinfo') {
-                console.log('🔒 Staff info - showing auth overlay');
-                pendingNavigation = 'staffinfo';
+            // 检查是否在页面映射表中
+            if (pageMap[page]) {
+                console.log('🔒 Protected page:', page, '->', pageMap[page]);
+                pendingNavigation = page;
                 showAuthOverlay();
                 return;
             }
 
-            // Punch Card Record - 需要认证
-            if (page === 'punch') {
-                console.log('🔒 Punch - showing auth overlay');
-                pendingNavigation = 'punch';
-                showAuthOverlay();
-                return;
-            }
-
-            // 其他受保护的页面
-            console.log('🔒 Other protected page:', page);
+            // 其他未定义的页面
+            console.log('⚠️ Unknown page:', page);
             pendingNavigation = page;
             showAuthOverlay();
         }
@@ -571,10 +576,17 @@
                 closeOverlay();
                 
                 if (pendingNavigation) {
-                    console.log('➡️ Navigating to:', pendingNavigation);
+                    // 页面映射表
+                    const pageMap = {
+                        'staffinfo': 'staffinfo.html',
+                        'punch': 'punch.html',
+                        'payroll': 'payroll.html'
+                    };
+                    
                     const basePath = getBasePath();
-                    const targetUrl = basePath + pendingNavigation + '.html';
-                    console.log('📍 Redirecting to:', targetUrl);
+                    const fileName = pageMap[pendingNavigation] || pendingNavigation + '.html';
+                    const targetUrl = basePath + fileName;
+                    console.log('➡️ Redirecting to:', targetUrl);
                     window.location.href = targetUrl;
                     pendingNavigation = null;
                 }
@@ -612,6 +624,7 @@
             console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
             console.log('📌 Base path:', getBasePath());
             console.log('📍 Current URL:', window.location.href);
+            console.log('📋 Apps Script URL:', SCRIPT_URL);
             
             setTimeout(testConnection, 500);
             setLanguage('ms');
