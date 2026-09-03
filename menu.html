@@ -84,6 +84,7 @@
             flex-direction: column;
             align-items: center;
             gap: 6px;
+            text-decoration: none;
         }
         .menu-btn:hover {
             background: #1a3a5c;
@@ -185,92 +186,6 @@
         @media (max-width: 380px) {
             .menu-grid { grid-template-columns: 1fr; }
         }
-
-        /* Auth Overlay Styles */
-        .auth-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .auth-overlay.show {
-            display: flex;
-        }
-        .auth-overlay .auth-box {
-            background: white;
-            padding: 30px 24px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .auth-overlay .auth-box h3 {
-            text-align: center;
-            color: #1a3a5c;
-            margin-bottom: 16px;
-        }
-        .auth-overlay .auth-box .form-group {
-            margin-bottom: 12px;
-        }
-        .auth-overlay .auth-box .form-group label {
-            display: block;
-            font-weight: 600;
-            font-size: 13px;
-            color: #2d3748;
-            margin-bottom: 4px;
-        }
-        .auth-overlay .auth-box .form-group input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 15px;
-            background: #fafcfd;
-        }
-        .auth-overlay .auth-box .form-group input:focus {
-            border-color: #1a3a5c;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
-        }
-        .auth-overlay .auth-box .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-bottom: 8px;
-        }
-        .auth-overlay .auth-box .btn-primary {
-            background: #1a3a5c;
-            color: white;
-        }
-        .auth-overlay .auth-box .btn-primary:hover {
-            background: #0f2a44;
-        }
-        .auth-overlay .auth-box .btn-gray {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-        .auth-overlay .auth-box .btn-gray:hover {
-            background: #cbd5e0;
-        }
-        .auth-overlay .auth-box .error-msg {
-            color: #c53030;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 8px;
-            display: none;
-        }
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -289,32 +204,43 @@
         <!-- Status Bar -->
         <div id="statusBar" class="status-bar">🔌 Menyambung...</div>
 
-        <!-- Menu Grid -->
+        <!-- Menu Grid - 使用 <a> 标签直接跳转 -->
         <div class="menu-grid">
-            <button class="menu-btn primary" onclick="navigateTo('signlog')">
+            <!-- Daftar / Log Masuk -> index.html -->
+            <a href="https://yzcorpsdk2-ctrl.github.io/.github.io/index.html" class="menu-btn primary">
                 <span class="icon">📝</span>
                 <span class="label" id="menuSignLog">Daftar / Log Masuk</span>
-            </button>
-            <button class="menu-btn success" onclick="navigateTo('staffinfo')">
+            </a>
+            
+            <!-- Staff Info -> staffinfo.html -->
+            <a href="https://yzcorpsdk2-ctrl.github.io/.github.io/staffinfo.html" class="menu-btn success">
                 <span class="icon">📇</span>
                 <span class="label" id="menuStaffInfo">Staff Info</span>
-            </button>
-            <button class="menu-btn pink" onclick="navigateTo('punch')">
+            </a>
+            
+            <!-- Punch Card -> punch.html -->
+            <a href="https://yzcorpsdk2-ctrl.github.io/.github.io/punch.html" class="menu-btn pink">
                 <span class="icon">🕐</span>
                 <span class="label" id="menuPunch">Punch Card Record</span>
-            </button>
-            <button class="menu-btn purple" onclick="navigateTo('payroll')">
+            </a>
+            
+            <!-- Payroll -> salary.html -->
+            <a href="https://yzcorpsdk2-ctrl.github.io/.github.io/salary.html" class="menu-btn purple">
                 <span class="icon">💰</span>
                 <span class="label" id="menuPayroll">Payroll</span>
-            </button>
-            <button class="menu-btn teal" onclick="navigateTo('menu2')">
+            </a>
+            
+            <!-- Menu 2 -->
+            <a href="https://yzcorpsdk2-ctrl.github.io/.github.io/menu2.html" class="menu-btn teal">
                 <span class="icon">📁</span>
                 <span class="label" id="menu2">Menu 2</span>
-            </button>
-            <button class="menu-btn danger" onclick="navigateTo('menu3')">
+            </a>
+            
+            <!-- Menu 3 -->
+            <a href="https://yzcorpsdk2-ctrl.github.io/.github.io/menu3.html" class="menu-btn danger">
                 <span class="icon">📁</span>
                 <span class="label" id="menu3">Menu 3</span>
-            </button>
+            </a>
         </div>
 
         <div class="menu-divider"></div>
@@ -322,35 +248,11 @@
         <div class="footer-text" id="footerText">© 2026 Sistem Pengurusan Staf</div>
     </div>
 
-    <!-- ========== AUTH OVERLAY ========== -->
-    <div class="auth-overlay hidden" id="authOverlay">
-        <div class="auth-box">
-            <h3>🔐 Akses Dilindungi</h3>
-            <p style="text-align:center; color:#718096; margin-bottom:16px; font-size:14px;" id="authSub">Sila log masuk untuk mengakses halaman ini</p>
-            <div class="form-group">
-                <label id="authUserLabel">Username</label>
-                <input type="text" id="overlayUsername" placeholder="Masukkan username" value="SIANGSIANG">
-            </div>
-            <div class="form-group">
-                <label id="authPassLabel">Password</label>
-                <input type="password" id="overlayPassword" placeholder="Masukkan password">
-            </div>
-            <button class="btn btn-primary" onclick="authenticateOverlay()" id="authLoginBtn">🔓 Log Masuk</button>
-            <button class="btn btn-gray" onclick="closeOverlay()" id="authCancelBtn">Batal</button>
-            <div class="error-msg" id="overlayError">Username atau Password salah!</div>
-        </div>
-    </div>
-
     <script>
         // ============= CONFIG =============
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
         
-        // ============= BASE URL =============
-        // 固定使用你的 GitHub Pages 部署路径
-        const BASE_URL = 'https://yzcorpsdk2-ctrl.github.io/.github.io/';
-
         let currentLanguage = 'ms';
-        let pendingNavigation = null;
 
         // ============= TRANSLATIONS =============
         const translations = {
@@ -364,18 +266,9 @@
                 menu2: '📁 Menu 2',
                 menu3: '📁 Menu 3',
                 footer: '© 2026 Sistem Pengurusan Staf',
-                authTitle: '🔐 Akses Dilindungi',
-                authSub: 'Sila log masuk untuk mengakses halaman ini',
-                authUser: 'Username',
-                authPass: 'Password',
-                authLogin: '🔓 Log Masuk',
-                authCancel: 'Batal',
-                authError: 'Username atau Password salah!',
-                authRequired: 'Sila masukkan username dan password',
                 connecting: '🔌 Menyambung...',
                 connected: '✅ Bersambung!',
                 connectionFail: '❌ Sambungan gagal: ',
-                protectedAccess: '🔒 Akses dilindungi. Sila log masuk.',
             },
             en: {
                 title: 'Staff Management System',
@@ -387,18 +280,9 @@
                 menu2: '📁 Menu 2',
                 menu3: '📁 Menu 3',
                 footer: '© 2026 Staff Management System',
-                authTitle: '🔐 Protected Access',
-                authSub: 'Please login to access this page',
-                authUser: 'Username',
-                authPass: 'Password',
-                authLogin: '🔓 Login',
-                authCancel: 'Cancel',
-                authError: 'Incorrect username or password!',
-                authRequired: 'Please enter username and password',
                 connecting: '🔌 Connecting...',
                 connected: '✅ Connected!',
                 connectionFail: '❌ Connection failed: ',
-                protectedAccess: '🔒 Protected access. Please login.',
             },
             zh: {
                 title: '员工管理系统',
@@ -410,18 +294,9 @@
                 menu2: '📁 菜单 2',
                 menu3: '📁 菜单 3',
                 footer: '© 2026 员工管理系统',
-                authTitle: '🔐 受保护访问',
-                authSub: '请登录以访问此页面',
-                authUser: '用户名',
-                authPass: '密码',
-                authLogin: '🔓 登录',
-                authCancel: '取消',
-                authError: '用户名或密码错误！',
-                authRequired: '请输入用户名和密码',
                 connecting: '🔌 连接中...',
                 connected: '✅ 已连接！',
                 connectionFail: '❌ 连接失败：',
-                protectedAccess: '🔒 受保护访问，请登录。',
             }
         };
 
@@ -448,14 +323,6 @@
             document.getElementById('menu2').textContent = t('menu2');
             document.getElementById('menu3').textContent = t('menu3');
             document.getElementById('footerText').textContent = t('footer');
-            
-            // Auth overlay
-            document.querySelector('#authOverlay h3').textContent = t('authTitle');
-            document.getElementById('authSub').textContent = t('authSub');
-            document.getElementById('authUserLabel').textContent = t('authUser');
-            document.getElementById('authPassLabel').textContent = t('authPass');
-            document.getElementById('authLoginBtn').textContent = t('authLogin');
-            document.getElementById('authCancelBtn').textContent = t('authCancel');
         }
 
         // ============= STATUS =============
@@ -463,17 +330,6 @@
             const el = document.getElementById('statusBar');
             el.textContent = msg;
             el.className = 'status-bar ' + type;
-        }
-
-        function showAlert(msg, type = 'info') {
-            const statusBar = document.getElementById('statusBar');
-            statusBar.textContent = msg;
-            statusBar.className = 'status-bar ' + type;
-            setTimeout(() => {
-                if (type !== 'error') {
-                    updateStatus(t('connected'), 'success');
-                }
-            }, 4000);
         }
 
         // ============= CONNECTION TEST =============
@@ -496,136 +352,15 @@
             });
         }
 
-        // ============= NAVIGATION =============
-        function navigateTo(page) {
-            console.log('🔍 Navigating to:', page);
-            console.log('📍 Current URL:', window.location.href);
-            console.log('📁 Base URL:', BASE_URL);
-
-            // 页面映射表：页面标识 -> 完整 URL
-            const pageUrls = {
-                'signlog': BASE_URL + 'index.html',
-                'staffinfo': BASE_URL + 'staffinfo.html',
-                'punch': BASE_URL + 'punch.html',
-                'payroll': BASE_URL + 'salary.html'   // Payroll 链接到 salary.html
-            };
-
-            // 如果是 signlog (index.html)，不需要认证，直接跳转
-            if (page === 'signlog') {
-                console.log('➡️ Redirecting to:', pageUrls.signlog);
-                window.location.href = pageUrls.signlog;
-                return;
-            }
-
-            // 检查是否在页面映射表中（需要认证的页面）
-            if (pageUrls[page]) {
-                console.log('🔒 Protected page:', page, '->', pageUrls[page]);
-                pendingNavigation = page;
-                showAuthOverlay();
-                return;
-            }
-
-            // 其他未定义的页面
-            console.log('⚠️ Unknown page:', page);
-            pendingNavigation = page;
-            showAuthOverlay();
-        }
-
-        // ============= AUTH OVERLAY =============
-        function showAuthOverlay() {
-            const overlay = document.getElementById('authOverlay');
-            overlay.classList.add('show');
-            document.getElementById('overlayUsername').value = 'SIANGSIANG';
-            document.getElementById('overlayPassword').value = '';
-            document.getElementById('overlayError').style.display = 'none';
-            document.getElementById('overlayPassword').focus();
-        }
-
-        function closeOverlay() {
-            document.getElementById('authOverlay').classList.remove('show');
-            pendingNavigation = null;
-        }
-
-        function authenticateOverlay() {
-            const username = document.getElementById('overlayUsername').value.trim();
-            const password = document.getElementById('overlayPassword').value.trim();
-
-            console.log('🔐 Authentication attempt for:', username);
-
-            if (!username || !password) {
-                document.getElementById('overlayError').textContent = t('authRequired');
-                document.getElementById('overlayError').style.display = 'block';
-                return;
-            }
-
-            if (username === 'SIANGSIANG' && password === '0000') {
-                console.log('✅ Authentication successful!');
-                document.getElementById('overlayError').style.display = 'none';
-                closeOverlay();
-                
-                if (pendingNavigation) {
-                    // 页面映射表 - 完整 URL
-                    const pageUrls = {
-                        'staffinfo': BASE_URL + 'staffinfo.html',
-                        'punch': BASE_URL + 'punch.html',
-                        'payroll': BASE_URL + 'salary.html'   // Payroll 链接到 salary.html
-                    };
-                    
-                    const targetUrl = pageUrls[pendingNavigation] || BASE_URL + pendingNavigation + '.html';
-                    console.log('➡️ Redirecting to:', targetUrl);
-                    window.location.href = targetUrl;
-                    pendingNavigation = null;
-                }
-            } else {
-                console.log('❌ Authentication failed!');
-                document.getElementById('overlayError').textContent = t('authError');
-                document.getElementById('overlayError').style.display = 'block';
-                document.getElementById('overlayPassword').value = '';
-                document.getElementById('overlayPassword').focus();
-            }
-        }
-
-        // ============= KEYBOARD EVENTS =============
-        document.getElementById('overlayPassword').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                authenticateOverlay();
-            }
-        });
-        document.getElementById('overlayUsername').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('overlayPassword').focus();
-            }
-        });
-
-        // ============= CLOSE OVERLAY ON BACKDROP CLICK =============
-        document.getElementById('authOverlay').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeOverlay();
-            }
-        });
-
         // ============= INIT =============
         window.addEventListener('load', function() {
             console.log('🚀 Menu loaded');
-            console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
-            console.log('📁 Base URL:', BASE_URL);
             console.log('📍 Current URL:', window.location.href);
             console.log('📋 Apps Script URL:', SCRIPT_URL);
-            
-            // 显示部署信息
-            console.log('📄 Page mappings:');
-            console.log('   - Daftar/Log Masuk -> ' + BASE_URL + 'index.html');
-            console.log('   - Staff Info -> ' + BASE_URL + 'staffinfo.html');
-            console.log('   - Punch Card -> ' + BASE_URL + 'punch.html');
-            console.log('   - Payroll -> ' + BASE_URL + 'salary.html');
             
             setTimeout(testConnection, 500);
             setLanguage('ms');
         });
-
-        // Console helper for debugging
-        console.log('💡 Tip: Type "BASE_URL" to see the base URL');
-        console.log('💡 Tip: Type "window.location.href" to see current URL');
     </script>
 </body>
 </html>
