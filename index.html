@@ -344,6 +344,14 @@
     <script>
         // ============= CONFIG =============
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
+        
+        // ============= PAGE URLS =============
+        // 定义所有页面的完整URL
+        const PAGE_URLS = {
+            'staffinfo': 'https://yzcorpsdk2-ctrl.github.io/.github.io/staffinfo.html',
+            'punch': 'https://yzcorpsdk2-ctrl.github.io/.github.io/punch.html',
+            'signlog': 'https://yzcorpsdk2-ctrl.github.io/.github.io/signlog.html'
+        };
 
         let currentLanguage = 'ms';
         let pendingNavigation = null;
@@ -495,18 +503,17 @@
         // ============= NAVIGATION =============
         function navigateTo(page) {
             console.log('🔍 Navigating to:', page);
-            console.log('📍 Current location:', window.location.href);
-            console.log('📍 Current pathname:', window.location.pathname);
-            
-            // Get the base path
-            const pathParts = window.location.pathname.split('/');
-            const basePath = pathParts.slice(0, -1).join('/');
-            console.log('📍 Base path:', basePath);
+            console.log('📍 Current URL:', window.location.href);
 
             // 直接跳转的页面（不需要认证）
             if (page === 'signlog') {
-                console.log('➡️ Redirecting to signlog.html');
-                window.location.href = 'signlog.html';
+                console.log('➡️ Redirecting to signlog page');
+                if (PAGE_URLS[page]) {
+                    console.log('📍 Full URL:', PAGE_URLS[page]);
+                    window.location.href = PAGE_URLS[page];
+                } else {
+                    window.location.href = 'signlog.html';
+                }
                 return;
             }
 
@@ -567,18 +574,18 @@
                 if (pendingNavigation) {
                     console.log('➡️ Navigating to:', pendingNavigation);
                     
-                    if (pendingNavigation === 'staffinfo') {
-                        console.log('➡️ Redirecting to staffinfo.html');
-                        console.log('📍 Full URL:', window.location.href.replace('index.html', 'staffinfo.html'));
-                        window.location.href = 'staffinfo.html';
-                    } else if (pendingNavigation === 'punch') {
-                        console.log('➡️ Redirecting to punch.html');
-                        console.log('📍 Full URL:', window.location.href.replace('index.html', 'punch.html'));
-                        window.location.href = 'punch.html';
+                    // 使用完整的URL进行跳转
+                    if (PAGE_URLS[pendingNavigation]) {
+                        const targetUrl = PAGE_URLS[pendingNavigation];
+                        console.log('📍 Redirecting to full URL:', targetUrl);
+                        window.location.href = targetUrl;
                     } else {
-                        showAlert('📍 Halaman "' + pendingNavigation + '" akan dibuka (demo)', 'success');
-                        pendingNavigation = null;
+                        // Fallback: 使用相对路径
+                        const fallbackUrl = pendingNavigation + '.html';
+                        console.log('📍 Redirecting to fallback URL:', fallbackUrl);
+                        window.location.href = fallbackUrl;
                     }
+                    pendingNavigation = null;
                 }
             } else {
                 console.log('❌ Authentication failed!');
@@ -612,8 +619,10 @@
         window.addEventListener('load', function() {
             console.log('🚀 Index (Menu) loaded');
             console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
-            console.log('📌 Staff Info → staffinfo.html');
-            console.log('📌 Punch Card Record → punch.html');
+            console.log('📌 Page URLs:');
+            console.log('   Staff Info →', PAGE_URLS.staffinfo);
+            console.log('   Punch Card →', PAGE_URLS.punch);
+            console.log('   Sign Log →', PAGE_URLS.signlog);
             console.log('📍 Current URL:', window.location.href);
             
             setTimeout(testConnection, 500);
@@ -621,8 +630,8 @@
         });
 
         // Console helper for debugging
+        console.log('💡 Tip: Type "PAGE_URLS" to see all page URLs');
         console.log('💡 Tip: Type "window.location.href" to see current URL');
-        console.log('💡 Tip: Type "window.location.pathname" to see current path');
     </script>
 </body>
 </html>
