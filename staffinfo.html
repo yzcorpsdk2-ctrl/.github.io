@@ -36,11 +36,12 @@
         .status-badge.unknown { background: #e2e8f0; color: #4a5568; }
         .empty-state { text-align: center; padding: 40px 10px; color: #a0aec0; }
         .empty-state .icon { font-size: 40px; display: block; margin-bottom: 12px; }
-        .status-bar { background: #edf2f7; padding: 8px 14px; border-radius: 12px; font-size: 13px; color: #4a5568; margin-bottom: 16px; text-align: center; cursor: default; user-select: none; }
+        .status-bar { background: #edf2f7; padding: 8px 14px; border-radius: 12px; font-size: 13px; color: #4a5568; margin-bottom: 16px; text-align: center; cursor: default; user-select: none; word-break: break-all; }
         .status-bar.success { background: #c6f6d5; color: #22543d; }
         .status-bar.error { background: #fed7d7; color: #9b2c2c; }
         .status-bar.info { background: #bee3f8; color: #2a4365; }
         .status-bar.saving { background: #fefcbf; color: #975a16; }
+        .status-bar.debug { background: #e9d8fd; color: #553c9a; }
         .hidden { display: none !important; }
         .other-input-container { margin-top: 8px; }
         .other-input-container input { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; background: #fafcfd; }
@@ -104,6 +105,8 @@
         .page-login-overlay .login-box .btn-gray:hover { background: #cbd5e0; }
         .page-login-overlay .login-box .error-msg { color: #c53030; font-size: 14px; text-align: center; margin-top: 10px; display: none; }
         #mainContent { display: none; }
+        .debug-btn { background: #805ad5; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; margin-left: 8px; }
+        .debug-btn:hover { background: #6b46c1; }
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .filter-row { flex-direction: column; gap: 10px; }
@@ -143,6 +146,7 @@
                 <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
                 <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
                 <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
+                <button class="debug-btn" onclick="testConnection()">🔧 Test Connection</button>
             </div>
 
             <h1 id="mainTitle">📇 Staff Info</h1>
@@ -221,10 +225,10 @@
 
     <script>
         // ============================================================
-        //  KONFIGURASI
+        //  KONFIGURASI - UPDATED URL
         // ============================================================
-        // ✅ URL Apps Script baru
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMwpE6zvWupu3H-0R333JqQqb3aVIprNJHjY8BgxDdtRLZoO0pXyPvzMhucTlzS85YIQ/exec';
+        // 🔥 UPDATED: Menggunakan URL yang diberikan
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
         const SHEET_NAME = 'STAFF LOGIN RECORD';
         const PAGE_USERNAME = 'SIANGSIANG';
         const PAGE_PASSWORD = '0000';
@@ -294,6 +298,50 @@
         pageUsername.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') pagePassword.focus();
         });
+
+        // ============================================================
+        //  TEST CONNECTION
+        // ============================================================
+        async function testConnection() {
+            updateStatus('🔍 Menguji sambungan ke Google Sheets...', 'info');
+            showAlert('🔍 Menguji sambungan...', 'info');
+            
+            try {
+                const url = `${SCRIPT_URL}?action=getData&_t=${Date.now()}`;
+                console.log('🧪 Testing connection to:', url);
+                
+                const response = await fetch(url);
+                console.log('📥 Response status:', response.status);
+                console.log('📥 Response headers:', [...response.headers.entries()]);
+                
+                const text = await response.text();
+                console.log('📥 Raw response (first 500 chars):', text.substring(0, 500));
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    updateStatus('❌ Response bukan JSON: ' + text.substring(0, 100), 'error');
+                    showAlert('❌ Server tidak mengembalikan JSON. Sila semak Apps Script deployment.', 'error');
+                    return;
+                }
+                
+                console.log('📥 Parsed data:', data);
+                
+                if (data && data.result === 'success') {
+                    const count = data.data ? data.data.length : 0;
+                    updateStatus(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
+                    showAlert(`✅ Sambungan berjaya! Ditemui ${count} rekod.`, 'success');
+                } else {
+                    updateStatus('⚠️ Sambungan berjaya tetapi data tidak seperti dijangka: ' + JSON.stringify(data).substring(0, 100), 'debug');
+                    showAlert('⚠️ Sambungan berjaya tetapi format data tidak dijangka. Lihat Console untuk butiran.', 'info');
+                }
+            } catch (err) {
+                console.error('❌ Test connection error:', err);
+                updateStatus('❌ Gagal menyambung: ' + err.message, 'error');
+                showAlert('❌ Gagal menyambung ke server: ' + err.message, 'error');
+            }
+        }
 
         // ============================================================
         //  TRANSLATIONS
@@ -424,9 +472,6 @@
             document.getElementById('loginBtn').textContent = t('staffLoginBtn');
             document.querySelector('#loginOverlay .btn-gray').textContent = t('cancelBtn');
 
-            document.querySelector('.filter-group label').textContent = t('groupName');
-            document.querySelectorAll('.filter-group label')[1].textContent = t('statusLabel');
-
             const branchSel = document.getElementById('branchSelect');
             if (branchSel.options.length > 0) {
                 branchSel.options[0].text = t('selectBranch');
@@ -444,13 +489,13 @@
         function showAlert(msg, type = 'error') {
             alertBox.textContent = msg;
             alertBox.className = 'alert ' + type;
-            setTimeout(() => { alertBox.className = 'alert'; }, 5000);
+            setTimeout(() => { alertBox.className = 'alert'; }, 8000);
         }
 
         function updateStatus(msg, type = '') {
             statusBar.textContent = msg;
             statusBar.className = 'status-bar ' + type;
-            console.log(msg);
+            console.log('📊 Status:', msg);
         }
 
         function getStatusBadge(status) {
@@ -488,11 +533,18 @@
             updateStatus('⏳ Menghubungi server...', 'info');
 
             try {
-                const url = `${SCRIPT_URL}?action=getData`;
+                const url = `${SCRIPT_URL}?action=getData&_t=${Date.now()}`;
+                console.log('📡 Fetching data from:', url);
+                
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('HTTP ' + response.status);
+                console.log('📥 Response status:', response.status);
+                
+                if (!response.ok) throw new Error('HTTP ' + response.status + ': ' + response.statusText);
 
                 const rawResult = await response.json();
+                console.log('📥 Raw response type:', typeof rawResult);
+                console.log('📥 Raw response keys:', rawResult ? Object.keys(rawResult) : 'null');
+                
                 let dataArray;
 
                 if (Array.isArray(rawResult)) {
@@ -508,7 +560,14 @@
                     if (keys.length > 0 && keys.every(k => !isNaN(parseInt(k)))) {
                         dataArray = Object.values(rawResult);
                     } else {
-                        throw new Error('Format data tidak dikenali.');
+                        // Check if it's a single object with all fields
+                        const possibleFields = ['Code', 'Name', 'GroupName', 'Situation'];
+                        const hasStaffFields = possibleFields.some(f => rawResult[f] !== undefined);
+                        if (hasStaffFields) {
+                            dataArray = [rawResult];
+                        } else {
+                            throw new Error('Format data tidak dikenali: ' + JSON.stringify(rawResult).substring(0, 200));
+                        }
                     }
                 } else {
                     throw new Error('Format data tidak dikenali.');
@@ -518,11 +577,15 @@
                     throw new Error('Tiada data ditemui.');
                 }
 
+                console.log('📊 Data array length:', dataArray.length);
+                console.log('📊 First row sample:', dataArray[0]);
+
                 const firstRow = dataArray[0];
                 let staff = [];
                 const branchSet = new Set();
 
                 if (Array.isArray(firstRow)) {
+                    // Array format - using column indices
                     const idx = {
                         situation: 1, loginPwd: 28, name: 4, code: 3, group: 2,
                         jantina: 5, tarikhLahir: 6, salary: 7, ic: 8, jawatan: 9,
@@ -576,7 +639,10 @@
                         if (group) branchSet.add(group);
                     }
                 } else if (typeof firstRow === 'object' && firstRow !== null) {
+                    // Object format - using field names
                     const sampleKeys = Object.keys(firstRow);
+                    console.log('📋 Available keys:', sampleKeys);
+                    
                     const findKey = (possibleNames) => {
                         for (const name of possibleNames) {
                             const found = sampleKeys.find(k => k.toLowerCase() === name.toLowerCase());
@@ -595,7 +661,7 @@
                     const groupKey = findKey(['GroupName', 'groupName', 'Group', 'group', 'Cawangan', 'cawangan']);
 
                     if (!situationKey || !loginPwdKey || !nameKey || !codeKey || !groupKey) {
-                        throw new Error('Header tidak dijumpai.');
+                        throw new Error('Header tidak dijumpai. Keys: ' + sampleKeys.join(', '));
                     }
 
                     const fieldMap = {
@@ -676,6 +742,8 @@
 
                 const msg = t('connected').replace('{count}', staff.length);
                 updateStatus(msg, 'success');
+                console.log('✅ Loaded', staff.length, 'staff records');
+                console.log('📋 Branches:', branches);
                 return true;
 
             } catch (err) {
@@ -722,6 +790,7 @@
                         ${t('noData')}
                         ${selectedBranch ? `<br><small style="color:#a0aec0;">Cawangan: ${selectedBranch}</small>` : ''}
                         ${selectedStatus ? `<br><small style="color:#a0aec0;">Status: ${selectedStatus}</small>` : ''}
+                        <br><small style="color:#a0aec0;">Jumlah rekod: ${allStaff.length}</small>
                     </div>
                 `;
                 return;
@@ -937,7 +1006,7 @@
         }
 
         // ============================================================
-        //  SAVE PROFILE - FIXED VERSION
+        //  SAVE PROFILE
         // ============================================================
         function saveProfile() {
             if (!currentUser || !currentUser.Code) {
@@ -963,7 +1032,7 @@
             // Update timestamp
             currentUser.UpdateDate = new Date().toISOString();
 
-            // Build payload - 使用正确的字段名匹配 Apps Script
+            // Build payload
             const payload = {
                 action: 'update',
                 Code: currentUser.Code || '',
@@ -999,7 +1068,6 @@
             console.log('💾 Saving to Google Sheets:', payload);
             updateStatus('⏳ Menyimpan ke Google Sheets...', 'saving');
 
-            // 使用默认的 CORS 模式（不是 no-cors）
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1081,6 +1149,10 @@
         // ============================================================
         async function init() {
             setLanguage('ms');
+            
+            console.log('🚀 Initializing Staff Info page...');
+            console.log('🔗 SCRIPT_URL:', SCRIPT_URL);
+            console.log('📋 SHEET_NAME:', SHEET_NAME);
 
             const success = await fetchStaffData();
 
@@ -1104,6 +1176,9 @@
                         <span class="icon">⚠️</span>
                         Gagal memuatkan data. Sila semak semula sambungan atau sheet.
                         <br><small style="color:#a0aec0;">Pastikan sheet "${SHEET_NAME}" wujud dan mempunyai data.</small>
+                        <br><small style="color:#a0aec0;">Klik "Test Connection" untuk mendiagnosis.</small>
+                        <br><br>
+                        <button class="btn btn-primary" onclick="testConnection()" style="width:auto;padding:8px 24px;display:inline-block;">🔧 Test Connection</button>
                     </div>
                 `;
             }
@@ -1111,9 +1186,7 @@
             branchSelect.addEventListener('change', handleBranchChange);
             statusSelect.addEventListener('change', renderStaffList);
 
-            console.log('📋 Staff Info page loaded.');
-            console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
-            console.log('💾 Save function will sync changes to Google Sheets');
+            console.log('📋 Staff Info page loaded successfully.');
         }
 
         // ============================================================
@@ -1124,8 +1197,10 @@
 
         console.log('📋 Staff Info page loaded.');
         console.log('🔑 Page Login: Username=SIANGSIANG, Password=0000');
+        console.log('🔗 Apps Script URL:', SCRIPT_URL);
         console.log('💡 Selepas login, klik pada staff untuk lihat profil lengkap (27 fields)');
         console.log('🔄 Perubahan akan disimpan ke Google Sheets melalui Apps Script');
+        console.log('💡 Klik "Test Connection" untuk menguji sambungan ke Google Sheets');
     </script>
 </body>
 </html>
