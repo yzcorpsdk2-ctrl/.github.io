@@ -185,77 +185,7 @@
         @media (max-width: 380px) {
             .menu-grid { grid-template-columns: 1fr; }
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="logo">📋</div>
-        <h1 id="mainTitle">Sistem Pengurusan Staf</h1>
-        <p class="subtitle" id="subtitle">Pilih menu di bawah untuk navigasi</p>
 
-        <!-- Language Bar -->
-        <div class="lang-bar">
-            <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
-            <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
-            <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
-        </div>
-
-        <!-- Status Bar -->
-        <div id="statusBar" class="status-bar">🔌 Menyambung...</div>
-
-        <!-- Menu Grid -->
-        <div class="menu-grid">
-            <button class="menu-btn primary" onclick="navigateTo('signlog')">
-                <span class="icon">📝</span>
-                <span class="label" id="menuSignLog">Daftar / Log Masuk</span>
-            </button>
-            <button class="menu-btn success" onclick="navigateTo('staffinfo')">
-                <span class="icon">📇</span>
-                <span class="label" id="menuStaffInfo">Staff Info</span>
-            </button>
-            <button class="menu-btn pink" onclick="navigateTo('punch')">
-                <span class="icon">🕐</span>
-                <span class="label" id="menuPunch">Punch Card Record</span>
-            </button>
-            <button class="menu-btn purple" onclick="navigateTo('xxx1')">
-                <span class="icon">📁</span>
-                <span class="label" id="menu1">Menu 1</span>
-            </button>
-            <button class="menu-btn teal" onclick="navigateTo('xxx2')">
-                <span class="icon">📁</span>
-                <span class="label" id="menu2">Menu 2</span>
-            </button>
-            <button class="menu-btn danger" onclick="navigateTo('xxx3')">
-                <span class="icon">📁</span>
-                <span class="label" id="menu3">Menu 3</span>
-            </button>
-        </div>
-
-        <div class="menu-divider"></div>
-
-        <div class="footer-text" id="footerText">© 2026 Sistem Pengurusan Staf</div>
-    </div>
-
-    <!-- ========== AUTH OVERLAY ========== -->
-    <div class="auth-overlay hidden" id="authOverlay">
-        <div class="auth-box">
-            <h3>🔐 Akses Dilindungi</h3>
-            <p style="text-align:center; color:#718096; margin-bottom:16px; font-size:14px;" id="authSub">Sila log masuk untuk mengakses halaman ini</p>
-            <div class="form-group">
-                <label id="authUserLabel">Username</label>
-                <input type="text" id="overlayUsername" placeholder="Masukkan username" value="SIANGSIANG">
-            </div>
-            <div class="form-group">
-                <label id="authPassLabel">Password</label>
-                <input type="password" id="overlayPassword" placeholder="Masukkan password">
-            </div>
-            <button class="btn btn-primary" onclick="authenticateOverlay()" id="authLoginBtn">🔓 Log Masuk</button>
-            <button class="btn btn-gray" onclick="closeOverlay()" id="authCancelBtn">Batal</button>
-            <div class="error-msg" id="overlayError">Username atau Password salah!</div>
-        </div>
-    </div>
-
-    <style>
         /* Auth Overlay Styles */
         .auth-overlay {
             position: fixed;
@@ -342,10 +272,77 @@
         }
         .hidden { display: none !important; }
     </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📋</div>
+        <h1 id="mainTitle">Sistem Pengurusan Staf</h1>
+        <p class="subtitle" id="subtitle">Pilih menu di bawah untuk navigasi</p>
+
+        <!-- Language Bar -->
+        <div class="lang-bar">
+            <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
+            <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
+            <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="statusBar" class="status-bar">🔌 Menyambung...</div>
+
+        <!-- Menu Grid -->
+        <div class="menu-grid">
+            <button class="menu-btn primary" onclick="navigateTo('signlog')">
+                <span class="icon">📝</span>
+                <span class="label" id="menuSignLog">Daftar / Log Masuk</span>
+            </button>
+            <button class="menu-btn success" onclick="navigateTo('staffinfo')">
+                <span class="icon">📇</span>
+                <span class="label" id="menuStaffInfo">Staff Info</span>
+            </button>
+            <button class="menu-btn pink" onclick="navigateTo('punch')">
+                <span class="icon">🕐</span>
+                <span class="label" id="menuPunch">Punch Card Record</span>
+            </button>
+            <button class="menu-btn purple" onclick="navigateTo('xxx1')">
+                <span class="icon">📁</span>
+                <span class="label" id="menu1">Menu 1</span>
+            </button>
+            <button class="menu-btn teal" onclick="navigateTo('xxx2')">
+                <span class="icon">📁</span>
+                <span class="label" id="menu2">Menu 2</span>
+            </button>
+            <button class="menu-btn danger" onclick="navigateTo('xxx3')">
+                <span class="icon">📁</span>
+                <span class="label" id="menu3">Menu 3</span>
+            </button>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <div class="footer-text" id="footerText">© 2026 Sistem Pengurusan Staf</div>
+    </div>
+
+    <!-- ========== AUTH OVERLAY ========== -->
+    <div class="auth-overlay hidden" id="authOverlay">
+        <div class="auth-box">
+            <h3>🔐 Akses Dilindungi</h3>
+            <p style="text-align:center; color:#718096; margin-bottom:16px; font-size:14px;" id="authSub">Sila log masuk untuk mengakses halaman ini</p>
+            <div class="form-group">
+                <label id="authUserLabel">Username</label>
+                <input type="text" id="overlayUsername" placeholder="Masukkan username" value="SIANGSIANG">
+            </div>
+            <div class="form-group">
+                <label id="authPassLabel">Password</label>
+                <input type="password" id="overlayPassword" placeholder="Masukkan password">
+            </div>
+            <button class="btn btn-primary" onclick="authenticateOverlay()" id="authLoginBtn">🔓 Log Masuk</button>
+            <button class="btn btn-gray" onclick="closeOverlay()" id="authCancelBtn">Batal</button>
+            <div class="error-msg" id="overlayError">Username atau Password salah!</div>
+        </div>
+    </div>
 
     <script>
         // ============= CONFIG =============
-        // ⚠️ 替换为您的 Apps Script URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
 
         let currentLanguage = 'ms';
@@ -496,31 +493,41 @@
         }
 
         // ============= NAVIGATION =============
-        const protectedPages = ['staffinfo', 'punch', 'xxx1', 'xxx2', 'xxx3'];
-        const unprotectedPages = [];
-
         function navigateTo(page) {
+            console.log('🔍 Navigating to:', page);
+            console.log('📍 Current location:', window.location.href);
+            console.log('📍 Current pathname:', window.location.pathname);
+            
+            // Get the base path
+            const pathParts = window.location.pathname.split('/');
+            const basePath = pathParts.slice(0, -1).join('/');
+            console.log('📍 Base path:', basePath);
+
             // 直接跳转的页面（不需要认证）
             if (page === 'signlog') {
+                console.log('➡️ Redirecting to signlog.html');
                 window.location.href = 'signlog.html';
                 return;
             }
 
-            // Staff Info - 需要认证，跳转到 staffinfo.html
+            // Staff Info - 需要认证
             if (page === 'staffinfo') {
+                console.log('🔒 Staff info - showing auth overlay');
                 pendingNavigation = 'staffinfo';
                 showAuthOverlay();
                 return;
             }
 
-            // Punch Card Record - 需要认证，跳转到 punch.html
+            // Punch Card Record - 需要认证
             if (page === 'punch') {
+                console.log('🔒 Punch - showing auth overlay');
                 pendingNavigation = 'punch';
                 showAuthOverlay();
                 return;
             }
 
-            // 其他受保护的页面 (xxx1, xxx2, xxx3)
+            // 其他受保护的页面
+            console.log('🔒 Other protected page:', page);
             pendingNavigation = page;
             showAuthOverlay();
         }
@@ -544,28 +551,37 @@
             const username = document.getElementById('overlayUsername').value.trim();
             const password = document.getElementById('overlayPassword').value.trim();
 
+            console.log('🔐 Authentication attempt for:', username);
+
             if (!username || !password) {
                 document.getElementById('overlayError').textContent = t('authRequired');
                 document.getElementById('overlayError').style.display = 'block';
                 return;
             }
 
-            // 验证用户名和密码
             if (username === 'SIANGSIANG' && password === '0000') {
+                console.log('✅ Authentication successful!');
                 document.getElementById('overlayError').style.display = 'none';
                 closeOverlay();
                 
                 if (pendingNavigation) {
+                    console.log('➡️ Navigating to:', pendingNavigation);
+                    
                     if (pendingNavigation === 'staffinfo') {
+                        console.log('➡️ Redirecting to staffinfo.html');
+                        console.log('📍 Full URL:', window.location.href.replace('index.html', 'staffinfo.html'));
                         window.location.href = 'staffinfo.html';
                     } else if (pendingNavigation === 'punch') {
+                        console.log('➡️ Redirecting to punch.html');
+                        console.log('📍 Full URL:', window.location.href.replace('index.html', 'punch.html'));
                         window.location.href = 'punch.html';
                     } else {
                         showAlert('📍 Halaman "' + pendingNavigation + '" akan dibuka (demo)', 'success');
+                        pendingNavigation = null;
                     }
-                    pendingNavigation = null;
                 }
             } else {
+                console.log('❌ Authentication failed!');
                 document.getElementById('overlayError').textContent = t('authError');
                 document.getElementById('overlayError').style.display = 'block';
                 document.getElementById('overlayPassword').value = '';
@@ -594,14 +610,19 @@
 
         // ============= INIT =============
         window.addEventListener('load', function() {
+            console.log('🚀 Index (Menu) loaded');
+            console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
+            console.log('📌 Staff Info → staffinfo.html');
+            console.log('📌 Punch Card Record → punch.html');
+            console.log('📍 Current URL:', window.location.href);
+            
             setTimeout(testConnection, 500);
             setLanguage('ms');
         });
 
-        console.log('🚀 Index (Menu) loaded');
-        console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
-        console.log('📌 Staff Info → staffinfo.html');
-        console.log('📌 Punch Card Record → punch.html');
+        // Console helper for debugging
+        console.log('💡 Tip: Type "window.location.href" to see current URL');
+        console.log('💡 Tip: Type "window.location.pathname" to see current path');
     </script>
 </body>
 </html>
