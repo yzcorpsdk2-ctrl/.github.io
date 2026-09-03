@@ -104,10 +104,6 @@
         .page-login-overlay .login-box .btn-gray:hover { background: #cbd5e0; }
         .page-login-overlay .login-box .error-msg { color: #c53030; font-size: 14px; text-align: center; margin-top: 10px; display: none; }
         #mainContent { display: none; }
-        .save-indicator { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 8px; }
-        .save-indicator.saved { background: #c6f6d5; color: #22543d; }
-        .save-indicator.saving { background: #fefcbf; color: #975a16; }
-        .save-indicator.error { background: #fed7d7; color: #9b2c2c; }
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .filter-row { flex-direction: column; gap: 10px; }
@@ -227,8 +223,8 @@
         // ============================================================
         //  KONFIGURASI
         // ============================================================
-        // ⚠️ GANTIKAN dengan URL Apps Script anda
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPTI_FjWh0s0g8LZ3Sef-R_6158bjaA5lr8_jIA4YT7PoI9gXCfZ8YU2krttNDq8sbOA/exec';
+        // ✅ URL Apps Script baru
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyo3BDLx00rAgp6SpH2mHMszSrLbdtWsFR6VFLme914_ApGtC1U1qaBdP9xLbyka4-W3Q/exec';
         const SHEET_NAME = 'STAFF LOGIN RECORD';
         const PAGE_USERNAME = 'SIANGSIANG';
         const PAGE_PASSWORD = '0000';
@@ -527,7 +523,6 @@
                 const branchSet = new Set();
 
                 if (Array.isArray(firstRow)) {
-                    // Column indices based on your Google Sheets structure
                     const idx = {
                         situation: 1, loginPwd: 28, name: 4, code: 3, group: 2,
                         jantina: 5, tarikhLahir: 6, salary: 7, ic: 8, jawatan: 9,
@@ -581,7 +576,6 @@
                         if (group) branchSet.add(group);
                     }
                 } else if (typeof firstRow === 'object' && firstRow !== null) {
-                    // Object format with named keys
                     const sampleKeys = Object.keys(firstRow);
                     const findKey = (possibleNames) => {
                         for (const name of possibleNames) {
@@ -843,7 +837,7 @@
         });
 
         // ============================================================
-        //  SHOW PROFILE (ALL 27 FIELDS)
+        //  SHOW PROFILE
         // ============================================================
         function showProfile(user) {
             filterSection.style.display = 'none';
@@ -923,7 +917,6 @@
                     input.addEventListener('change', function() {
                         currentUser[key] = this.value;
                         currentUser.UpdateDate = new Date().toISOString();
-                        // Show indicator that data has been modified
                         const saveBtn = document.getElementById('saveProfileBtn');
                         saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
                         saveBtn.style.background = '#dd6b20';
@@ -935,7 +928,6 @@
                 profileFields.appendChild(div);
             }
 
-            // Reset save button
             const saveBtn = document.getElementById('saveProfileBtn');
             saveBtn.textContent = '💾 ' + t('saveBtn');
             saveBtn.style.background = '#38a169';
@@ -945,7 +937,7 @@
         }
 
         // ============================================================
-        //  SAVE PROFILE - SYNC TO GOOGLE SHEETS
+        //  SAVE PROFILE - FIXED VERSION
         // ============================================================
         function saveProfile() {
             if (!currentUser || !currentUser.Code) {
@@ -971,10 +963,10 @@
             // Update timestamp
             currentUser.UpdateDate = new Date().toISOString();
 
-            // Build payload for Google Sheets update
+            // Build payload - 使用正确的字段名匹配 Apps Script
             const payload = {
                 action: 'update',
-                Code: currentUser.Code,
+                Code: currentUser.Code || '',
                 GroupName: currentUser.GroupName || '',
                 Name: currentUser.Name || '',
                 Jantina: currentUser.Jantina || '',
@@ -1005,24 +997,23 @@
             };
 
             console.log('💾 Saving to Google Sheets:', payload);
-
             updateStatus('⏳ Menyimpan ke Google Sheets...', 'saving');
 
+            // 使用默认的 CORS 模式（不是 no-cors）
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(payload)
-                // 如果你已经修改了后端 Code.gs (加了 doOptions)，请保留上面这些
-                // 如果你还没改后端，并且想临时用，请把下面这行注释取消，但注意这样无法收到成功/失败的回执
-                // mode: 'no-cors' 
             })
             .then(response => {
+                console.log('📥 Response status:', response.status);
                 if (!response.ok) {
                     throw new Error('HTTP ' + response.status + ': ' + response.statusText);
                 }
                 return response.json();
             })
             .then(result => {
+                console.log('📥 Save response:', result);
                 btn.innerHTML = '💾 ' + t('saveBtn') + ' ✅';
                 btn.disabled = false;
                 btn.style.background = '#38a169';
@@ -1031,13 +1022,12 @@
                     showAlert('✅ ' + t('saveSuccess'), 'success');
                     updateStatus('✅ Data disimpan ke Google Sheets', 'success');
 
-                    // Update the local data
+                    // Update local data
                     const idx = allStaff.findIndex(s => s.Code === currentUser.Code);
                     if (idx !== -1) {
                         allStaff[idx] = { ...currentUser };
                     }
 
-                    // Reset button after 3 seconds
                     setTimeout(() => {
                         btn.innerHTML = '💾 ' + t('saveBtn');
                         btn.style.background = '#38a169';
@@ -1054,10 +1044,10 @@
                 }
             })
             .catch(err => {
+                console.error('❌ Save error:', err);
                 btn.innerHTML = '💾 ' + t('saveBtn') + ' ❌';
                 btn.disabled = false;
                 btn.style.background = '#c53030';
-                console.error('❌ Save error:', err);
                 showAlert('⚠️ ' + t('networkError') + ': ' + err.message, 'error');
                 updateStatus('❌ Ralat: ' + err.message, 'error');
 
@@ -1102,7 +1092,6 @@
                     opt.textContent = b;
                     branchSelect.appendChild(opt);
                 });
-                // Add Others option
                 const optOthers = document.createElement('option');
                 optOthers.value = 'Others';
                 optOthers.textContent = 'Others (Lain-lain)';
@@ -1124,7 +1113,6 @@
 
             console.log('📋 Staff Info page loaded.');
             console.log(`🔗 SCRIPT_URL: ${SCRIPT_URL}`);
-            console.log('📌 Sheet: "STAFF LOGIN RECORD" | All 27 fields mapped');
             console.log('💾 Save function will sync changes to Google Sheets');
         }
 
