@@ -1031,6 +1031,7 @@
             // Get phone type from hidden field
             const phoneType = document.getElementById('sPhoneType').value || 'Unknown';
 
+            // ✅ 构建数据对象 - 所有字段名必须与 Sheet 列名完全匹配
             const data = {
                 GroupName: groupVal,
                 Code: code,
@@ -1213,9 +1214,37 @@
         function saveProfile() {
             if (!currentUser || !currentUser.Code) return;
 
+            // ✅ 构建更新数据 - 包含所有字段
             const payload = {
                 action: 'update',
-                ...currentUser
+                Situation: currentUser.Situation || 'Active',
+                GroupName: currentUser.GroupName || '',
+                Code: currentUser.Code || '',
+                Name: currentUser.Name || '',
+                Jantina: currentUser.Jantina || '',
+                TarikhLahir: currentUser.TarikhLahir || '',
+                Holidays: currentUser.Holidays || '0',
+                Salary: currentUser.Salary || '',
+                IC: currentUser.IC || '',
+                Jawatan: currentUser.Jawatan || '',
+                TarikhMasukKerja: currentUser.TarikhMasukKerja || '',
+                TelefonNo: currentUser.TelefonNo || '',
+                Email: currentUser.Email || '',
+                ShiftType: currentUser.ShiftType || '',
+                OffDay: currentUser.OffDay || '',
+                AgreementSituation: currentUser.AgreementSituation || 'Default',
+                AlamatTetap: currentUser.AlamatTetap || '',
+                NamaWaris: currentUser.NamaWaris || '',
+                AlamatWaris: currentUser.AlamatWaris || '',
+                BankNama: currentUser.BankNama || '',
+                BankAccountNo: currentUser.BankAccountNo || '',
+                EPF: currentUser.EPF || '',
+                PERKESO: currentUser.PERKESO || '',
+                EIS: currentUser.EIS || '',
+                Lindungan: currentUser.Lindungan || '',
+                YellowCard: currentUser.YellowCard || '',
+                LoginPassword: currentUser.LoginPassword || '',
+                PhoneType: currentUser.PhoneType || 'Unknown'
             };
 
             console.log('💾 Saving profile:', payload);
