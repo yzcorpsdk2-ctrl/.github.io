@@ -24,7 +24,7 @@
             background: white;
             border-radius: 24px;
             padding: 20px 16px 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
         h1 {
             text-align: center;
@@ -251,7 +251,7 @@
             box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1);
         }
 
-        /* ===== PROFILE VIEW (SAME AS INDEX.HTML) ===== */
+        /* ===== PROFILE VIEW ===== */
         .profile-view {
             margin-top: 16px;
         }
@@ -367,24 +367,21 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ===== LOGIN OVERLAY (Popup on staff click) ===== */
-        .login-overlay {
+        /* ===== PAGE LOGIN OVERLAY (Enter page) ===== */
+        .page-login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.6);
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 2000;
             backdrop-filter: blur(4px);
         }
-        .login-overlay.active {
-            display: flex;
-        }
-        .login-overlay .login-box {
+        .page-login-overlay .login-box {
             background: white;
             padding: 32px 28px;
             border-radius: 24px;
@@ -403,29 +400,29 @@
                 opacity: 1;
             }
         }
-        .login-overlay .login-box h3 {
+        .page-login-overlay .login-box h3 {
             text-align: center;
             color: #1a3a5c;
             font-size: 22px;
             margin-bottom: 6px;
         }
-        .login-overlay .login-box .login-sub {
+        .page-login-overlay .login-box .login-sub {
             text-align: center;
             color: #718096;
             font-size: 14px;
             margin-bottom: 20px;
         }
-        .login-overlay .login-box .form-group {
+        .page-login-overlay .login-box .form-group {
             margin-bottom: 14px;
         }
-        .login-overlay .login-box .form-group label {
+        .page-login-overlay .login-box .form-group label {
             display: block;
             font-weight: 600;
             font-size: 13px;
             color: #2d3748;
             margin-bottom: 4px;
         }
-        .login-overlay .login-box .form-group input {
+        .page-login-overlay .login-box .form-group input {
             width: 100%;
             padding: 12px 14px;
             border: 2px solid #e2e8f0;
@@ -433,12 +430,12 @@
             font-size: 15px;
             transition: 0.2s;
         }
-        .login-overlay .login-box .form-group input:focus {
+        .page-login-overlay .login-box .form-group input:focus {
             border-color: #1a3a5c;
             outline: none;
             box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1);
         }
-        .login-overlay .login-box .btn {
+        .page-login-overlay .login-box .btn {
             width: 100%;
             padding: 12px;
             border: none;
@@ -449,32 +446,130 @@
             transition: 0.2s;
             margin-top: 6px;
         }
-        .login-overlay .login-box .btn-primary {
+        .page-login-overlay .login-box .btn-primary {
             background: #1a3a5c;
             color: white;
         }
-        .login-overlay .login-box .btn-primary:hover {
+        .page-login-overlay .login-box .btn-primary:hover {
             background: #0f2a44;
         }
-        .login-overlay .login-box .btn-primary:disabled {
+        .page-login-overlay .login-box .btn-primary:disabled {
             opacity: 0.7;
             cursor: not-allowed;
         }
-        .login-overlay .login-box .btn-gray {
+        .page-login-overlay .login-box .btn-gray {
             background: #e2e8f0;
             color: #4a5568;
         }
-        .login-overlay .login-box .btn-gray:hover {
+        .page-login-overlay .login-box .btn-gray:hover {
             background: #cbd5e0;
         }
-        .login-overlay .login-box .error-msg {
+        .page-login-overlay .login-box .error-msg {
             color: #c53030;
             font-size: 14px;
             text-align: center;
             margin-top: 10px;
             display: none;
         }
-        .login-overlay .login-box .success-msg {
+
+        /* ===== Staff Login Overlay (click staff) ===== */
+        .staff-login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .staff-login-overlay.active {
+            display: flex;
+        }
+        .staff-login-overlay .login-box {
+            background: white;
+            padding: 32px 28px;
+            border-radius: 24px;
+            max-width: 420px;
+            width: 92%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease;
+        }
+        .staff-login-overlay .login-box h3 {
+            text-align: center;
+            color: #1a3a5c;
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+        .staff-login-overlay .login-box .login-sub {
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .staff-login-overlay .login-box .form-group {
+            margin-bottom: 14px;
+        }
+        .staff-login-overlay .login-box .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        .staff-login-overlay .login-box .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        .staff-login-overlay .login-box .form-group input:focus {
+            border-color: #1a3a5c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1);
+        }
+        .staff-login-overlay .login-box .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 6px;
+        }
+        .staff-login-overlay .login-box .btn-primary {
+            background: #1a3a5c;
+            color: white;
+        }
+        .staff-login-overlay .login-box .btn-primary:hover {
+            background: #0f2a44;
+        }
+        .staff-login-overlay .login-box .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .staff-login-overlay .login-box .btn-gray {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .staff-login-overlay .login-box .btn-gray:hover {
+            background: #cbd5e0;
+        }
+        .staff-login-overlay .login-box .error-msg {
+            color: #c53030;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+        .staff-login-overlay .login-box .success-msg {
             color: #22543d;
             font-size: 14px;
             text-align: center;
@@ -505,6 +600,11 @@
             display: block;
         }
 
+        /* Hide main content initially */
+        #mainContent {
+            display: none;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 16px 12px;
@@ -527,99 +627,122 @@
             .profile-field select {
                 font-size: 13px;
             }
-            .login-overlay .login-box {
+            .page-login-overlay .login-box,
+            .staff-login-overlay .login-box {
                 padding: 24px 18px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container" id="mainContainer">
-        <!-- Language Bar -->
-        <div class="lang-bar">
-            <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
-            <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
-            <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
-        </div>
-
-        <h1 id="mainTitle">📇 Staff Info</h1>
-        <div class="subtitle" id="subTitle">Pilih cawangan & lihat senarai staf</div>
-
-        <!-- Status Bar -->
-        <div id="statusBar" class="status-bar">🔌 Memuatkan data...</div>
-
-        <!-- Alert -->
-        <div id="alert" class="alert"></div>
-
-        <!-- Filter Section -->
-        <div id="filterSection" class="filter-section">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label for="branchSelect">🏢 Cawangan (GroupName)</label>
-                    <select id="branchSelect">
-                        <option value="">-- Pilih Cawangan --</option>
-                        <option value="SIANG SIANG RESTAURANT(BANDAR)">SIANG SIANG RESTAURANT (BANDAR)</option>
-                        <option value="SIANG SIANG RESTAURANT(BATU 4)">SIANG SIANG RESTAURANT (BATU 4)</option>
-                        <option value="YZ UFO">YZ UFO</option>
-                        <option value="YZ CYBER CAFE(BANDAR)">YZ CYBER CAFE (BANDAR)</option>
-                        <option value="YZ CYBER CAFE(SEJATI)">YZ CYBER CAFE (SEJATI)</option>
-                        <option value="CC TELESHOP (KIMFUNG)">CC TELESHOP (KIMFUNG)</option>
-                        <option value="CC TELESHOP (MESRA)">CC TELESHOP (MESRA)</option>
-                        <option value="Others">Others (Lain-lain)</option>
-                    </select>
-                    <div id="otherBranchContainer" class="other-input-container hidden">
-                        <input type="text" id="otherBranchInput" placeholder="Sila nyatakan cawangan lain...">
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <label for="statusSelect">📌 Status (Situation)</label>
-                    <select id="statusSelect">
-                        <option value="">Semua Status</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Pending">Pending</option>
-                    </select>
-                </div>
-                <div class="filter-group" style="flex: 0 1 auto; min-width: 80px;">
-                    <button class="btn-back" onclick="goBackToIndex()">← Kembali</button>
-                </div>
+    <!-- ===== PAGE LOGIN OVERLAY (Enter page) ===== -->
+    <div class="page-login-overlay" id="pageLoginOverlay">
+        <div class="login-box">
+            <h3>🔐 Akses Dilindungi</h3>
+            <p class="login-sub">Sila log masuk untuk mengakses halaman ini</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="pageUsername" placeholder="Masukkan username" value="SIANGSIANG">
             </div>
-        </div>
-
-        <!-- Staff List -->
-        <div id="staffListContainer">
-            <div class="staff-list" id="staffList">
-                <!-- Dynamic content -->
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="pagePassword" placeholder="Masukkan password">
             </div>
-        </div>
-
-        <!-- ===== PROFILE VIEW (SAME AS INDEX.HTML) ===== -->
-        <div id="profileView" class="profile-view hidden">
-            <h2 id="profileTitle">👤 Profil Staf</h2>
-            <div class="profile-edit-hint">✏️ Klik pada mana-mana medan untuk sunting</div>
-            <div id="profileFields"></div>
-            <button class="btn btn-success" id="saveProfileBtn" onclick="saveProfile()">💾 Simpan Perubahan</button>
-            <button class="btn btn-danger" onclick="logoutAndGoBack()">🚪 Log Keluar & Kembali</button>
+            <button class="btn btn-primary" id="pageLoginBtn" onclick="authenticatePage()">🔓 Log Masuk</button>
+            <button class="btn btn-gray" onclick="goBackToIndex()">← Kembali ke Index</button>
+            <div class="error-msg" id="pageLoginError">Username atau Password salah!</div>
         </div>
     </div>
 
-    <!-- ===== LOGIN OVERLAY (Popup on staff click) ===== -->
-    <div class="login-overlay" id="loginOverlay">
+    <!-- ===== MAIN CONTENT ===== -->
+    <div id="mainContent">
+        <div class="container">
+            <!-- Language Bar -->
+            <div class="lang-bar">
+                <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
+                <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
+                <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
+            </div>
+
+            <h1 id="mainTitle">📇 Staff Info</h1>
+            <div class="subtitle" id="subTitle">Pilih cawangan & lihat senarai staf</div>
+
+            <!-- Status Bar -->
+            <div id="statusBar" class="status-bar">🔌 Memuatkan data...</div>
+
+            <!-- Alert -->
+            <div id="alert" class="alert"></div>
+
+            <!-- Filter Section -->
+            <div id="filterSection" class="filter-section">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="branchSelect">🏢 Cawangan (GroupName)</label>
+                        <select id="branchSelect">
+                            <option value="">-- Pilih Cawangan --</option>
+                            <option value="SIANG SIANG RESTAURANT(BANDAR)">SIANG SIANG RESTAURANT (BANDAR)</option>
+                            <option value="SIANG SIANG RESTAURANT(BATU 4)">SIANG SIANG RESTAURANT (BATU 4)</option>
+                            <option value="YZ UFO">YZ UFO</option>
+                            <option value="YZ CYBER CAFE(BANDAR)">YZ CYBER CAFE (BANDAR)</option>
+                            <option value="YZ CYBER CAFE(SEJATI)">YZ CYBER CAFE (SEJATI)</option>
+                            <option value="CC TELESHOP (KIMFUNG)">CC TELESHOP (KIMFUNG)</option>
+                            <option value="CC TELESHOP (MESRA)">CC TELESHOP (MESRA)</option>
+                            <option value="Others">Others (Lain-lain)</option>
+                        </select>
+                        <div id="otherBranchContainer" class="other-input-container hidden">
+                            <input type="text" id="otherBranchInput" placeholder="Sila nyatakan cawangan lain...">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label for="statusSelect">📌 Status (Situation)</label>
+                        <select id="statusSelect">
+                            <option value="">Semua Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" style="flex: 0 1 auto; min-width: 80px;">
+                        <button class="btn-back" onclick="goBackToIndex()">← Kembali</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff List -->
+            <div id="staffListContainer">
+                <div class="staff-list" id="staffList">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+
+            <!-- ===== PROFILE VIEW ===== -->
+            <div id="profileView" class="profile-view hidden">
+                <h2 id="profileTitle">👤 Profil Staf</h2>
+                <div class="profile-edit-hint">✏️ Klik pada mana-mana medan untuk sunting</div>
+                <div id="profileFields"></div>
+                <button class="btn btn-success" id="saveProfileBtn" onclick="saveProfile()">💾 Simpan Perubahan</button>
+                <button class="btn btn-danger" onclick="logoutAndGoBack()">🚪 Log Keluar & Kembali</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== STAFF LOGIN OVERLAY (Click staff) ===== -->
+    <div class="staff-login-overlay" id="staffLoginOverlay">
         <div class="login-box">
-            <h3>🔐 Log Masuk</h3>
+            <h3>🔐 Log Masuk Staf</h3>
             <p class="login-sub">Masukkan Code dan Password untuk melihat profil</p>
             <div class="form-group">
-                <label for="loginCode">Code</label>
-                <input type="text" id="loginCode" placeholder="Masukkan Code Staff" autocomplete="off">
+                <label for="staffLoginCode">Code</label>
+                <input type="text" id="staffLoginCode" placeholder="Masukkan Code Staff" autocomplete="off">
             </div>
             <div class="form-group">
-                <label for="loginPassword">Password</label>
-                <input type="password" id="loginPassword" placeholder="Masukkan Password">
+                <label for="staffLoginPassword">Password</label>
+                <input type="password" id="staffLoginPassword" placeholder="Masukkan Password">
             </div>
-            <button class="btn btn-primary" id="loginBtn" onclick="performLogin()">🔓 Log Masuk</button>
-            <button class="btn btn-gray" onclick="closeLoginOverlay()">Batal</button>
-            <div class="error-msg" id="loginError">Code atau Password salah!</div>
-            <div class="success-msg" id="loginSuccess">✅ Log masuk berjaya!</div>
+            <button class="btn btn-primary" id="staffLoginBtn" onclick="performStaffLogin()">🔓 Log Masuk</button>
+            <button class="btn btn-gray" onclick="closeStaffLogin()">Batal</button>
+            <div class="error-msg" id="staffLoginError">Code atau Password salah!</div>
+            <div class="success-msg" id="staffLoginSuccess">✅ Log masuk berjaya!</div>
         </div>
     </div>
 
@@ -629,6 +752,8 @@
         // ============================================================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RYp3Wz40B5QzWEqzfkv9lKzCYQNXSIJp9LqlteimJakZJntTQuGTb9iwibeMdzwE/exec';
         const SHEET_NAME = 'STAFF LOGIN RECORD';
+        const PAGE_USERNAME = 'SIANGSIANG';
+        const PAGE_PASSWORD = '0000';
 
         // ============================================================
         //  STATE
@@ -637,9 +762,10 @@
         let branches = [];
         let isLoading = false;
         let currentUser = null;
-        let isLoggedIn = false;
+        let isStaffLoggedIn = false;
         let currentLanguage = 'ms';
-        let pendingLoginCode = null;
+        let pendingStaffCode = null;
+        let isPageAuthenticated = false;
 
         // Elemen DOM
         const branchSelect = document.getElementById('branchSelect');
@@ -648,17 +774,53 @@
         const statusBar = document.getElementById('statusBar');
         const otherBranchContainer = document.getElementById('otherBranchContainer');
         const otherBranchInput = document.getElementById('otherBranchInput');
-        const loginOverlay = document.getElementById('loginOverlay');
-        const loginCode = document.getElementById('loginCode');
-        const loginPassword = document.getElementById('loginPassword');
-        const loginError = document.getElementById('loginError');
-        const loginSuccess = document.getElementById('loginSuccess');
-        const loginBtn = document.getElementById('loginBtn');
         const alertBox = document.getElementById('alert');
         const profileView = document.getElementById('profileView');
         const profileFields = document.getElementById('profileFields');
         const filterSection = document.getElementById('filterSection');
         const staffListContainer = document.getElementById('staffListContainer');
+
+        // Page Login
+        const pageLoginOverlay = document.getElementById('pageLoginOverlay');
+        const pageUsername = document.getElementById('pageUsername');
+        const pagePassword = document.getElementById('pagePassword');
+        const pageLoginError = document.getElementById('pageLoginError');
+        const pageLoginBtn = document.getElementById('pageLoginBtn');
+        const mainContent = document.getElementById('mainContent');
+
+        // Staff Login
+        const staffLoginOverlay = document.getElementById('staffLoginOverlay');
+        const staffLoginCode = document.getElementById('staffLoginCode');
+        const staffLoginPassword = document.getElementById('staffLoginPassword');
+        const staffLoginError = document.getElementById('staffLoginError');
+        const staffLoginSuccess = document.getElementById('staffLoginSuccess');
+        const staffLoginBtn = document.getElementById('staffLoginBtn');
+
+        // ============================================================
+        //  PAGE AUTHENTICATION
+        // ============================================================
+        function authenticatePage() {
+            const username = pageUsername.value.trim();
+            const password = pagePassword.value.trim();
+
+            if (username === PAGE_USERNAME && password === PAGE_PASSWORD) {
+                isPageAuthenticated = true;
+                pageLoginOverlay.style.display = 'none';
+                mainContent.style.display = 'block';
+                init();
+            } else {
+                pageLoginError.style.display = 'block';
+                pagePassword.value = '';
+                pagePassword.focus();
+            }
+        }
+
+        pagePassword.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') authenticatePage();
+        });
+        pageUsername.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') pagePassword.focus();
+        });
 
         // ============================================================
         //  TRANSLATIONS
@@ -668,18 +830,9 @@
                 title: '📇 Staff Info',
                 subTitle: 'Pilih cawangan & lihat senarai staf',
                 profileTitle: '👤 Profil Staf',
-                loginTitle: '🔐 Log Masuk',
-                loginSub: 'Masukkan Code dan Password untuk melihat profil',
-                loginCode: 'Code',
-                loginPassword: 'Password',
-                loginBtn: '🔓 Log Masuk',
-                cancelBtn: 'Batal',
-                backBtn: '← Kembali',
+                editHint: '✏️ Klik pada mana-mana medan untuk sunting',
                 saveBtn: '💾 Simpan Perubahan',
                 logoutBtn: '🚪 Log Keluar & Kembali',
-                editHint: '✏️ Klik pada mana-mana medan untuk sunting',
-                loginSuccess: '✅ Log masuk berjaya!',
-                loginError: 'Code atau Password salah!',
                 saveSuccess: '✅ Data berjaya disimpan!',
                 saveFail: '❌ Gagal menyimpan data.',
                 networkError: '⚠️ Ralat rangkaian',
@@ -692,25 +845,23 @@
                 connected: '✅ Bersambung! {count} rekod ditemui.',
                 othersPlaceholder: 'Sila nyatakan cawangan lain...',
                 emptyOthers: 'Sila nyatakan cawangan lain di ruangan yang disediakan.',
-                required: 'Sila isi semua medan yang wajib.',
-                confirmLogout: 'Anda pasti mahu log keluar?'
+                confirmLogout: 'Anda pasti mahu log keluar?',
+                staffLoginTitle: '🔐 Log Masuk Staf',
+                staffLoginSub: 'Masukkan Code dan Password untuk melihat profil',
+                staffLoginCode: 'Code',
+                staffLoginPassword: 'Password',
+                staffLoginBtn: '🔓 Log Masuk',
+                cancelBtn: 'Batal',
+                staffLoginSuccess: '✅ Log masuk berjaya!',
+                staffLoginError: 'Code atau Password salah!'
             },
             en: {
                 title: '📇 Staff Info',
                 subTitle: 'Select branch & view staff list',
                 profileTitle: '👤 Staff Profile',
-                loginTitle: '🔐 Login',
-                loginSub: 'Enter Code and Password to view profile',
-                loginCode: 'Code',
-                loginPassword: 'Password',
-                loginBtn: '🔓 Login',
-                cancelBtn: 'Cancel',
-                backBtn: '← Back',
+                editHint: '✏️ Click on any field to edit',
                 saveBtn: '💾 Save Changes',
                 logoutBtn: '🚪 Logout & Back',
-                editHint: '✏️ Click on any field to edit',
-                loginSuccess: '✅ Login successful!',
-                loginError: 'Incorrect Code or Password!',
                 saveSuccess: '✅ Data saved successfully!',
                 saveFail: '❌ Failed to save data.',
                 networkError: '⚠️ Network error',
@@ -723,25 +874,23 @@
                 connected: '✅ Connected! {count} records found.',
                 othersPlaceholder: 'Please specify other branch...',
                 emptyOthers: 'Please specify other branch in the field provided.',
-                required: 'Please fill in all required fields.',
-                confirmLogout: 'Are you sure you want to logout?'
+                confirmLogout: 'Are you sure you want to logout?',
+                staffLoginTitle: '🔐 Staff Login',
+                staffLoginSub: 'Enter Code and Password to view profile',
+                staffLoginCode: 'Code',
+                staffLoginPassword: 'Password',
+                staffLoginBtn: '🔓 Login',
+                cancelBtn: 'Cancel',
+                staffLoginSuccess: '✅ Login successful!',
+                staffLoginError: 'Incorrect Code or Password!'
             },
             zh: {
                 title: '📇 员工信息',
                 subTitle: '选择分店并查看员工列表',
                 profileTitle: '👤 员工资料',
-                loginTitle: '🔐 登录',
-                loginSub: '输入代码和密码以查看资料',
-                loginCode: '员工代码',
-                loginPassword: '密码',
-                loginBtn: '🔓 登录',
-                cancelBtn: '取消',
-                backBtn: '← 返回',
+                editHint: '✏️ 点击任意字段进行编辑',
                 saveBtn: '💾 保存修改',
                 logoutBtn: '🚪 退出并返回',
-                editHint: '✏️ 点击任意字段进行编辑',
-                loginSuccess: '✅ 登录成功！',
-                loginError: '代码或密码错误！',
                 saveSuccess: '✅ 数据保存成功！',
                 saveFail: '❌ 保存数据失败。',
                 networkError: '⚠️ 网络错误',
@@ -754,8 +903,15 @@
                 connected: '✅ 已连接！找到 {count} 条记录。',
                 othersPlaceholder: '请注明其他分店...',
                 emptyOthers: '请在提供的字段中注明其他分店。',
-                required: '请填写所有必填字段。',
-                confirmLogout: '您确定要退出登录吗？'
+                confirmLogout: '您确定要退出登录吗？',
+                staffLoginTitle: '🔐 员工登录',
+                staffLoginSub: '输入代码和密码以查看资料',
+                staffLoginCode: '员工代码',
+                staffLoginPassword: '密码',
+                staffLoginBtn: '🔓 登录',
+                cancelBtn: '取消',
+                staffLoginSuccess: '✅ 登录成功！',
+                staffLoginError: '代码或密码错误！'
             }
         };
 
@@ -779,12 +935,12 @@
             document.getElementById('saveProfileBtn').textContent = t('saveBtn');
             document.querySelector('.profile-view .btn-danger').textContent = t('logoutBtn');
 
-            document.querySelector('.login-box h3').textContent = t('loginTitle');
-            document.querySelector('.login-box .login-sub').textContent = t('loginSub');
-            document.querySelectorAll('.login-box .form-group label')[0].textContent = t('loginCode');
-            document.querySelectorAll('.login-box .form-group label')[1].textContent = t('loginPassword');
-            document.getElementById('loginBtn').textContent = t('loginBtn');
-            document.querySelector('.login-box .btn-gray').textContent = t('cancelBtn');
+            document.querySelector('#staffLoginOverlay h3').textContent = t('staffLoginTitle');
+            document.querySelector('#staffLoginOverlay .login-sub').textContent = t('staffLoginSub');
+            document.querySelectorAll('#staffLoginOverlay .form-group label')[0].textContent = t('staffLoginCode');
+            document.querySelectorAll('#staffLoginOverlay .form-group label')[1].textContent = t('staffLoginPassword');
+            document.getElementById('staffLoginBtn').textContent = t('staffLoginBtn');
+            document.querySelector('#staffLoginOverlay .btn-gray').textContent = t('cancelBtn');
 
             document.querySelector('.filter-group label').textContent = t('groupName');
             document.querySelectorAll('.filter-group label')[1].textContent = t('statusLabel');
@@ -1010,7 +1166,7 @@
                 const statusBadge = getStatusBadge(staff.situation);
                 const safeCode = staff.code.replace(/'/g, "\\'");
                 html += `
-                    <div class="staff-item" onclick="openLoginForStaff('${safeCode}')">
+                    <div class="staff-item" onclick="openStaffLogin('${safeCode}')">
                         <div class="info">
                             <div class="name">${staff.name}</div>
                             <div class="code">🔑 ${staff.code}</div>
@@ -1026,11 +1182,10 @@
         }
 
         // ============================================================
-        //  LOGIN - Popup Overlay (only on staff click)
+        //  STAFF LOGIN (Click staff)
         // ============================================================
-        function openLoginForStaff(code) {
-            if (isLoggedIn) {
-                // If already logged in, just show profile
+        function openStaffLogin(code) {
+            if (isStaffLoggedIn) {
                 const staff = allStaff.find(s => s.code === code);
                 if (staff) {
                     currentUser = { ...staff };
@@ -1039,87 +1194,86 @@
                 return;
             }
 
-            pendingLoginCode = code;
-            loginCode.value = code;
-            loginPassword.value = '';
-            loginError.style.display = 'none';
-            loginSuccess.style.display = 'none';
-            loginBtn.disabled = false;
-            loginBtn.textContent = t('loginBtn');
-            loginOverlay.classList.add('active');
-            loginPassword.focus();
+            pendingStaffCode = code;
+            staffLoginCode.value = code;
+            staffLoginPassword.value = '';
+            staffLoginError.style.display = 'none';
+            staffLoginSuccess.style.display = 'none';
+            staffLoginBtn.disabled = false;
+            staffLoginBtn.textContent = t('staffLoginBtn');
+            staffLoginOverlay.classList.add('active');
+            staffLoginPassword.focus();
         }
 
-        function closeLoginOverlay() {
-            loginOverlay.classList.remove('active');
-            pendingLoginCode = null;
+        function closeStaffLogin() {
+            staffLoginOverlay.classList.remove('active');
+            pendingStaffCode = null;
         }
 
-        function performLogin() {
-            const code = loginCode.value.trim();
-            const password = loginPassword.value.trim();
+        function performStaffLogin() {
+            const code = staffLoginCode.value.trim();
+            const password = staffLoginPassword.value.trim();
 
             if (!code || !password) {
-                loginError.textContent = 'Sila masukkan Code dan Password.';
-                loginError.style.display = 'block';
-                loginSuccess.style.display = 'none';
+                staffLoginError.textContent = 'Sila masukkan Code dan Password.';
+                staffLoginError.style.display = 'block';
+                staffLoginSuccess.style.display = 'none';
                 return;
             }
 
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = `<span class="loading-spinner"></span>Memproses...`;
-            loginError.style.display = 'none';
-            loginSuccess.style.display = 'none';
+            staffLoginBtn.disabled = true;
+            staffLoginBtn.innerHTML = `<span class="loading-spinner"></span>Memproses...`;
+            staffLoginError.style.display = 'none';
+            staffLoginSuccess.style.display = 'none';
 
             const staff = allStaff.find(s => s.code === code);
 
             if (!staff) {
-                loginBtn.disabled = false;
-                loginBtn.textContent = t('loginBtn');
-                loginError.textContent = 'Code tidak dijumpai!';
-                loginError.style.display = 'block';
+                staffLoginBtn.disabled = false;
+                staffLoginBtn.textContent = t('staffLoginBtn');
+                staffLoginError.textContent = 'Code tidak dijumpai!';
+                staffLoginError.style.display = 'block';
                 return;
             }
 
             if (staff.loginPwd !== password) {
-                loginBtn.disabled = false;
-                loginBtn.textContent = t('loginBtn');
-                loginError.textContent = t('loginError');
-                loginError.style.display = 'block';
-                loginPassword.value = '';
-                loginPassword.focus();
+                staffLoginBtn.disabled = false;
+                staffLoginBtn.textContent = t('staffLoginBtn');
+                staffLoginError.textContent = t('staffLoginError');
+                staffLoginError.style.display = 'block';
+                staffLoginPassword.value = '';
+                staffLoginPassword.focus();
                 return;
             }
 
-            loginSuccess.textContent = t('loginSuccess');
-            loginSuccess.style.display = 'block';
-            loginBtn.disabled = false;
-            loginBtn.textContent = t('loginBtn');
+            staffLoginSuccess.textContent = t('staffLoginSuccess');
+            staffLoginSuccess.style.display = 'block';
+            staffLoginBtn.disabled = false;
+            staffLoginBtn.textContent = t('staffLoginBtn');
 
             setTimeout(() => {
-                loginOverlay.classList.remove('active');
-                isLoggedIn = true;
+                staffLoginOverlay.classList.remove('active');
+                isStaffLoggedIn = true;
                 currentUser = { ...staff };
                 showProfile(currentUser);
             }, 600);
         }
 
-        loginPassword.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') performLogin();
+        staffLoginPassword.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') performStaffLogin();
         });
-        loginCode.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') loginPassword.focus();
+        staffLoginCode.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') staffLoginPassword.focus();
         });
 
-        // Close overlay when clicking outside
-        loginOverlay.addEventListener('click', function(e) {
+        staffLoginOverlay.addEventListener('click', function(e) {
             if (e.target === this) {
-                closeLoginOverlay();
+                closeStaffLogin();
             }
         });
 
         // ============================================================
-        //  SHOW PROFILE (SAME AS INDEX.HTML)
+        //  SHOW PROFILE - ALL FIELDS (SAME AS INDEX.HTML)
         // ============================================================
         function showProfile(user) {
             filterSection.style.display = 'none';
@@ -1127,7 +1281,7 @@
             profileView.classList.remove('hidden');
             profileFields.innerHTML = '';
 
-            // All fields from index.html
+            // ALL fields from index.html
             const fields = [
                 'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir', 'Salary',
                 'IC', 'Jawatan', 'TarikhMasukKerja', 'TelefonNo', 'Email',
@@ -1167,13 +1321,7 @@
                 UpdateDate: 'Update Date'
             };
 
-            // Get all keys from user data
-            const userKeys = Object.keys(user);
-
             for (let key of fields) {
-                // Only show fields that exist in user data
-                if (!userKeys.includes(key) && key !== 'LoginPassword' && key !== 'PhoneType') continue;
-
                 const val = user[key] || '';
                 const div = document.createElement('div');
                 div.className = 'profile-field';
@@ -1182,7 +1330,9 @@
                 label.textContent = labels[key] || key + ':';
 
                 let input;
-                if (key === 'Code') {
+
+                if (key === 'Code' || key === 'SignupDate' || key === 'UpdateDate') {
+                    // Read-only fields
                     input = document.createElement('input');
                     input.type = 'text';
                     input.value = val;
@@ -1192,12 +1342,46 @@
                     input = document.createElement('input');
                     input.type = 'password';
                     input.value = val;
-                } else if (key === 'SignupDate' || key === 'UpdateDate') {
-                    input = document.createElement('input');
-                    input.type = 'text';
-                    input.value = val;
-                    input.readOnly = true;
-                    input.style.background = '#f7fafc';
+                } else if (key === 'Jantina') {
+                    input = document.createElement('select');
+                    const options = ['', 'Lelaki', 'Perempuan'];
+                    options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt || '-- Pilih --';
+                        if (opt === val) option.selected = true;
+                        input.appendChild(option);
+                    });
+                } else if (key === 'Lindungan' || key === 'YellowCard') {
+                    input = document.createElement('select');
+                    const options = ['', 'YES', 'NO'];
+                    options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt || '-- Pilih --';
+                        if (opt === val) option.selected = true;
+                        input.appendChild(option);
+                    });
+                } else if (key === 'ShiftType') {
+                    input = document.createElement('select');
+                    const options = ['', '6AM-2.30PM', '8AM-4.30PM', '2PM-10.30PM', '3.30PM-11.00PM', 'Others'];
+                    options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt || '-- Pilih --';
+                        if (opt === val) option.selected = true;
+                        input.appendChild(option);
+                    });
+                } else if (key === 'OffDay') {
+                    input = document.createElement('select');
+                    const options = ['', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad'];
+                    options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt || '-- Pilih --';
+                        if (opt === val) option.selected = true;
+                        input.appendChild(option);
+                    });
                 } else {
                     input = document.createElement('input');
                     input.type = 'text';
@@ -1206,7 +1390,6 @@
 
                 input.dataset.field = key;
                 input.id = 'prof_' + key;
-                input.placeholder = 'Klik untuk sunting';
 
                 if (key !== 'Code' && key !== 'SignupDate' && key !== 'UpdateDate') {
                     input.addEventListener('change', function() {
@@ -1224,7 +1407,7 @@
         }
 
         // ============================================================
-        //  SAVE PROFILE (SAME AS INDEX.HTML)
+        //  SAVE PROFILE
         // ============================================================
         function saveProfile() {
             if (!currentUser || !currentUser.Code) {
@@ -1237,8 +1420,8 @@
             btn.innerHTML = `<span class="loading-spinner"></span>Menyimpan...`;
             btn.disabled = true;
 
-            // Get all values from inputs
-            const inputs = profileFields.querySelectorAll('input');
+            // Get all values from inputs and selects
+            const inputs = profileFields.querySelectorAll('input, select');
             inputs.forEach(el => {
                 const field = el.dataset.field;
                 if (field && field !== 'Code' && field !== 'SignupDate' && field !== 'UpdateDate') {
@@ -1269,6 +1452,17 @@
                         if (idx !== -1) {
                             allStaff[idx] = { ...currentUser };
                         }
+                        // Also update the original staff data format
+                        const staffIdx = allStaff.findIndex(s => s.code === currentUser.Code);
+                        if (staffIdx !== -1) {
+                            allStaff[staffIdx] = {
+                                group: currentUser.GroupName || currentUser.group,
+                                code: currentUser.Code,
+                                name: currentUser.Name,
+                                situation: currentUser.Situation || currentUser.situation,
+                                loginPwd: currentUser.LoginPassword || currentUser.loginPwd
+                            };
+                        }
                     } else {
                         showAlert('❌ ' + t('saveFail') + ': ' + (result.message || ''), 'error');
                     }
@@ -1286,7 +1480,7 @@
         // ============================================================
         function logoutAndGoBack() {
             if (!confirm(t('confirmLogout'))) return;
-            isLoggedIn = false;
+            isStaffLoggedIn = false;
             currentUser = null;
             profileView.classList.add('hidden');
             filterSection.style.display = 'block';
@@ -1303,10 +1497,8 @@
         //  INIT
         // ============================================================
         async function init() {
-            // Set language
             setLanguage('ms');
 
-            // Load data
             const success = await fetchStaffData();
 
             if (success && allStaff.length > 0) {
@@ -1331,15 +1523,13 @@
             branchSelect.addEventListener('change', handleBranchChange);
             statusSelect.addEventListener('change', renderStaffList);
 
-            // Check if there's a saved code from sessionStorage (from index.html)
             const savedCode = sessionStorage.getItem('staffCode');
             if (savedCode) {
                 const staff = allStaff.find(s => s.code === savedCode);
                 if (staff) {
                     sessionStorage.removeItem('staffCode');
-                    // Auto-open login for this staff
                     setTimeout(() => {
-                        openLoginForStaff(savedCode);
+                        openStaffLogin(savedCode);
                     }, 500);
                 }
             }
@@ -1350,8 +1540,15 @@
             console.log('💡 Klik pada staff untuk log masuk dan lihat profil');
         }
 
-        // Run
-        init();
+        // ============================================================
+        //  START - Show page login first
+        // ============================================================
+        pageLoginOverlay.style.display = 'flex';
+        mainContent.style.display = 'none';
+
+        console.log('📋 Staff Info page loaded.');
+        console.log('🔑 Page Login: Username=SIANGSIANG, Password=0000');
+        console.log('💡 Selepas login, klik pada staff untuk lihat profil');
     </script>
 </body>
 </html>
