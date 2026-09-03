@@ -51,9 +51,10 @@
         .profile-edit-hint { text-align: center; font-size: 13px; color: #718096; margin-bottom: 12px; }
         .profile-field { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; align-items: center; flex-wrap: wrap; }
         .profile-field label { font-weight: 600; color: #4a5568; font-size: 13px; flex: 0 0 130px; }
-        .profile-field input, .profile-field select { border: none; text-align: right; font-size: 14px; background: transparent; flex: 1; padding: 4px 8px; min-width: 100px; border-radius: 4px; }
-        .profile-field input:focus, .profile-field select:focus { outline: 2px solid #1a3a5c; background: white; border-radius: 4px; }
-        .profile-field input:read-only { background: #f7fafc; }
+        .profile-field input, .profile-field select { border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white; flex: 1; padding: 6px 10px; min-width: 100px; transition: 0.2s; }
+        .profile-field input:focus, .profile-field select:focus { border-color: #1a3a5c; outline: none; box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1); }
+        .profile-field input:read-only { background: #f7fafc; border-color: transparent; }
+        .profile-field select { cursor: pointer; appearance: auto; }
         .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 8px; }
         .btn-success { background: #38a169; color: white; }
         .btn-success:hover { background: #2f855a; }
@@ -107,6 +108,10 @@
         #mainContent { display: none; }
         .debug-btn { background: #805ad5; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; margin-left: 8px; }
         .debug-btn:hover { background: #6b46c1; }
+        .situation-select { font-weight: 600; }
+        .situation-select.active { color: #22543d; background: #c6f6d5; border-color: #22543d !important; }
+        .situation-select.inactive { color: #9b2c2c; background: #fed7d7; border-color: #9b2c2c !important; }
+        .situation-select.pending { color: #975a16; background: #fefcbf; border-color: #975a16 !important; }
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .filter-row { flex-direction: column; gap: 10px; }
@@ -377,7 +382,8 @@
                 staffLoginError: 'Code atau Password salah!',
                 saving: 'Menyimpan ke Google Sheets...',
                 saved: 'Disimpan',
-                syncToSheet: '🔄 Sinkronisasi ke Google Sheets'
+                syncToSheet: '🔄 Sinkronisasi ke Google Sheets',
+                situationLabel: '📌 Situation (Status)'
             },
             en: {
                 title: '📇 Staff Info',
@@ -409,7 +415,8 @@
                 staffLoginError: 'Incorrect Code or Password!',
                 saving: 'Saving to Google Sheets...',
                 saved: 'Saved',
-                syncToSheet: '🔄 Sync to Google Sheets'
+                syncToSheet: '🔄 Sync to Google Sheets',
+                situationLabel: '📌 Situation (Status)'
             },
             zh: {
                 title: '📇 员工信息',
@@ -441,7 +448,8 @@
                 staffLoginError: '代码或密码错误！',
                 saving: '正在保存到 Google Sheets...',
                 saved: '已保存',
-                syncToSheet: '🔄 同步到 Google Sheets'
+                syncToSheet: '🔄 同步到 Google Sheets',
+                situationLabel: '📌 状态 (Situation)'
             }
         };
 
@@ -560,7 +568,6 @@
                     if (keys.length > 0 && keys.every(k => !isNaN(parseInt(k)))) {
                         dataArray = Object.values(rawResult);
                     } else {
-                        // Check if it's a single object with all fields
                         const possibleFields = ['Code', 'Name', 'GroupName', 'Situation'];
                         const hasStaffFields = possibleFields.some(f => rawResult[f] !== undefined);
                         if (hasStaffFields) {
@@ -906,7 +913,7 @@
         });
 
         // ============================================================
-        //  SHOW PROFILE
+        //  SHOW PROFILE - MODIFIED: Added Situation dropdown above GroupName
         // ============================================================
         function showProfile(user) {
             filterSection.style.display = 'none';
@@ -914,16 +921,40 @@
             profileView.classList.remove('hidden');
             profileFields.innerHTML = '';
 
+            // Define fields - Situation moved to top (before GroupName)
             const fields = [
-                'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir', 'Salary',
-                'IC', 'Jawatan', 'TarikhMasukKerja', 'TelefonNo', 'Email',
-                'ShiftType', 'OffDay', 'AlamatTetap', 'NamaWaris', 'AlamatWaris',
-                'BankNama', 'BankAccountNo', 'EPF', 'PERKESO', 'EIS',
-                'Lindungan', 'YellowCard', 'LoginPassword', 'PhoneType',
-                'SignupDate', 'UpdateDate'
+                'Situation',    // 👈 SITUATION放在最前面（Group Name上面）
+                'GroupName', 
+                'Code', 
+                'Name', 
+                'Jantina', 
+                'TarikhLahir', 
+                'Salary',
+                'IC', 
+                'Jawatan', 
+                'TarikhMasukKerja', 
+                'TelefonNo', 
+                'Email',
+                'ShiftType', 
+                'OffDay', 
+                'AlamatTetap', 
+                'NamaWaris', 
+                'AlamatWaris',
+                'BankNama', 
+                'BankAccountNo', 
+                'EPF', 
+                'PERKESO', 
+                'EIS',
+                'Lindungan', 
+                'YellowCard', 
+                'LoginPassword', 
+                'PhoneType',
+                'SignupDate', 
+                'UpdateDate'
             ];
 
             const labels = {
+                Situation: '📌 Situation (Status)',
                 GroupName: 'Group Name',
                 Code: 'Code',
                 Name: 'Name',
@@ -953,6 +984,9 @@
                 UpdateDate: 'Update Date'
             };
 
+            // Situation options
+            const situationOptions = ['ACTIVE', 'INACTIVE', 'PENDING'];
+
             for (let key of fields) {
                 const val = user[key] || '';
                 const div = document.createElement('div');
@@ -962,12 +996,56 @@
                 label.textContent = labels[key] || key + ':';
 
                 let input;
-                if (key === 'Code' || key === 'SignupDate' || key === 'UpdateDate') {
+
+                // For Situation field - use dropdown
+                if (key === 'Situation') {
+                    input = document.createElement('select');
+                    input.className = 'situation-select';
+                    
+                    // Add options
+                    situationOptions.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt;
+                        if (val.toUpperCase() === opt) {
+                            option.selected = true;
+                        }
+                        input.appendChild(option);
+                    });
+                    
+                    // Add color class based on current value
+                    const valLower = val.toLowerCase();
+                    if (valLower === 'active') input.classList.add('active');
+                    else if (valLower === 'inactive') input.classList.add('inactive');
+                    else if (valLower === 'pending') input.classList.add('pending');
+                    
+                    // When selection changes, update color and mark as changed
+                    input.addEventListener('change', function() {
+                        // Remove all color classes
+                        this.classList.remove('active', 'inactive', 'pending');
+                        // Add appropriate class
+                        const newVal = this.value.toLowerCase();
+                        if (newVal === 'active') this.classList.add('active');
+                        else if (newVal === 'inactive') this.classList.add('inactive');
+                        else if (newVal === 'pending') this.classList.add('pending');
+                        
+                        // Update currentUser
+                        currentUser.Situation = this.value;
+                        currentUser.UpdateDate = new Date().toISOString();
+                        
+                        // Mark save button
+                        const saveBtn = document.getElementById('saveProfileBtn');
+                        saveBtn.textContent = '💾 ' + t('saveBtn') + ' ⚡';
+                        saveBtn.style.background = '#dd6b20';
+                    });
+                    
+                } else if (key === 'Code' || key === 'SignupDate' || key === 'UpdateDate') {
                     input = document.createElement('input');
                     input.type = 'text';
                     input.value = val;
                     input.readOnly = true;
                     input.style.background = '#f7fafc';
+                    input.style.borderColor = 'transparent';
                 } else if (key === 'LoginPassword') {
                     input = document.createElement('input');
                     input.type = 'password';
@@ -982,7 +1060,8 @@
                 input.id = 'prof_' + key;
                 input.placeholder = 'Klik untuk sunting';
 
-                if (key !== 'Code' && key !== 'SignupDate' && key !== 'UpdateDate') {
+                // Add change listener for editable fields (not Situation, Code, SignupDate, UpdateDate)
+                if (key !== 'Situation' && key !== 'Code' && key !== 'SignupDate' && key !== 'UpdateDate') {
                     input.addEventListener('change', function() {
                         currentUser[key] = this.value;
                         currentUser.UpdateDate = new Date().toISOString();
@@ -1006,7 +1085,7 @@
         }
 
         // ============================================================
-        //  SAVE PROFILE
+        //  SAVE PROFILE - Updated to handle Situation dropdown
         // ============================================================
         function saveProfile() {
             if (!currentUser || !currentUser.Code) {
@@ -1025,6 +1104,15 @@
             inputs.forEach(el => {
                 const field = el.dataset.field;
                 if (field && field !== 'Code' && field !== 'SignupDate' && field !== 'UpdateDate') {
+                    currentUser[field] = el.value;
+                }
+            });
+
+            // Also collect select values (Situation)
+            const selects = profileFields.querySelectorAll('select');
+            selects.forEach(el => {
+                const field = el.dataset.field;
+                if (field) {
                     currentUser[field] = el.value;
                 }
             });
@@ -1094,6 +1182,16 @@
                     const idx = allStaff.findIndex(s => s.Code === currentUser.Code);
                     if (idx !== -1) {
                         allStaff[idx] = { ...currentUser };
+                    }
+
+                    // Update the status badge color in the dropdown
+                    const situationSelect = document.querySelector('select[data-field="Situation"]');
+                    if (situationSelect) {
+                        situationSelect.className = 'situation-select';
+                        const val = situationSelect.value.toLowerCase();
+                        if (val === 'active') situationSelect.classList.add('active');
+                        else if (val === 'inactive') situationSelect.classList.add('inactive');
+                        else if (val === 'pending') situationSelect.classList.add('pending');
                     }
 
                     setTimeout(() => {
@@ -1201,6 +1299,7 @@
         console.log('💡 Selepas login, klik pada staff untuk lihat profil lengkap (27 fields)');
         console.log('🔄 Perubahan akan disimpan ke Google Sheets melalui Apps Script');
         console.log('💡 Klik "Test Connection" untuk menguji sambungan ke Google Sheets');
+        console.log('📌 Situation dropdown now appears above Group Name with options: ACTIVE, INACTIVE, PENDING');
     </script>
 </body>
 </html>
