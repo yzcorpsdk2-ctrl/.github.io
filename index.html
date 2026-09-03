@@ -25,7 +25,6 @@
         h1, h2 { text-align: center; color: #1a3a5c; margin-bottom: 16px; font-size: 24px; }
         h2 { font-size: 20px; }
         
-        /* Language Bar */
         .lang-bar {
             display: flex;
             justify-content: center;
@@ -49,7 +48,6 @@
             color: white;
         }
 
-        /* Buttons */
         .btn {
             width: 100%;
             padding: 12px;
@@ -80,7 +78,6 @@
         }
         .auth-section .btn { margin-bottom: 0; }
 
-        /* Form */
         .form-group { margin-bottom: 12px; }
         .form-group label {
             display: block;
@@ -104,10 +101,10 @@
         }
         .form-group input:read-only {
             background: #f7fafc;
+            color: #718096;
         }
         .hidden { display: none !important; }
 
-        /* Alert */
         .alert {
             padding: 12px;
             border-radius: 10px;
@@ -119,7 +116,6 @@
         .alert.success { background: #c6f6d5; color: #22543d; display: block; }
         .alert.info { background: #bee3f8; color: #2a4365; display: block; }
 
-        /* Status Bar */
         .status-bar {
             background: #edf2f7;
             padding: 8px 12px;
@@ -132,7 +128,6 @@
         .status-bar.success { background: #c6f6d5; color: #22543d; }
         .status-bar.error { background: #fed7d7; color: #9b2c2c; }
 
-        /* Profile */
         .profile-field {
             display: flex;
             justify-content: space-between;
@@ -162,7 +157,6 @@
             border-radius: 4px;
         }
 
-        .required-star { color: #e53e3e; }
         .field-required::after { content: " *"; color: #e53e3e; }
 
         .loading-spinner {
@@ -181,9 +175,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        .other-input {
-            margin-top: 6px;
-        }
+        .other-input { margin-top: 6px; }
 
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
@@ -197,30 +189,25 @@
     <div class="container">
         <h1 id="mainTitle">👤 Sistem Pengurusan Staf</h1>
 
-        <!-- Language Bar -->
         <div class="lang-bar">
             <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
             <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
             <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
         </div>
 
-        <!-- Status Bar -->
         <div id="statusBar" class="status-bar">🔌 Menyambung...</div>
 
-        <!-- Auth Section -->
         <div class="auth-section" id="authSection">
             <button class="btn btn-primary" id="signupBtn" onclick="showSignup()">📝 Daftar</button>
             <button class="btn btn-secondary" id="loginBtn" onclick="showLogin()">🔑 Log Masuk</button>
         </div>
 
-        <!-- Alert -->
         <div id="alert" class="alert"></div>
 
-        <!-- ========== REGISTER FORM ========== -->
+        <!-- Register Form -->
         <div id="signupForm" class="hidden">
             <h2 id="signupTitle">📋 Daftar Staf Baru</h2>
             <form id="registerForm">
-                <!-- Group Name -->
                 <div class="form-group">
                     <label class="field-required" id="lblGroupName">Group Name</label>
                     <select id="sGroupName" required onchange="handleGroupChange()">
@@ -239,19 +226,16 @@
                     </div>
                 </div>
 
-                <!-- Code -->
                 <div class="form-group">
                     <label class="field-required" id="lblCode">Code</label>
                     <input type="text" id="sCode" placeholder="Kod Unik" required>
                 </div>
 
-                <!-- Name -->
                 <div class="form-group">
                     <label class="field-required" id="lblName">Name</label>
                     <input type="text" id="sName" placeholder="Nama Penuh" required>
                 </div>
 
-                <!-- Jantina -->
                 <div class="form-group">
                     <label class="field-required" id="lblJantina">Jantina</label>
                     <select id="sJantina" required>
@@ -261,49 +245,41 @@
                     </select>
                 </div>
 
-                <!-- Tarikh Lahir -->
                 <div class="form-group">
                     <label class="field-required" id="lblTarikhLahir">Tarikh Lahir</label>
                     <input type="date" id="sTarikhLahir" required>
                 </div>
 
-                <!-- Salary -->
                 <div class="form-group">
                     <label class="field-required" id="lblSalary">Salary</label>
                     <input type="number" id="sSalary" placeholder="Gaji" required>
                 </div>
 
-                <!-- IC -->
                 <div class="form-group">
                     <label class="field-required" id="lblIC">IC/Passport/Doc.No</label>
                     <input type="text" id="sIC" placeholder="No. KP/Passport" required>
                 </div>
 
-                <!-- Jawatan -->
                 <div class="form-group">
                     <label class="field-required" id="lblJawatan">Jawatan</label>
                     <input type="text" id="sJawatan" placeholder="Jawatan" required>
                 </div>
 
-                <!-- Tarikh Masuk Kerja -->
                 <div class="form-group">
                     <label class="field-required" id="lblTarikhMasuk">Tarikh Masuk Kerja</label>
                     <input type="date" id="sTarikhMasukKerja" required>
                 </div>
 
-                <!-- Telefon -->
                 <div class="form-group">
                     <label class="field-required" id="lblTelefon">Telefon No.</label>
                     <input type="tel" id="sTelefonNo" placeholder="012-3456789" required>
                 </div>
 
-                <!-- Email -->
                 <div class="form-group">
                     <label id="lblEmail">Email</label>
                     <input type="email" id="sEmail" placeholder="email@contoh.com">
                 </div>
 
-                <!-- Shift Type -->
                 <div class="form-group">
                     <label class="field-required" id="lblShiftType">Shift Type</label>
                     <select id="sShiftType" required onchange="handleShiftChange()">
@@ -319,7 +295,6 @@
                     </div>
                 </div>
 
-                <!-- Off Day -->
                 <div class="form-group">
                     <label class="field-required" id="lblOffDay">Off Day</label>
                     <select id="sOffDay" required>
@@ -334,25 +309,21 @@
                     </select>
                 </div>
 
-                <!-- Alamat Tetap -->
                 <div class="form-group">
                     <label class="field-required" id="lblAlamatTetap">Alamat Tetap</label>
                     <input type="text" id="sAlamatTetap" placeholder="Alamat Rumah" required>
                 </div>
 
-                <!-- Nama Waris -->
                 <div class="form-group">
                     <label id="lblNamaWaris">Nama Waris</label>
                     <input type="text" id="sNamaWaris" placeholder="Nama Waris">
                 </div>
 
-                <!-- Alamat Waris -->
                 <div class="form-group">
                     <label id="lblAlamatWaris">Alamat Waris</label>
                     <input type="text" id="sAlamatWaris" placeholder="Alamat Waris">
                 </div>
 
-                <!-- Bank Nama -->
                 <div class="form-group">
                     <label class="field-required" id="lblBankNama">Bank Nama</label>
                     <select id="sBankNama" required onchange="handleBankChange()">
@@ -376,31 +347,26 @@
                     </div>
                 </div>
 
-                <!-- Bank Account No -->
                 <div class="form-group">
                     <label class="field-required" id="lblBankAccount">Bank Account No.</label>
                     <input type="text" id="sBankAccountNo" placeholder="No. Akaun" required>
                 </div>
 
-                <!-- EPF -->
                 <div class="form-group">
                     <label class="field-required" id="lblEPF">EPF (kwsp) No.</label>
                     <input type="text" id="sEPF" placeholder="No. KWSP" required>
                 </div>
 
-                <!-- PERKESO -->
                 <div class="form-group">
                     <label class="field-required" id="lblPERKESO">PERKESO NO.</label>
                     <input type="text" id="sPERKESO" placeholder="No. PERKESO" required>
                 </div>
 
-                <!-- EIS -->
                 <div class="form-group">
                     <label class="field-required" id="lblEIS">EIS NO.</label>
                     <input type="text" id="sEIS" placeholder="No. EIS" required>
                 </div>
 
-                <!-- 24Jam Lindungan -->
                 <div class="form-group">
                     <label class="field-required" id="lblLindungan">24Jam Lindungan</label>
                     <select id="sLindungan" required>
@@ -410,7 +376,6 @@
                     </select>
                 </div>
 
-                <!-- Yellow Card -->
                 <div class="form-group">
                     <label class="field-required" id="lblYellowCard">Kad Kebersihan (Yellow Card)</label>
                     <select id="sYellowCard" required>
@@ -420,13 +385,11 @@
                     </select>
                 </div>
 
-                <!-- Login Password -->
                 <div class="form-group">
                     <label class="field-required" id="lblLoginPassword">Login Password</label>
                     <input type="password" id="sLoginPassword" placeholder="Kata Laluan" required>
                 </div>
 
-                <!-- Phone Type (hidden - auto detected) -->
                 <input type="hidden" id="sPhoneType" value="">
 
                 <button type="submit" class="btn btn-success" id="signupSubmitBtn">📤 Daftar</button>
@@ -434,7 +397,7 @@
             </form>
         </div>
 
-        <!-- ========== LOGIN FORM ========== -->
+        <!-- Login Form -->
         <div id="loginForm" class="hidden">
             <h2 id="loginTitle">🔐 Log Masuk</h2>
             <div class="form-group">
@@ -450,7 +413,7 @@
             <div id="loginResult" style="margin-top:12px; text-align:center; font-weight:600;"></div>
         </div>
 
-        <!-- ========== PROFILE ========== -->
+        <!-- Profile View -->
         <div id="profileView" class="hidden">
             <h2 id="profileTitle">👤 Profil Staf</h2>
             <div style="text-align:center; font-size:13px; color:#718096; margin-bottom:12px;">
@@ -483,7 +446,6 @@
                 register: '📤 Daftar',
                 loginBtn: '🔓 Log Masuk',
                 back: '← Kembali',
-                // Labels
                 lblGroupName: 'Group Name',
                 lblCode: 'Code',
                 lblName: 'Name',
@@ -510,7 +472,6 @@
                 lblLoginPassword: 'Login Password',
                 lblLoginCode: 'Code',
                 lblLoginPassword2: 'Password',
-                // Messages
                 required: 'Sila isi semua medan yang wajib.',
                 loginSuccess: 'Log masuk berjaya!',
                 loginFail: 'Code atau Password salah.',
@@ -532,7 +493,6 @@
                 otherGroup: 'Others (Lain-lain)',
                 otherBank: 'Others (Lain-lain)',
                 otherShift: 'Others (Lain-lain)',
-                pleaseSpecify: 'Sila nyatakan',
                 bankOthers: 'Sila nyatakan bank lain',
                 groupOthers: 'Sila nyatakan kumpulan lain',
                 shiftOthers: 'Contoh: 9AM-5PM',
@@ -540,14 +500,6 @@
                 no: 'NO',
                 male: 'Lelaki',
                 female: 'Perempuan',
-                // Days
-                monday: 'Isnin (Monday)',
-                tuesday: 'Selasa (Tuesday)',
-                wednesday: 'Rabu (Wednesday)',
-                thursday: 'Khamis (Thursday)',
-                friday: 'Jumaat (Friday)',
-                saturday: 'Sabtu (Saturday)',
-                sunday: 'Ahad (Sunday)',
             },
             en: {
                 title: '👤 Staff Management System',
@@ -607,7 +559,6 @@
                 otherGroup: 'Others',
                 otherBank: 'Others',
                 otherShift: 'Others',
-                pleaseSpecify: 'Please specify',
                 bankOthers: 'Please specify other bank',
                 groupOthers: 'Please specify other group',
                 shiftOthers: 'Example: 9AM-5PM',
@@ -615,13 +566,6 @@
                 no: 'NO',
                 male: 'Male',
                 female: 'Female',
-                monday: 'Monday',
-                tuesday: 'Tuesday',
-                wednesday: 'Wednesday',
-                thursday: 'Thursday',
-                friday: 'Friday',
-                saturday: 'Saturday',
-                sunday: 'Sunday',
             },
             zh: {
                 title: '👤 员工管理系统',
@@ -681,7 +625,6 @@
                 otherGroup: '其他',
                 otherBank: '其他',
                 otherShift: '其他',
-                pleaseSpecify: '请注明',
                 bankOthers: '请注明其他银行',
                 groupOthers: '请注明其他组别',
                 shiftOthers: '例如：9AM-5PM',
@@ -689,13 +632,6 @@
                 no: '否',
                 male: '男',
                 female: '女',
-                monday: '星期一',
-                tuesday: '星期二',
-                wednesday: '星期三',
-                thursday: '星期四',
-                friday: '星期五',
-                saturday: '星期六',
-                sunday: '星期日',
             }
         };
 
@@ -703,7 +639,6 @@
             return translations[currentLanguage]?.[key] || key;
         }
 
-        // ============= LANGUAGE =============
         function setLanguage(lang) {
             currentLanguage = lang;
             document.querySelectorAll('.lang-btn').forEach(b => {
@@ -757,7 +692,6 @@
                     el.textContent = label + (el.classList.contains('field-required') ? ' *' : '');
                 }
             }
-            // Update select placeholders
             updateSelectPlaceholders();
         }
 
@@ -777,7 +711,6 @@
                     el.options[0].text = text;
                 }
             });
-            // Update option texts
             const groupSel = document.getElementById('sGroupName');
             if (groupSel) {
                 const opt = groupSel.querySelector('option[value="Others"]');
@@ -793,7 +726,6 @@
                 const opt = shiftSel.querySelector('option[value="Others"]');
                 if (opt) opt.text = t('otherShift');
             }
-            // Update placeholders
             const placeholders = [
                 { id: 'OtherGroupInput', text: t('groupOthers') },
                 { id: 'OtherBankInput', text: t('bankOthers') },
@@ -805,7 +737,6 @@
             });
         }
 
-        // ============= UI FUNCTIONS =============
         function showAlert(msg, type = 'error') {
             const el = document.getElementById('alert');
             el.textContent = msg;
@@ -824,8 +755,9 @@
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('profileView').classList.add('hidden');
             document.getElementById('authSection').classList.add('hidden');
-            // Auto detect phone type
             detectPhoneType();
+            // Reset bank handling
+            handleBankChange();
         }
 
         function showLogin() {
@@ -859,35 +791,22 @@
             }
         }
 
-        // ============= PHONE TYPE DETECTION =============
         function detectPhoneType() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             let device = 'Unknown';
-            
-            if (/android/i.test(userAgent)) {
-                device = 'Android';
-            } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                device = 'iOS';
-            } else if (/Windows Phone/i.test(userAgent)) {
-                device = 'Windows Phone';
-            } else if (/Macintosh|Mac OS X/i.test(userAgent)) {
-                device = 'Mac';
-            } else if (/Windows/i.test(userAgent)) {
-                device = 'Windows';
-            } else if (/Linux/i.test(userAgent)) {
-                device = 'Linux';
-            }
-            
-            // Get more details if possible
+            if (/android/i.test(userAgent)) device = 'Android';
+            else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) device = 'iOS';
+            else if (/Windows Phone/i.test(userAgent)) device = 'Windows Phone';
+            else if (/Macintosh|Mac OS X/i.test(userAgent)) device = 'Mac';
+            else if (/Windows/i.test(userAgent)) device = 'Windows';
+            else if (/Linux/i.test(userAgent)) device = 'Linux';
             if (navigator.userAgentData && navigator.userAgentData.platform) {
                 device = navigator.userAgentData.platform;
             }
-            
             document.getElementById('sPhoneType').value = device;
             console.log('📱 Phone Type detected:', device);
         }
 
-        // ============= GROUP HANDLING =============
         function handleGroupChange() {
             const sel = document.getElementById('sGroupName');
             const container = document.getElementById('otherGroupContainer');
@@ -899,7 +818,6 @@
             }
         }
 
-        // ============= SHIFT HANDLING =============
         function handleShiftChange() {
             const sel = document.getElementById('sShiftType');
             const container = document.getElementById('otherShiftContainer');
@@ -911,21 +829,41 @@
             }
         }
 
-        // ============= BANK HANDLING =============
+        // ============= UPDATED BANK HANDLING =============
         function handleBankChange() {
             const bank = document.getElementById('sBankNama').value;
             const otherContainer = document.getElementById('otherBankContainer');
-            const accInput = document.getElementById('sBankAccountNo');
+            
+            // 需要设为 "-" 且只读的字段
+            const fieldsToDisable = ['sBankAccountNo', 'sEPF', 'sPERKESO', 'sEIS'];
             
             if (bank === 'CASH' || bank === 'MECHANTRADE') {
-                accInput.value = '-';
-                accInput.readOnly = true;
-                accInput.required = false;
+                // 启用 "只读" 模式
+                fieldsToDisable.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.value = '-';
+                        el.readOnly = true;
+                        el.required = false;
+                        el.style.backgroundColor = '#f7fafc';
+                        el.style.color = '#718096';
+                    }
+                });
             } else {
-                accInput.readOnly = false;
-                accInput.required = true;
-                if (accInput.value === '-') accInput.value = '';
+                // 恢复正常模式
+                fieldsToDisable.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (el.value === '-') el.value = '';
+                        el.readOnly = false;
+                        el.required = true;
+                        el.style.backgroundColor = '';
+                        el.style.color = '';
+                    }
+                });
             }
+            
+            // 处理 "Others" 银行
             if (bank === 'Others') {
                 otherContainer.classList.remove('hidden');
             } else {
@@ -960,12 +898,6 @@
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get values
-            const code = document.getElementById('sCode').value.trim();
-            const name = document.getElementById('sName').value.trim();
-            const password = document.getElementById('sLoginPassword').value.trim();
-            
-            // Check required fields
             const requiredIds = [
                 'sGroupName', 'sCode', 'sName', 'sJantina', 'sTarikhLahir',
                 'sSalary', 'sIC', 'sJawatan', 'sTarikhMasukKerja', 'sTelefonNo',
@@ -983,59 +915,56 @@
                 }
             }
             
-            // Check if BankAccountNo is required (not CASH or MECHANTRADE)
             const bank = document.getElementById('sBankNama').value;
             const accInput = document.getElementById('sBankAccountNo');
+            
+            // 如果不是 CASH/MECHANTRADE，需要检查 BankAccountNo
             if (bank !== 'CASH' && bank !== 'MECHANTRADE' && !accInput.value.trim()) {
                 showAlert('Sila masukkan Bank Account No.');
                 accInput.focus();
                 return;
             }
             
-            // Group Others
             let groupVal = document.getElementById('sGroupName').value;
             if (groupVal === 'Others') {
                 const other = document.getElementById('OtherGroupInput').value.trim();
                 if (!other) {
-                    showAlert('Sila nyatakan kumpulan lain / Please specify other group');
+                    showAlert('Sila nyatakan kumpulan lain');
                     document.getElementById('OtherGroupInput').focus();
                     return;
                 }
                 groupVal = other;
             }
             
-            // Bank Others
             let bankVal = document.getElementById('sBankNama').value;
             if (bankVal === 'Others') {
                 const other = document.getElementById('OtherBankInput').value.trim();
                 if (!other) {
-                    showAlert('Sila nyatakan bank lain / Please specify other bank');
+                    showAlert('Sila nyatakan bank lain');
                     document.getElementById('OtherBankInput').focus();
                     return;
                 }
                 bankVal = other;
             }
             
-            // Shift Others
             let shiftVal = document.getElementById('sShiftType').value;
             if (shiftVal === 'Others') {
                 const other = document.getElementById('OtherShiftInput').value.trim();
                 if (!other) {
-                    showAlert('Sila nyatakan waktu shift / Please specify shift time');
+                    showAlert('Sila nyatakan waktu shift');
                     document.getElementById('OtherShiftInput').focus();
                     return;
                 }
                 shiftVal = other;
             }
 
-            // Get phone type from hidden field
             const phoneType = document.getElementById('sPhoneType').value || 'Unknown';
 
-            // ✅ 构建数据对象 - 所有字段名必须与 Sheet 列名完全匹配
+            // ✅ 构建数据对象 - 不包含 Holidays
             const data = {
                 GroupName: groupVal,
-                Code: code,
-                Name: name,
+                Code: document.getElementById('sCode').value.trim(),
+                Name: document.getElementById('sName').value.trim(),
                 Jantina: document.getElementById('sJantina').value,
                 TarikhLahir: document.getElementById('sTarikhLahir').value,
                 Salary: document.getElementById('sSalary').value.trim(),
@@ -1056,7 +985,7 @@
                 EIS: document.getElementById('sEIS').value.trim(),
                 Lindungan: document.getElementById('sLindungan').value,
                 YellowCard: document.getElementById('sYellowCard').value,
-                LoginPassword: password,
+                LoginPassword: document.getElementById('sLoginPassword').value.trim(),
                 PhoneType: phoneType,
             };
 
@@ -1085,7 +1014,8 @@
                     document.getElementById('otherBankContainer').classList.add('hidden');
                     document.getElementById('otherGroupContainer').classList.add('hidden');
                     document.getElementById('otherShiftContainer').classList.add('hidden');
-                    document.getElementById('sBankAccountNo').readOnly = false;
+                    // Reset bank handling
+                    handleBankChange();
                     setTimeout(showLogin, 1500);
                 } else {
                     showAlert('❌ Ralat: ' + (result.error || result.message || 'Unknown error'));
@@ -1157,7 +1087,6 @@
             const container = document.getElementById('profileFields');
             container.innerHTML = '';
 
-            // All fields to display (excluding hidden ones)
             const fields = [
                 'GroupName', 'Code', 'Name', 'Jantina', 'TarikhLahir', 'Salary',
                 'IC', 'Jawatan', 'TarikhMasukKerja', 'TelefonNo', 'Email',
@@ -1200,7 +1129,7 @@
                 
                 input.addEventListener('change', function() {
                     currentUser[key] = this.value;
-                    currentUser.UpdateDate = new Date().toISOString();
+                    currentUser.UpdateDate = getMalaysiaTimeISO();
                     saveProfile();
                 });
                 
@@ -1210,11 +1139,18 @@
             }
         }
 
+        // ============= GET MALAYSIA TIME =============
+        function getMalaysiaTimeISO() {
+            // Malaysia is UTC+8
+            const now = new Date();
+            const malaysiaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+            return malaysiaTime.toISOString().replace('Z', '');
+        }
+
         // ============= SAVE PROFILE =============
         function saveProfile() {
             if (!currentUser || !currentUser.Code) return;
 
-            // ✅ 构建更新数据 - 包含所有字段
             const payload = {
                 action: 'update',
                 Situation: currentUser.Situation || 'Active',
@@ -1223,7 +1159,7 @@
                 Name: currentUser.Name || '',
                 Jantina: currentUser.Jantina || '',
                 TarikhLahir: currentUser.TarikhLahir || '',
-                Holidays: currentUser.Holidays || '0',
+                // ✅ 不发送 Holidays - 让 Google Sheet 保持原值
                 Salary: currentUser.Salary || '',
                 IC: currentUser.IC || '',
                 Jawatan: currentUser.Jawatan || '',
@@ -1270,17 +1206,15 @@
 
         // ============= INIT =============
         window.addEventListener('load', function() {
-            // Detect phone type on load
             detectPhoneType();
-            // Test connection
             setTimeout(testConnection, 500);
-            // Set initial language
             setLanguage('ms');
+            // Initialize bank handling
+            handleBankChange();
         });
 
         console.log('🚀 Staff System loaded');
         console.log('📡 SCRIPT_URL:', SCRIPT_URL);
-        console.log('📱 Phone Type:', document.getElementById('sPhoneType')?.value || 'Not detected');
     </script>
 </body>
 </html>
