@@ -343,19 +343,11 @@
 
     <script>
         // ============= CONFIG =============
-        // 使用你提供的 Apps Script URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
         
-        // ============= GET BASE PATH =============
-        function getBasePath() {
-            // 获取当前路径的目录部分
-            const path = window.location.pathname;
-            const lastSlash = path.lastIndexOf('/');
-            if (lastSlash > 0) {
-                return path.substring(0, lastSlash + 1);
-            }
-            return '/';
-        }
+        // ============= BASE URL =============
+        // 固定使用你的 GitHub Pages 部署路径
+        const BASE_URL = 'https://yzcorpsdk2-ctrl.github.io/.github.io/';
 
         let currentLanguage = 'ms';
         let pendingNavigation = null;
@@ -508,30 +500,26 @@
         function navigateTo(page) {
             console.log('🔍 Navigating to:', page);
             console.log('📍 Current URL:', window.location.href);
-            
-            const basePath = getBasePath();
-            console.log('📁 Base path:', basePath);
+            console.log('📁 Base URL:', BASE_URL);
 
-            // 页面映射表：页面标识 -> 实际文件名
-            const pageMap = {
-                'signlog': 'index.html',      // Daftar / Log Masuk
-                'staffinfo': 'staffinfo.html',
-                'punch': 'punch.html',
-                'payroll': 'payroll.html'
+            // 页面映射表：页面标识 -> 完整 URL
+            const pageUrls = {
+                'signlog': BASE_URL + 'index.html',
+                'staffinfo': BASE_URL + 'staffinfo.html',
+                'punch': BASE_URL + 'punch.html',
+                'payroll': BASE_URL + 'salary.html'   // Payroll 链接到 salary.html
             };
 
-            // 检查是否是直接跳转的页面（不需要认证）
+            // 如果是 signlog (index.html)，不需要认证，直接跳转
             if (page === 'signlog') {
-                console.log('➡️ Redirecting to signlog page (index.html)');
-                const targetUrl = basePath + 'index.html';
-                console.log('📍 Full URL:', targetUrl);
-                window.location.href = targetUrl;
+                console.log('➡️ Redirecting to:', pageUrls.signlog);
+                window.location.href = pageUrls.signlog;
                 return;
             }
 
-            // 检查是否在页面映射表中
-            if (pageMap[page]) {
-                console.log('🔒 Protected page:', page, '->', pageMap[page]);
+            // 检查是否在页面映射表中（需要认证的页面）
+            if (pageUrls[page]) {
+                console.log('🔒 Protected page:', page, '->', pageUrls[page]);
                 pendingNavigation = page;
                 showAuthOverlay();
                 return;
@@ -576,16 +564,14 @@
                 closeOverlay();
                 
                 if (pendingNavigation) {
-                    // 页面映射表
-                    const pageMap = {
-                        'staffinfo': 'staffinfo.html',
-                        'punch': 'punch.html',
-                        'payroll': 'payroll.html'
+                    // 页面映射表 - 完整 URL
+                    const pageUrls = {
+                        'staffinfo': BASE_URL + 'staffinfo.html',
+                        'punch': BASE_URL + 'punch.html',
+                        'payroll': BASE_URL + 'salary.html'   // Payroll 链接到 salary.html
                     };
                     
-                    const basePath = getBasePath();
-                    const fileName = pageMap[pendingNavigation] || pendingNavigation + '.html';
-                    const targetUrl = basePath + fileName;
+                    const targetUrl = pageUrls[pendingNavigation] || BASE_URL + pendingNavigation + '.html';
                     console.log('➡️ Redirecting to:', targetUrl);
                     window.location.href = targetUrl;
                     pendingNavigation = null;
@@ -620,18 +606,25 @@
 
         // ============= INIT =============
         window.addEventListener('load', function() {
-            console.log('🚀 Index (Menu) loaded');
+            console.log('🚀 Menu loaded');
             console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
-            console.log('📌 Base path:', getBasePath());
+            console.log('📁 Base URL:', BASE_URL);
             console.log('📍 Current URL:', window.location.href);
             console.log('📋 Apps Script URL:', SCRIPT_URL);
+            
+            // 显示部署信息
+            console.log('📄 Page mappings:');
+            console.log('   - Daftar/Log Masuk -> ' + BASE_URL + 'index.html');
+            console.log('   - Staff Info -> ' + BASE_URL + 'staffinfo.html');
+            console.log('   - Punch Card -> ' + BASE_URL + 'punch.html');
+            console.log('   - Payroll -> ' + BASE_URL + 'salary.html');
             
             setTimeout(testConnection, 500);
             setLanguage('ms');
         });
 
         // Console helper for debugging
-        console.log('💡 Tip: Type "getBasePath()" to see the base path');
+        console.log('💡 Tip: Type "BASE_URL" to see the base URL');
         console.log('💡 Tip: Type "window.location.href" to see current URL');
     </script>
 </body>
