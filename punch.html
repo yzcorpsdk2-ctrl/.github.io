@@ -1,1 +1,604 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📇 打卡记录 · YZ Corp</title>
+  <!-- 使用与 Staff Info 相似的风格 (暗色卡片, 圆角, 柔光) -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
 
+    body {
+      background: #0b0e14;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #181e28;
+      max-width: 500px;
+      width: 100%;
+      padding: 32px 28px;
+      border-radius: 36px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      color: #eef2f6;
+      transition: all 0.2s;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #2c3540;
+      padding-bottom: 16px;
+    }
+
+    .card-header h1 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-header h1 span {
+      background: #2d3744;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: #9aa9bb;
+    }
+
+    .status-badge {
+      background: #1f2a36;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      color: #b0c4db;
+      border: 1px solid #2f3b4a;
+    }
+
+    .login-section, .clock-section, .action-section {
+      margin: 18px 0;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #a4b6cf;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-group input {
+      background: #11181f;
+      border: 1px solid #2b3645;
+      border-radius: 60px;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      color: #eef2f6;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: #5f7a9e;
+      box-shadow: 0 0 0 3px rgba(79, 114, 167, 0.2);
+    }
+
+    .input-group input::placeholder {
+      color: #5d6f84;
+      font-weight: 300;
+    }
+
+    .btn {
+      background: #2d3a4b;
+      border: none;
+      border-radius: 60px;
+      padding: 14px 22px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #eef2f6;
+      width: 100%;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0;
+      border: 1px solid #3e4c5e;
+    }
+
+    .btn-primary {
+      background: #3b5a7a;
+      border-color: #4d6f94;
+      box-shadow: 0 4px 12px rgba(44, 82, 130, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #4a6f94;
+      transform: scale(1.01);
+      border-color: #6b8bb0;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #3d4b5d;
+      color: #b8c9e0;
+    }
+
+    .btn-outline:hover {
+      background: #1f2937;
+      border-color: #5d7190;
+    }
+
+    .btn-success {
+      background: #1f6d4a;
+      border-color: #2d8b5e;
+      box-shadow: 0 4px 12px rgba(33, 110, 71, 0.3);
+    }
+
+    .btn-success:hover {
+      background: #2a8357;
+      border-color: #3baa74;
+    }
+
+    .btn-danger {
+      background: #7a3a4a;
+      border-color: #9f4b5f;
+    }
+
+    .btn-danger:hover {
+      background: #974a5e;
+    }
+
+    .clock-display {
+      background: #0f161e;
+      border-radius: 60px;
+      padding: 18px 24px;
+      text-align: center;
+      border: 1px solid #29323f;
+      margin: 12px 0 20px 0;
+    }
+
+    .clock-display .time {
+      font-size: 2.3rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: #d6e4ff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .clock-display .date {
+      font-size: 0.8rem;
+      color: #889bb3;
+      margin-top: 4px;
+    }
+
+    .info-text {
+      font-size: 0.8rem;
+      color: #859bb5;
+      background: #131b24;
+      padding: 10px 16px;
+      border-radius: 40px;
+      display: inline-block;
+      border: 1px solid #26303d;
+    }
+
+    .user-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #141d27;
+      padding: 12px 18px;
+      border-radius: 60px;
+      margin: 12px 0;
+      border: 1px solid #293645;
+    }
+
+    .user-badge .detail {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .user-badge .label {
+      color: #7b8fa8;
+      font-size: 0.7rem;
+    }
+    .user-badge .value {
+      font-weight: 500;
+    }
+
+    .back-link {
+      color: #7893b3;
+      text-decoration: none;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      border-bottom: 1px dashed #2f3e50;
+      padding-bottom: 4px;
+    }
+
+    .back-link:hover {
+      color: #aec6e5;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 10px;
+    }
+    .flex-row .btn {
+      flex: 1;
+    }
+
+    .error-msg {
+      background: #4d2a33;
+      color: #f5b7b7;
+      padding: 10px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      border: 1px solid #784552;
+      margin: 8px 0;
+      display: none;
+    }
+
+    .success-msg {
+      background: #1b4d3b;
+      color: #b3e0c6;
+      padding: 10px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      border: 1px solid #2d7a58;
+      margin: 8px 0;
+      display: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .mt-2 { margin-top: 12px; }
+    .mb-1 { margin-bottom: 8px; }
+    .text-center { text-align: center; }
+    .gap-2 { gap: 8px; }
+  </style>
+</head>
+<body>
+<div class="card" id="appContainer">
+  <!-- header -->
+  <div class="card-header">
+    <h1>📇 打卡 <span>YZ</span></h1>
+    <div class="status-badge" id="sessionStatus">⏳ 登入</div>
+  </div>
+
+  <!-- 时区显示 (马来西亚时间 UTC+8) -->
+  <div class="clock-display">
+    <div class="time" id="malaysiaTime">--:--:--</div>
+    <div class="date" id="malaysiaDate">Loading...</div>
+  </div>
+
+  <!-- 登录面板 (默认可见，若已登录则隐藏) -->
+  <div id="loginPanel">
+    <div class="input-group">
+      <label>📱 手机号 / 邮箱</label>
+      <input type="text" id="loginUser" placeholder="+60 12-345 6789 / email@domain" value="">
+    </div>
+    <div class="input-group">
+      <label>🔑 员工编号 (Code)</label>
+      <input type="text" id="loginCode" placeholder="例如: YZ-1001" value="">
+    </div>
+    <div class="input-group">
+      <label>🔒 密码</label>
+      <input type="password" id="loginPass" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" id="loginBtn">🔓 Log Masuk / 登入</button>
+    <div id="loginError" class="error-msg">❌ 手机号/邮箱、员工编号或密码错误</div>
+    <div class="text-center mt-2">
+      <span class="info-text">🔐 首次登入后持续保持 48 小时</span>
+    </div>
+    <div style="margin-top: 12px;">
+      <button class="btn btn-outline" id="testConnBtn" style="width: auto; padding: 8px 20px; display: inline-block;">🔧 Test Connection</button>
+      <span id="testResult" style="margin-left: 12px; color: #8ba0bc; font-size: 0.8rem;"></span>
+    </div>
+  </div>
+
+  <!-- 已登录面板 (默认隐藏) -->
+  <div id="loggedInPanel" class="hidden">
+    <div class="user-badge">
+      <div class="detail">
+        <div><span class="label">👤 用户</span> <span class="value" id="displayUser">-</span></div>
+        <div><span class="label">🆔 员工码</span> <span class="value" id="displayCode">-</span></div>
+      </div>
+      <button class="btn btn-danger" id="logoutBtn" style="width: auto; padding: 6px 18px; font-size: 0.75rem;">🚪 Keluar</button>
+    </div>
+
+    <!-- 打卡动作 -->
+    <div class="action-section">
+      <button class="btn btn-success" id="clockInBtn">✅ 打卡 · 签到</button>
+      <div id="clockSuccess" class="success-msg">✔️ 打卡成功！已记录 (备份至 Google Sheet)</div>
+      <div id="clockError" class="error-msg">⚠️ 打卡失败，请重试</div>
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
+        <button class="btn btn-outline" id="manualBackupBtn" style="flex:1;">📤 手动备份</button>
+        <button class="btn btn-outline" id="refreshSessionBtn" style="flex:1;">🔄 续期登录</button>
+      </div>
+      <div id="backupMsg" style="font-size:0.8rem; color:#7e96b2; margin-top: 8px;"></div>
+    </div>
+
+    <div style="margin-top: 24px; border-top: 1px solid #26303d; padding-top: 16px;">
+      <div class="info-text" style="width:100%; text-align:center;">📌 打卡记录自动备份到 Google Sheet</div>
+      <a href="#" class="back-link" id="goBackLink">← Kembali ke Index (模拟)</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- 配置 ----------
+    const STORAGE_KEY = 'yz_clock_session';
+    const SESSION_TTL = 48 * 60 * 60 * 1000; // 48小时
+
+    // 模拟用户数据库 (实际可对接后端)
+    const VALID_USERS = [
+      { user: 'admin@yz.com', code: 'YZ-0001', pass: '123456' },
+      { user: '+60123456789', code: 'YZ-1001', pass: 'abcd' },
+      { user: 'test@corp', code: 'YZ-2002', pass: 'test123' },
+    ];
+
+    // DOM 引用
+    const loginPanel = document.getElementById('loginPanel');
+    const loggedInPanel = document.getElementById('loggedInPanel');
+    const loginUser = document.getElementById('loginUser');
+    const loginCode = document.getElementById('loginCode');
+    const loginPass = document.getElementById('loginPass');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+    const testConnBtn = document.getElementById('testConnBtn');
+    const testResult = document.getElementById('testResult');
+
+    const displayUser = document.getElementById('displayUser');
+    const displayCode = document.getElementById('displayCode');
+    const clockInBtn = document.getElementById('clockInBtn');
+    const clockSuccess = document.getElementById('clockSuccess');
+    const clockError = document.getElementById('clockError');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const manualBackupBtn = document.getElementById('manualBackupBtn');
+    const refreshSessionBtn = document.getElementById('refreshSessionBtn');
+    const backupMsg = document.getElementById('backupMsg');
+    const goBackLink = document.getElementById('goBackLink');
+    const sessionStatus = document.getElementById('sessionStatus');
+
+    // 时间显示元素
+    const timeEl = document.getElementById('malaysiaTime');
+    const dateEl = document.getElementById('malaysiaDate');
+
+    // ---------- 辅助: 马来西亚时间 (UTC+8) ----------
+    function getMalaysiaTime() {
+      const now = new Date();
+      const ms = now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000);
+      return new Date(ms);
+    }
+
+    function updateClock() {
+      const dt = getMalaysiaTime();
+      const hh = String(dt.getHours()).padStart(2, '0');
+      const mm = String(dt.getMinutes()).padStart(2, '0');
+      const ss = String(dt.getSeconds()).padStart(2, '0');
+      timeEl.textContent = `${hh}:${mm}:${ss}`;
+
+      const opts = { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short' };
+      dateEl.textContent = dt.toLocaleDateString('ms-MY', opts) + ' (MYT)';
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ---------- 会话管理 ----------
+    function getSession() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (Date.now() - data.timestamp > SESSION_TTL) {
+          localStorage.removeItem(STORAGE_KEY);
+          return null;
+        }
+        return data;
+      } catch (_) { return null; }
+    }
+
+    function setSession(user, code) {
+      const payload = { user, code, timestamp: Date.now() };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      applySession(payload);
+    }
+
+    function clearSession() {
+      localStorage.removeItem(STORAGE_KEY);
+      applySession(null);
+    }
+
+    function applySession(session) {
+      if (session) {
+        loginPanel.classList.add('hidden');
+        loggedInPanel.classList.remove('hidden');
+        displayUser.textContent = session.user;
+        displayCode.textContent = session.code;
+        sessionStatus.textContent = '✅ 已登入';
+        sessionStatus.style.borderColor = '#2d7a58';
+        // 隐藏错误信息
+        loginError.style.display = 'none';
+        clockSuccess.style.display = 'none';
+        clockError.style.display = 'none';
+        backupMsg.textContent = '';
+      } else {
+        loginPanel.classList.remove('hidden');
+        loggedInPanel.classList.add('hidden');
+        sessionStatus.textContent = '⏳ 登入';
+        sessionStatus.style.borderColor = '#2f3b4a';
+        // 清空敏感输入 (保留用户方便)
+        loginPass.value = '';
+        loginError.style.display = 'none';
+        clockSuccess.style.display = 'none';
+        clockError.style.display = 'none';
+        backupMsg.textContent = '';
+      }
+    }
+
+    // ---------- 登录逻辑 ----------
+    function performLogin() {
+      const user = loginUser.value.trim();
+      const code = loginCode.value.trim();
+      const pass = loginPass.value.trim();
+
+      if (!user || !code || !pass) {
+        loginError.textContent = '⚠️ 请填写完整 (用户/编号/密码)';
+        loginError.style.display = 'block';
+        return;
+      }
+
+      const found = VALID_USERS.find(u => u.user === user && u.code === code && u.pass === pass);
+      if (found) {
+        loginError.style.display = 'none';
+        setSession(user, code);
+        // 模拟备份登录记录
+        console.log(`[Login] ${user} (${code}) at ${new Date().toISOString()}`);
+        backupMsg.textContent = '✅ 登录记录已备份 (模拟 Google Sheet)';
+        setTimeout(() => { backupMsg.textContent = ''; }, 3000);
+      } else {
+        loginError.textContent = '❌ 手机号/邮箱、员工编号或密码错误';
+        loginError.style.display = 'block';
+      }
+    }
+
+    // ---------- 打卡 (备份到Google Sheet模拟) ----------
+    function recordClock() {
+      const session = getSession();
+      if (!session) {
+        clockError.textContent = '⚠️ 会话已过期，请重新登录';
+        clockError.style.display = 'block';
+        return;
+      }
+
+      // 模拟打卡 + Google Sheet 备份
+      const now = getMalaysiaTime();
+      const timeStr = now.toLocaleString('ms-MY', { hour12: false });
+      const payload = {
+        user: session.user,
+        code: session.code,
+        timestamp: now.toISOString(),
+        action: 'CLOCK_IN',
+        backup: 'Google Sheet (模拟)',
+      };
+
+      // 显示成功 (模拟)
+      clockSuccess.textContent = `✔️ 打卡成功! ${timeStr} (MYT) 已备份至 Google Sheet`;
+      clockSuccess.style.display = 'block';
+      clockError.style.display = 'none';
+      backupMsg.textContent = `📤 模拟备份: ${JSON.stringify(payload)}`;
+
+      // 模拟异步备份 (Google Sheet)
+      console.log('[Backup]', payload);
+      // 可在此调用真实的 Google Apps Script Web App
+      // 例如: fetch('https://script.google.com/...', { method: 'POST', body: JSON.stringify(payload) });
+    }
+
+    // ---------- 事件绑定 ----------
+    loginBtn.addEventListener('click', performLogin);
+    // 回车触发登录
+    document.querySelectorAll('#loginPanel input').forEach(inp => {
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') performLogin(); });
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      clearSession();
+      backupMsg.textContent = '👋 已登出，会话已清除';
+    });
+
+    clockInBtn.addEventListener('click', recordClock);
+
+    // 手动备份 (模拟)
+    manualBackupBtn.addEventListener('click', () => {
+      const session = getSession();
+      if (!session) {
+        backupMsg.textContent = '⚠️ 请先登录';
+        return;
+      }
+      backupMsg.textContent = `📤 手动备份触发 (Google Sheet) 用户: ${session.user}`;
+      console.log('[Manual Backup]', session);
+      // 模拟调用
+      setTimeout(() => { backupMsg.textContent += ' ✅ 完成'; }, 600);
+    });
+
+    // 续期登录 (重置timestamp)
+    refreshSessionBtn.addEventListener('click', () => {
+      const session = getSession();
+      if (!session) {
+        backupMsg.textContent = '⚠️ 无有效会话，请重新登录';
+        return;
+      }
+      // 续期
+      const newSession = { ...session, timestamp: Date.now() };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newSession));
+      backupMsg.textContent = `🔄 会话已续期 (有效期延长至48小时后)`;
+      applySession(newSession);
+    });
+
+    // Test Connection (只是演示)
+    testConnBtn.addEventListener('click', () => {
+      testResult.textContent = '⏳ 检查中...';
+      setTimeout(() => {
+        testResult.textContent = '✅ 连接正常 (模拟)';
+      }, 400);
+    });
+
+    // 返回链接 (模拟)
+    goBackLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      backupMsg.textContent = '🔙 Kembali ke Index (模拟页面跳转)';
+    });
+
+    // ---------- 启动时检查会话 ----------
+    (function init() {
+      const session = getSession();
+      if (session) {
+        applySession(session);
+        // 自动续期？ (不自动，但用户可手动续期)
+        backupMsg.textContent = `👋 欢迎回来, ${session.user}`;
+        setTimeout(() => { backupMsg.textContent = ''; }, 2500);
+      } else {
+        applySession(null);
+        // 填入示例方便测试
+        loginUser.value = 'admin@yz.com';
+        loginCode.value = 'YZ-0001';
+        loginPass.value = '123456';
+      }
+    })();
+
+    // 额外: 如果超过48小时自动登出已在 getSession 中处理
+    // 每次页面加载都会检查
+
+  })();
+</script>
+</body>
+</html>
