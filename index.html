@@ -303,15 +303,15 @@
                 <span class="icon">🕐</span>
                 <span class="label" id="menuPunch">Punch Card Record</span>
             </button>
-            <button class="menu-btn purple" onclick="navigateTo('xxx1')">
+            <button class="menu-btn purple" onclick="navigateTo('menu1')">
                 <span class="icon">📁</span>
                 <span class="label" id="menu1">Menu 1</span>
             </button>
-            <button class="menu-btn teal" onclick="navigateTo('xxx2')">
+            <button class="menu-btn teal" onclick="navigateTo('menu2')">
                 <span class="icon">📁</span>
                 <span class="label" id="menu2">Menu 2</span>
             </button>
-            <button class="menu-btn danger" onclick="navigateTo('xxx3')">
+            <button class="menu-btn danger" onclick="navigateTo('menu3')">
                 <span class="icon">📁</span>
                 <span class="label" id="menu3">Menu 3</span>
             </button>
@@ -345,13 +345,16 @@
         // ============= CONFIG =============
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMwpE6zvWupu3H-0R333JqQqb3aVIprNJHjY8BgxDdtRLZoO0pXyPvzMhucTlzS85YIQ/exec';
         
-        // ============= PAGE URLS =============
-        // 定义所有页面的完整URL
-        const PAGE_URLS = {
-            'staffinfo': 'https://yzcorpsdk2-ctrl.github.io/.github.io/staffinfo.html',
-            'punch': 'https://yzcorpsdk2-ctrl.github.io/.github.io/punch.html',
-            'signlog': 'https://yzcorpsdk2-ctrl.github.io/.github.io/signlog.html'
-        };
+        // ============= GET BASE PATH =============
+        function getBasePath() {
+            // 获取当前路径的目录部分
+            const path = window.location.pathname;
+            const lastSlash = path.lastIndexOf('/');
+            if (lastSlash > 0) {
+                return path.substring(0, lastSlash + 1);
+            }
+            return '/';
+        }
 
         let currentLanguage = 'ms';
         let pendingNavigation = null;
@@ -504,16 +507,16 @@
         function navigateTo(page) {
             console.log('🔍 Navigating to:', page);
             console.log('📍 Current URL:', window.location.href);
+            
+            const basePath = getBasePath();
+            console.log('📁 Base path:', basePath);
 
-            // 直接跳转的页面（不需要认证）
+            // 需要直接跳转的页面（不需要认证）
             if (page === 'signlog') {
                 console.log('➡️ Redirecting to signlog page');
-                if (PAGE_URLS[page]) {
-                    console.log('📍 Full URL:', PAGE_URLS[page]);
-                    window.location.href = PAGE_URLS[page];
-                } else {
-                    window.location.href = 'signlog.html';
-                }
+                const targetUrl = basePath + 'signlog.html';
+                console.log('📍 Full URL:', targetUrl);
+                window.location.href = targetUrl;
                 return;
             }
 
@@ -573,18 +576,10 @@
                 
                 if (pendingNavigation) {
                     console.log('➡️ Navigating to:', pendingNavigation);
-                    
-                    // 使用完整的URL进行跳转
-                    if (PAGE_URLS[pendingNavigation]) {
-                        const targetUrl = PAGE_URLS[pendingNavigation];
-                        console.log('📍 Redirecting to full URL:', targetUrl);
-                        window.location.href = targetUrl;
-                    } else {
-                        // Fallback: 使用相对路径
-                        const fallbackUrl = pendingNavigation + '.html';
-                        console.log('📍 Redirecting to fallback URL:', fallbackUrl);
-                        window.location.href = fallbackUrl;
-                    }
+                    const basePath = getBasePath();
+                    const targetUrl = basePath + pendingNavigation + '.html';
+                    console.log('📍 Redirecting to:', targetUrl);
+                    window.location.href = targetUrl;
                     pendingNavigation = null;
                 }
             } else {
@@ -619,10 +614,7 @@
         window.addEventListener('load', function() {
             console.log('🚀 Index (Menu) loaded');
             console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
-            console.log('📌 Page URLs:');
-            console.log('   Staff Info →', PAGE_URLS.staffinfo);
-            console.log('   Punch Card →', PAGE_URLS.punch);
-            console.log('   Sign Log →', PAGE_URLS.signlog);
+            console.log('📌 Base path:', getBasePath());
             console.log('📍 Current URL:', window.location.href);
             
             setTimeout(testConnection, 500);
@@ -630,7 +622,7 @@
         });
 
         // Console helper for debugging
-        console.log('💡 Tip: Type "PAGE_URLS" to see all page URLs');
+        console.log('💡 Tip: Type "getBasePath()" to see the base path');
         console.log('💡 Tip: Type "window.location.href" to see current URL');
     </script>
 </body>
