@@ -143,6 +143,13 @@
         .menu-btn.teal:hover {
             background: #2c7a7b;
         }
+        .menu-btn.pink {
+            background: #d53f8c;
+            color: white;
+        }
+        .menu-btn.pink:hover {
+            background: #b83280;
+        }
 
         .menu-divider {
             border-top: 2px solid #e2e8f0;
@@ -206,9 +213,9 @@
                 <span class="icon">📇</span>
                 <span class="label" id="menuStaffInfo">Staff Info</span>
             </button>
-            <button class="menu-btn warning" onclick="navigateTo('staffmanagement')">
-                <span class="icon">👥</span>
-                <span class="label" id="menuStaffManagement">Staff Management</span>
+            <button class="menu-btn pink" onclick="navigateTo('punch')">
+                <span class="icon">🕐</span>
+                <span class="label" id="menuPunch">Punch Card Record</span>
             </button>
             <button class="menu-btn purple" onclick="navigateTo('xxx1')">
                 <span class="icon">📁</span>
@@ -351,7 +358,7 @@
                 subtitle: 'Pilih menu di bawah untuk navigasi',
                 signlog: '📝 Daftar / Log Masuk',
                 staffInfo: '📇 Staff Info',
-                staffManagement: '👥 Staff Management',
+                punch: '🕐 Punch Card Record',
                 menu1: '📁 Menu 1',
                 menu2: '📁 Menu 2',
                 menu3: '📁 Menu 3',
@@ -374,7 +381,7 @@
                 subtitle: 'Select a menu below to navigate',
                 signlog: '📝 Sign Up / Login',
                 staffInfo: '📇 Staff Info',
-                staffManagement: '👥 Staff Management',
+                punch: '🕐 Punch Card Record',
                 menu1: '📁 Menu 1',
                 menu2: '📁 Menu 2',
                 menu3: '📁 Menu 3',
@@ -397,7 +404,7 @@
                 subtitle: '选择下方菜单进行导航',
                 signlog: '📝 注册 / 登录',
                 staffInfo: '📇 员工信息',
-                staffManagement: '👥 员工管理',
+                punch: '🕐 打卡记录',
                 menu1: '📁 菜单 1',
                 menu2: '📁 菜单 2',
                 menu3: '📁 菜单 3',
@@ -435,7 +442,7 @@
             document.getElementById('subtitle').textContent = t('subtitle');
             document.getElementById('menuSignLog').textContent = t('signlog');
             document.getElementById('menuStaffInfo').textContent = t('staffInfo');
-            document.getElementById('menuStaffManagement').textContent = t('staffManagement');
+            document.getElementById('menuPunch').textContent = t('punch');
             document.getElementById('menu1').textContent = t('menu1');
             document.getElementById('menu2').textContent = t('menu2');
             document.getElementById('menu3').textContent = t('menu3');
@@ -489,25 +496,26 @@
         }
 
         // ============= NAVIGATION =============
-        const protectedPages = ['staffinfo', 'xxx1', 'xxx2', 'xxx3'];
-        const unprotectedPages = ['staffmanagement'];
+        const protectedPages = ['staffinfo', 'punch', 'xxx1', 'xxx2', 'xxx3'];
+        const unprotectedPages = [];
 
         function navigateTo(page) {
-            if (page === 'staffmanagement') {
-                // 当前页面显示提示
-                showAlert('📍 Staff Management page (demo)', 'info');
-                return;
-            }
-
+            // 直接跳转的页面（不需要认证）
             if (page === 'signlog') {
-                // 跳转到 signlog.html
                 window.location.href = 'signlog.html';
                 return;
             }
 
+            // Staff Info - 需要认证，跳转到 staffinfo.html
             if (page === 'staffinfo') {
-                // 受保护页面，显示认证弹窗
                 pendingNavigation = 'staffinfo';
+                showAuthOverlay();
+                return;
+            }
+
+            // Punch Card Record - 需要认证，跳转到 punch.html
+            if (page === 'punch') {
+                pendingNavigation = 'punch';
                 showAuthOverlay();
                 return;
             }
@@ -550,6 +558,8 @@
                 if (pendingNavigation) {
                     if (pendingNavigation === 'staffinfo') {
                         window.location.href = 'staffinfo.html';
+                    } else if (pendingNavigation === 'punch') {
+                        window.location.href = 'punch.html';
                     } else {
                         showAlert('📍 Halaman "' + pendingNavigation + '" akan dibuka (demo)', 'success');
                     }
@@ -590,6 +600,8 @@
 
         console.log('🚀 Index (Menu) loaded');
         console.log('🔒 Protected pages require login: SIANGSIANG / 0000');
+        console.log('📌 Staff Info → staffinfo.html');
+        console.log('📌 Punch Card Record → punch.html');
     </script>
 </body>
 </html>
