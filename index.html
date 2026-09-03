@@ -208,22 +208,10 @@
         <div id="signupForm" class="hidden">
             <h2 id="signupTitle">📋 Daftar Staf Baru</h2>
             <form id="registerForm">
+                <!-- Group Name - 改为自由输入 -->
                 <div class="form-group">
                     <label class="field-required" id="lblGroupName">Group Name</label>
-                    <select id="sGroupName" required onchange="handleGroupChange()">
-                        <option value="">-- Sila Pilih --</option>
-                        <option value="SIANG SIANG RESTAURANT(BANDAR)">SIANG SIANG RESTAURANT (BANDAR)</option>
-                        <option value="SIANG SIANG RESTAURANT(BATU 4)">SIANG SIANG RESTAURANT (BATU 4)</option>
-                        <option value="YZ UFO">YZ UFO</option>
-                        <option value="YZ CYBER CAFE(BANDAR)">YZ CYBER CAFE (BANDAR)</option>
-                        <option value="YZ CYBER CAFE(SEJATI)">YZ CYBER CAFE (SEJATI)</option>
-                        <option value="CC TELESHOP (KIMFUNG)">CC TELESHOP (KIMFUNG)</option>
-                        <option value="CC TELESHOP (MESRA)">CC TELESHOP (MESRA)</option>
-                        <option value="Others">Others (Lain-lain)</option>
-                    </select>
-                    <div id="otherGroupContainer" class="hidden other-input">
-                        <input type="text" id="OtherGroupInput" placeholder="Sila nyatakan kumpulan lain">
-                    </div>
+                    <input type="text" id="sGroupName" placeholder="Contoh: SIANG SIANG RESTAURANT(BANDAR)" required>
                 </div>
 
                 <div class="form-group">
@@ -485,21 +473,18 @@
                 saving: 'Menyimpan...',
                 selectOption: '-- Sila Pilih --',
                 selectBank: '-- Pilih Bank --',
-                selectGroup: '-- Sila Pilih --',
                 selectGender: '-- Sila Pilih --',
                 selectShift: '-- Sila Pilih --',
                 selectOffDay: '-- Sila Pilih --',
                 selectYesNo: '-- Pilih --',
-                otherGroup: 'Others (Lain-lain)',
-                otherBank: 'Others (Lain-lain)',
                 otherShift: 'Others (Lain-lain)',
                 bankOthers: 'Sila nyatakan bank lain',
-                groupOthers: 'Sila nyatakan kumpulan lain',
                 shiftOthers: 'Contoh: 9AM-5PM',
                 yes: 'YES',
                 no: 'NO',
                 male: 'Lelaki',
                 female: 'Perempuan',
+                groupPlaceholder: 'Contoh: SIANG SIANG RESTAURANT(BANDAR)',
             },
             en: {
                 title: '👤 Staff Management System',
@@ -551,21 +536,18 @@
                 saving: 'Saving...',
                 selectOption: '-- Select --',
                 selectBank: '-- Select Bank --',
-                selectGroup: '-- Select --',
                 selectGender: '-- Select --',
                 selectShift: '-- Select --',
                 selectOffDay: '-- Select --',
                 selectYesNo: '-- Select --',
-                otherGroup: 'Others',
-                otherBank: 'Others',
                 otherShift: 'Others',
                 bankOthers: 'Please specify other bank',
-                groupOthers: 'Please specify other group',
                 shiftOthers: 'Example: 9AM-5PM',
                 yes: 'YES',
                 no: 'NO',
                 male: 'Male',
                 female: 'Female',
+                groupPlaceholder: 'Example: SIANG SIANG RESTAURANT(BANDAR)',
             },
             zh: {
                 title: '👤 员工管理系统',
@@ -617,21 +599,18 @@
                 saving: '保存中...',
                 selectOption: '-- 请选择 --',
                 selectBank: '-- 选择银行 --',
-                selectGroup: '-- 请选择 --',
                 selectGender: '-- 请选择 --',
                 selectShift: '-- 请选择 --',
                 selectOffDay: '-- 请选择 --',
                 selectYesNo: '-- 请选择 --',
-                otherGroup: '其他',
-                otherBank: '其他',
                 otherShift: '其他',
                 bankOthers: '请注明其他银行',
-                groupOthers: '请注明其他组别',
                 shiftOthers: '例如：9AM-5PM',
                 yes: '是',
                 no: '否',
                 male: '男',
                 female: '女',
+                groupPlaceholder: '例如：SIANG SIANG RESTAURANT(BANDAR)',
             }
         };
 
@@ -692,12 +671,18 @@
                     el.textContent = label + (el.classList.contains('field-required') ? ' *' : '');
                 }
             }
+            
+            // Group Name placeholder
+            const groupInput = document.getElementById('sGroupName');
+            if (groupInput) {
+                groupInput.placeholder = t('groupPlaceholder');
+            }
+            
             updateSelectPlaceholders();
         }
 
         function updateSelectPlaceholders() {
             const selects = [
-                { id: 'sGroupName', text: t('selectGroup') },
                 { id: 'sJantina', text: t('selectGender') },
                 { id: 'sShiftType', text: t('selectShift') },
                 { id: 'sOffDay', text: t('selectOffDay') },
@@ -711,23 +696,19 @@
                     el.options[0].text = text;
                 }
             });
-            const groupSel = document.getElementById('sGroupName');
-            if (groupSel) {
-                const opt = groupSel.querySelector('option[value="Others"]');
-                if (opt) opt.text = t('otherGroup');
-            }
+            
             const bankSel = document.getElementById('sBankNama');
             if (bankSel) {
                 const opt = bankSel.querySelector('option[value="Others"]');
-                if (opt) opt.text = t('otherBank');
+                if (opt) opt.text = t('otherShift');
             }
             const shiftSel = document.getElementById('sShiftType');
             if (shiftSel) {
                 const opt = shiftSel.querySelector('option[value="Others"]');
                 if (opt) opt.text = t('otherShift');
             }
+            
             const placeholders = [
-                { id: 'OtherGroupInput', text: t('groupOthers') },
                 { id: 'OtherBankInput', text: t('bankOthers') },
                 { id: 'OtherShiftInput', text: t('shiftOthers') }
             ];
@@ -756,7 +737,6 @@
             document.getElementById('profileView').classList.add('hidden');
             document.getElementById('authSection').classList.add('hidden');
             detectPhoneType();
-            // Reset bank handling
             handleBankChange();
         }
 
@@ -807,17 +787,6 @@
             console.log('📱 Phone Type detected:', device);
         }
 
-        function handleGroupChange() {
-            const sel = document.getElementById('sGroupName');
-            const container = document.getElementById('otherGroupContainer');
-            if (sel.value === 'Others') {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-                document.getElementById('OtherGroupInput').value = '';
-            }
-        }
-
         function handleShiftChange() {
             const sel = document.getElementById('sShiftType');
             const container = document.getElementById('otherShiftContainer');
@@ -829,16 +798,14 @@
             }
         }
 
-        // ============= UPDATED BANK HANDLING =============
+        // ============= BANK HANDLING =============
         function handleBankChange() {
             const bank = document.getElementById('sBankNama').value;
             const otherContainer = document.getElementById('otherBankContainer');
             
-            // 需要设为 "-" 且只读的字段
             const fieldsToDisable = ['sBankAccountNo', 'sEPF', 'sPERKESO', 'sEIS'];
             
             if (bank === 'CASH' || bank === 'MECHANTRADE') {
-                // 启用 "只读" 模式
                 fieldsToDisable.forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
@@ -850,7 +817,6 @@
                     }
                 });
             } else {
-                // 恢复正常模式
                 fieldsToDisable.forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
@@ -863,7 +829,6 @@
                 });
             }
             
-            // 处理 "Others" 银行
             if (bank === 'Others') {
                 otherContainer.classList.remove('hidden');
             } else {
@@ -918,23 +883,14 @@
             const bank = document.getElementById('sBankNama').value;
             const accInput = document.getElementById('sBankAccountNo');
             
-            // 如果不是 CASH/MECHANTRADE，需要检查 BankAccountNo
             if (bank !== 'CASH' && bank !== 'MECHANTRADE' && !accInput.value.trim()) {
                 showAlert('Sila masukkan Bank Account No.');
                 accInput.focus();
                 return;
             }
             
-            let groupVal = document.getElementById('sGroupName').value;
-            if (groupVal === 'Others') {
-                const other = document.getElementById('OtherGroupInput').value.trim();
-                if (!other) {
-                    showAlert('Sila nyatakan kumpulan lain');
-                    document.getElementById('OtherGroupInput').focus();
-                    return;
-                }
-                groupVal = other;
-            }
+            // ✅ Group Name 直接从输入框获取
+            const groupVal = document.getElementById('sGroupName').value.trim();
             
             let bankVal = document.getElementById('sBankNama').value;
             if (bankVal === 'Others') {
@@ -960,7 +916,6 @@
 
             const phoneType = document.getElementById('sPhoneType').value || 'Unknown';
 
-            // ✅ 构建数据对象 - 不包含 Holidays
             const data = {
                 GroupName: groupVal,
                 Code: document.getElementById('sCode').value.trim(),
@@ -1012,9 +967,7 @@
                     showAlert('✅ Pendaftaran berjaya!', 'success');
                     document.getElementById('registerForm').reset();
                     document.getElementById('otherBankContainer').classList.add('hidden');
-                    document.getElementById('otherGroupContainer').classList.add('hidden');
                     document.getElementById('otherShiftContainer').classList.add('hidden');
-                    // Reset bank handling
                     handleBankChange();
                     setTimeout(showLogin, 1500);
                 } else {
@@ -1141,7 +1094,6 @@
 
         // ============= GET MALAYSIA TIME =============
         function getMalaysiaTimeISO() {
-            // Malaysia is UTC+8
             const now = new Date();
             const malaysiaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
             return malaysiaTime.toISOString().replace('Z', '');
@@ -1159,7 +1111,6 @@
                 Name: currentUser.Name || '',
                 Jantina: currentUser.Jantina || '',
                 TarikhLahir: currentUser.TarikhLahir || '',
-                // ✅ 不发送 Holidays - 让 Google Sheet 保持原值
                 Salary: currentUser.Salary || '',
                 IC: currentUser.IC || '',
                 Jawatan: currentUser.Jawatan || '',
@@ -1209,7 +1160,6 @@
             detectPhoneType();
             setTimeout(testConnection, 500);
             setLanguage('ms');
-            // Initialize bank handling
             handleBankChange();
         });
 
