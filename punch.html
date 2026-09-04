@@ -77,7 +77,7 @@
         .status-bar.error { background: #fed7d7; color: #9b2c2c; }
         .status-bar.info { background: #bee3f8; color: #2a4365; }
 
-        /* Clock Display */
+        /* Clock Display - only shown when logged in */
         .clock-display {
             background: #f7fafc;
             border-radius: 16px;
@@ -105,7 +105,7 @@
 
         /* Login Form */
         .login-form {
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
         .input-group {
             margin-bottom: 14px;
@@ -283,6 +283,23 @@
             flex: 1;
         }
 
+        .test-conn-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        .test-conn-row .btn {
+            width: auto;
+            padding: 8px 18px;
+            font-size: 13px;
+        }
+        .test-conn-row .result {
+            font-size: 13px;
+            color: #718096;
+        }
+
         @media (max-width: 480px) {
             .container { padding: 20px 16px; }
             .clock-display .time { font-size: 32px; }
@@ -308,13 +325,6 @@
         <!-- Status Bar -->
         <div id="statusBar" class="status-bar">🔌 Menyambung ke Google Sheet...</div>
 
-        <!-- Clock Display -->
-        <div class="clock-display">
-            <div class="time" id="clockTime">--:--:--</div>
-            <div class="date" id="clockDate">Loading...</div>
-            <div class="timezone">⏰ Waktu Malaysia (UTC+8)</div>
-        </div>
-
         <!-- ===== LOGIN PANEL ===== -->
         <div id="loginPanel">
             <div class="login-form">
@@ -335,15 +345,22 @@
                 <div style="margin-top: 12px; font-size: 13px; color: #718096;">
                     <span>🔐 Sesi kekal 48 jam selepas log masuk</span>
                 </div>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-outline btn-sm" id="testConnBtn" style="display: inline-block; width: auto;">🔧 Test Connection</button>
-                    <span id="testResult" style="margin-left: 10px; font-size: 13px; color: #718096;"></span>
+                <div class="test-conn-row">
+                    <button class="btn btn-outline btn-sm" id="testConnBtn">🔧 Test Connection</button>
+                    <span class="result" id="testResult"></span>
                 </div>
             </div>
         </div>
 
         <!-- ===== LOGGED IN PANEL ===== -->
         <div id="loggedInPanel" class="hidden">
+            <!-- Clock Display - only shown when logged in -->
+            <div class="clock-display">
+                <div class="time" id="clockTime">--:--:--</div>
+                <div class="date" id="clockDate">Loading...</div>
+                <div class="timezone">⏰ Waktu Malaysia (UTC+8)</div>
+            </div>
+
             <!-- User Badge -->
             <div class="user-badge">
                 <div class="info">
@@ -384,6 +401,7 @@
         // ============= STATE =============
         let currentLanguage = 'ms';
         let sessionData = null;
+        let clockInterval = null;
 
         // ============= TRANSLATIONS =============
         const translations = {
@@ -510,8 +528,19 @@
             const opts = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
             document.getElementById('clockDate').textContent = dt.toLocaleDateString('ms-MY', opts);
         }
-        updateClock();
-        setInterval(updateClock, 1000);
+
+        function startClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            updateClock();
+            clockInterval = setInterval(updateClock, 1000);
+        }
+
+        function stopClock() {
+            if (clockInterval) {
+                clearInterval(clockInterval);
+                clockInterval = null;
+            }
+        }
 
         // ============= STATUS BAR =============
         function updateStatus(msg, type = '') {
@@ -555,12 +584,16 @@
                 document.getElementById('displayCode').textContent = session.code;
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
+                // Start clock when logged in
+                startClock();
             } else {
                 document.getElementById('loginPanel').classList.remove('hidden');
                 document.getElementById('loggedInPanel').classList.add('hidden');
                 document.getElementById('loginPass').value = '';
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
+                // Stop clock when logged out
+                stopClock();
             }
         }
 
@@ -601,8 +634,6 @@
             }
 
             // Simulate login - in production, validate against Google Sheet
-            // For demo, accept any non-empty credentials
-            // But we'll simulate a simple validation
             if (user.length < 3 || code.length < 2 || pass.length < 2) {
                 const msg = document.getElementById('loginMsg');
                 msg.textContent = t('loginError');
@@ -665,7 +696,6 @@
 
             document.getElementById('actionMsg').textContent = '⏳ ' + t('backup') + '...';
             
-            // Simulate backup
             const payload = {
                 user: session.user,
                 code: session.code,
@@ -703,7 +733,6 @@
 
             console.log(`[${action}]`, payload);
 
-            // Send to Google Apps Script
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -727,7 +756,6 @@
             const session = getSession();
             if (session) {
                 applySession(session);
-                // Auto welcome message
                 const msg = document.getElementById('punchMsg');
                 msg.textContent = t('welcome') + session.user;
                 msg.className = 'msg info';
@@ -758,7 +786,6 @@
             document.getElementById('backLink').addEventListener('click', (e) => {
                 e.preventDefault();
                 document.getElementById('actionMsg').textContent = '🔙 Kembali ke menu utama';
-                // In production: window.location.href = 'https://yzcorpsdk2-ctrl.github.io/.github.io/index.html';
             });
 
             // Enter key on login
