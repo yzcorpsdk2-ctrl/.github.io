@@ -74,6 +74,7 @@
         .status-bar.success { background: #c6f6d5; color: #22543d; }
         .status-bar.error { background: #fed7d7; color: #9b2c2c; }
         .status-bar.info { background: #bee3f8; color: #2a4365; }
+        .status-bar.warning { background: #fefcbf; color: #744210; }
 
         .clock-display {
             background: #f7fafc;
@@ -176,6 +177,14 @@
             background: #9b2c2c;
         }
 
+        .btn-warning {
+            background: #d69e2e;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #b7791f;
+        }
+
         .btn-outline {
             background: transparent;
             color: #1a3a5c;
@@ -190,6 +199,14 @@
             padding: 10px 16px;
             font-size: 13px;
             width: auto;
+        }
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         .user-badge {
@@ -254,6 +271,11 @@
             background: #bee3f8;
             color: #2a4365;
         }
+        .msg.warning {
+            display: block;
+            background: #fefcbf;
+            color: #744210;
+        }
 
         .divider {
             border-top: 2px solid #e2e8f0;
@@ -264,6 +286,27 @@
             color: #a0aec0;
             font-size: 12px;
             margin-top: 16px;
+        }
+
+        .punch-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .punch-status.clocked-in {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .punch-status.clocked-out {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+        .punch-status.no-record {
+            background: #edf2f7;
+            color: #4a5568;
         }
 
         @media (max-width: 480px) {
@@ -325,6 +368,12 @@
                 <button class="btn btn-danger btn-sm" id="logoutBtn">🚪 Keluar</button>
             </div>
 
+            <!-- Punch Status -->
+            <div id="punchStatusContainer">
+                <div id="punchStatus" class="punch-status no-record">⏳ Belum punch</div>
+            </div>
+
+            <!-- Punch Button -->
             <button class="btn btn-success" id="punchBtn">✅ Punch / 打卡签到</button>
             <div id="punchMsg" class="msg success"></div>
 
@@ -346,7 +395,7 @@
 
     <script>
         // ============= CONFIG =============
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxt0IXbzrNYOa1NWvknyd3poLAT8KEc1ucZJpaJ_E7473bIj5N_KP6kr5dSWtElrx_d/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjv9pL3y6tmpKb7_bBUCddXhAVxzrRUze_jgIC4ZgGGpFClFPw0IUYIsNkMYlmrtwJ/exec';
         const STORAGE_KEY = 'yz_punch_session';
         const SESSION_TTL = 48 * 60 * 60 * 1000;
 
@@ -354,7 +403,7 @@
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
-        let staffData = null;
+        let punchStatus = 'none'; // 'none', 'clocked_in', 'clocked_out'
 
         // ============= TRANSLATIONS =============
         const translations = {
@@ -368,6 +417,8 @@
                 loginSuccess: '✅ Log masuk berjaya!',
                 logout: '🚪 Keluar',
                 punch: '✅ Punch / 打卡签到',
+                punchIn: '✅ Punch Masuk',
+                punchOut: '✅ Punch Keluar',
                 punchSuccess: '✅ Punch berjaya! Rekod disimpan ke Google Sheet',
                 punchError: '❌ Punch gagal, sila cuba lagi',
                 backup: '📤 Backup ke Google Sheet',
@@ -381,7 +432,11 @@
                 sessionExpired: '⚠️ Sesi tamat tempoh. Sila log masuk semula.',
                 backupSuccess: '✅ Backup berjaya!',
                 backupFail: '❌ Backup gagal: ',
-                welcome: '👋 Selamat datang, '
+                welcome: '👋 Selamat datang, ',
+                clockedIn: '✅ Telah punch masuk',
+                clockedOut: '❌ Telah punch keluar',
+                noRecord: '⏳ Belum punch',
+                alreadyClockedOut: '⚠️ Anda telah punch keluar untuk hari ini'
             },
             en: {
                 title: 'Punch Card System',
@@ -393,6 +448,8 @@
                 loginSuccess: '✅ Login successful!',
                 logout: '🚪 Logout',
                 punch: '✅ Punch In',
+                punchIn: '✅ Punch In',
+                punchOut: '✅ Punch Out',
                 punchSuccess: '✅ Punch successful! Record saved to Google Sheet',
                 punchError: '❌ Punch failed, please try again',
                 backup: '📤 Backup to Google Sheet',
@@ -406,7 +463,11 @@
                 sessionExpired: '⚠️ Session expired. Please login again.',
                 backupSuccess: '✅ Backup successful!',
                 backupFail: '❌ Backup failed: ',
-                welcome: '👋 Welcome, '
+                welcome: '👋 Welcome, ',
+                clockedIn: '✅ Clocked in',
+                clockedOut: '❌ Clocked out',
+                noRecord: '⏳ Not punched yet',
+                alreadyClockedOut: '⚠️ You have already clocked out for today'
             },
             zh: {
                 title: '打卡记录系统',
@@ -418,6 +479,8 @@
                 loginSuccess: '✅ 登录成功！',
                 logout: '🚪 退出',
                 punch: '✅ 打卡签到',
+                punchIn: '✅ 上班打卡',
+                punchOut: '✅ 下班打卡',
                 punchSuccess: '✅ 打卡成功！记录已保存至 Google Sheet',
                 punchError: '❌ 打卡失败，请重试',
                 backup: '📤 备份至 Google Sheet',
@@ -431,7 +494,11 @@
                 sessionExpired: '⚠️ 会话已过期，请重新登录。',
                 backupSuccess: '✅ 备份成功！',
                 backupFail: '❌ 备份失败：',
-                welcome: '👋 欢迎，'
+                welcome: '👋 欢迎，',
+                clockedIn: '✅ 已上班打卡',
+                clockedOut: '❌ 已下班打卡',
+                noRecord: '⏳ 尚未打卡',
+                alreadyClockedOut: '⚠️ 您今天已下班打卡'
             }
         };
 
@@ -444,6 +511,7 @@
                 b.classList.toggle('active', b.dataset.lang === lang);
             });
             updateAllTexts();
+            updatePunchButton();
         }
 
         function updateAllTexts() {
@@ -453,7 +521,6 @@
             document.getElementById('lblPass').textContent = t('passLabel');
             document.getElementById('loginBtn').textContent = t('loginBtn');
             document.getElementById('logoutBtn').textContent = t('logout');
-            document.getElementById('punchBtn').textContent = t('punch');
             document.getElementById('backupBtn').textContent = t('backup');
             document.getElementById('renewBtn').textContent = t('renew');
             document.getElementById('backLink').textContent = t('back');
@@ -520,14 +587,12 @@
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
             sessionData = payload;
-            staffData = userData;
             applySession(payload);
         }
 
         function clearSession() {
             localStorage.removeItem(STORAGE_KEY);
             sessionData = null;
-            staffData = null;
             applySession(null);
         }
 
@@ -544,6 +609,9 @@
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
                 startClock();
+                
+                // Check punch status for today
+                checkPunchStatus(session.code);
             } else {
                 document.getElementById('loginPanel').classList.remove('hidden');
                 document.getElementById('loggedInPanel').classList.add('hidden');
@@ -551,6 +619,7 @@
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
                 stopClock();
+                punchStatus = 'none';
             }
         }
 
@@ -597,17 +666,107 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (data && data.status === 'success' && data.data && data.data.length > 0) {
-                        updateStatus(t('connected') + ' ' + data.data.length + ' rekod ditemui.', 'success');
-                        resolve(data.data);
+                    if (data && data.length > 0) {
+                        updateStatus(t('connected') + ' ' + data.length + ' rekod ditemui.', 'success');
+                        resolve(data);
                     } else {
-                        throw new Error(data.message || 'No data found');
+                        throw new Error('No data found');
                     }
                 })
                 .catch(err => {
                     updateStatus(t('connectionFail') + err.message, 'error');
                     reject(err);
                 });
+            });
+        }
+
+        // ============= CHECK PUNCH STATUS =============
+        function checkPunchStatus(code) {
+            fetch(SCRIPT_URL + '?action=getPunchRecord&code=' + encodeURIComponent(code))
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const record = data[0];
+                    if (record[6] && record[6].toString().trim() !== '') {
+                        // Has clock out
+                        punchStatus = 'clocked_out';
+                    } else if (record[4] && record[4].toString().trim() !== '') {
+                        // Has clock in, no clock out
+                        punchStatus = 'clocked_in';
+                    } else {
+                        punchStatus = 'none';
+                    }
+                } else {
+                    punchStatus = 'none';
+                }
+                updatePunchStatus();
+                updatePunchButton();
+            })
+            .catch(err => {
+                console.error('Error checking punch status:', err);
+                punchStatus = 'none';
+                updatePunchStatus();
+                updatePunchButton();
+            });
+        }
+
+        // ============= UPDATE PUNCH STATUS =============
+        function updatePunchStatus() {
+            const el = document.getElementById('punchStatus');
+            if (punchStatus === 'clocked_in') {
+                el.textContent = t('clockedIn');
+                el.className = 'punch-status clocked-in';
+            } else if (punchStatus === 'clocked_out') {
+                el.textContent = t('clockedOut');
+                el.className = 'punch-status clocked-out';
+            } else {
+                el.textContent = t('noRecord');
+                el.className = 'punch-status no-record';
+            }
+        }
+
+        // ============= UPDATE PUNCH BUTTON =============
+        function updatePunchButton() {
+            const btn = document.getElementById('punchBtn');
+            if (punchStatus === 'clocked_in') {
+                btn.textContent = '🔴 ' + t('punchOut');
+                btn.className = 'btn btn-danger';
+                btn.disabled = false;
+            } else if (punchStatus === 'clocked_out') {
+                btn.textContent = '⛔ ' + t('punch');
+                btn.className = 'btn btn-warning btn-disabled';
+                btn.disabled = true;
+            } else {
+                btn.textContent = '🟢 ' + t('punchIn');
+                btn.className = 'btn btn-success';
+                btn.disabled = false;
+            }
+        }
+
+        // ============= UPDATE PHONE TYPE =============
+        function updatePhoneTypeInSheet(code, phoneType) {
+            const payload = {
+                action: 'UPDATE_PHONE_TYPE',
+                data: {
+                    code: code,
+                    phoneType: phoneType,
+                    timestamp: new Date().toISOString()
+                }
+            };
+
+            console.log('[UPDATE_PHONE_TYPE]', payload);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                console.log(`✅ PhoneType updated for ${code}: ${phoneType}`);
+            })
+            .catch(err => {
+                console.error(`❌ PhoneType update failed:`, err);
             });
         }
 
@@ -626,7 +785,6 @@
             try {
                 const staffList = await fetchStaffData();
                 
-                // Find matching staff: Code at index 2, LoginPassword at index 26
                 const matchedStaff = staffList.find(row => {
                     const staffCode = row[2] || '';
                     const staffPass = row[26] || '';
@@ -670,13 +828,25 @@
                     };
 
                     setSession(userData);
+                    
+                    updatePhoneTypeInSheet(userData.Code, deviceInfo);
 
-                    // Send login data to Google Sheet (updates PhoneType and logs to PUNCH sheet)
-                    await sendToSheet('LOGIN', { 
-                        code: userData.Code, 
-                        name: userData.Name,
-                        device: deviceInfo,
-                        phoneType: userData.PhoneType
+                    // Log login with device info
+                    const loginPayload = {
+                        action: 'LOGIN',
+                        data: {
+                            code: userData.Code,
+                            name: userData.Name,
+                            device: deviceInfo,
+                            phoneType: userData.PhoneType
+                        }
+                    };
+
+                    fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(loginPayload)
                     });
 
                     const msg = document.getElementById('loginMsg');
@@ -709,24 +879,61 @@
                 return;
             }
 
+            if (punchStatus === 'clocked_out') {
+                const msg = document.getElementById('punchMsg');
+                msg.textContent = t('alreadyClockedOut');
+                msg.className = 'msg warning';
+                return;
+            }
+
+            const deviceInfo = getDeviceInfo();
             const now = getMalaysiaTime();
             const timeStr = now.toLocaleString('ms-MY', { hour12: false });
-            const deviceInfo = getDeviceInfo();
             
             const payload = {
-                code: session.code,
-                name: session.name,
-                timestamp: now.toISOString(),
-                time: timeStr,
-                device: deviceInfo,
-                action: 'PUNCH_IN'
+                action: 'PUNCH',
+                data: {
+                    code: session.code,
+                    name: session.name,
+                    device: deviceInfo,
+                    timestamp: now.toISOString()
+                }
             };
 
             const msg = document.getElementById('punchMsg');
-            msg.textContent = t('punchSuccess') + ' (' + timeStr + ')';
-            msg.className = 'msg success';
+            msg.textContent = '⏳ Memproses...';
+            msg.className = 'msg info';
 
-            sendToSheet('PUNCH', payload);
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    if (result.action === 'CLOCK_IN') {
+                        punchStatus = 'clocked_in';
+                        msg.textContent = '✅ ' + t('punchIn') + ' (' + timeStr + ')';
+                        msg.className = 'msg success';
+                    } else if (result.action === 'CLOCK_OUT') {
+                        punchStatus = 'clocked_out';
+                        msg.textContent = '✅ ' + t('punchOut') + ' (' + timeStr + ')';
+                        msg.className = 'msg success';
+                    }
+                    updatePunchStatus();
+                    updatePunchButton();
+                } else {
+                    msg.textContent = '❌ ' + (result.error || t('punchError'));
+                    msg.className = 'msg error';
+                }
+            })
+            .catch(err => {
+                msg.textContent = '❌ ' + t('punchError') + ': ' + err.message;
+                msg.className = 'msg error';
+                console.error('Punch error:', err);
+            });
         }
 
         // ============= BACKUP =============
@@ -740,15 +947,28 @@
             document.getElementById('actionMsg').textContent = '⏳ ' + t('backup') + '...';
             
             const payload = {
-                code: session.code,
-                name: session.name,
-                action: 'MANUAL_BACKUP',
-                timestamp: new Date().toISOString()
+                action: 'BACKUP',
+                data: {
+                    code: session.code,
+                    name: session.name,
+                    timestamp: new Date().toISOString()
+                }
             };
 
-            sendToSheet('BACKUP', payload);
-            document.getElementById('actionMsg').textContent = t('backupSuccess');
-            setTimeout(() => { document.getElementById('actionMsg').textContent = ''; }, 3000);
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                document.getElementById('actionMsg').textContent = t('backupSuccess');
+                setTimeout(() => { document.getElementById('actionMsg').textContent = ''; }, 3000);
+            })
+            .catch(err => {
+                document.getElementById('actionMsg').textContent = t('backupFail') + err.message;
+                console.error('Backup error:', err);
+            });
         }
 
         // ============= RENEW SESSION =============
@@ -764,31 +984,6 @@
             sessionData = newSession;
             document.getElementById('actionMsg').textContent = t('renewSuccess');
             setTimeout(() => { document.getElementById('actionMsg').textContent = ''; }, 3000);
-        }
-
-        // ============= SEND TO GOOGLE SHEET =============
-        function sendToSheet(action, data) {
-            const payload = {
-                action: action,
-                data: data,
-                timestamp: new Date().toISOString()
-            };
-
-            console.log(`[${action}]`, payload);
-
-            return fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                console.log(`✅ ${action} sent to Google Sheet`);
-            })
-            .catch(err => {
-                console.error(`❌ ${action} failed:`, err);
-                throw err;
-            });
         }
 
         // ============= INIT =============
