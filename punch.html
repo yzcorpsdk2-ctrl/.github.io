@@ -346,7 +346,7 @@
 
     <script>
         // ============= CONFIG =============
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxt0IXbzrNYOa1NWvknyd3poLAT8KEc1ucZJpaJ_E7473bIj5N_KP6kr5dSWtElrx_d/exec';
         const STORAGE_KEY = 'yz_punch_session';
         const SESSION_TTL = 48 * 60 * 60 * 1000;
 
@@ -597,43 +597,17 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (data && data.length > 0) {
-                        updateStatus(t('connected') + ' ' + data.length + ' rekod ditemui.', 'success');
-                        resolve(data);
+                    if (data && data.status === 'success' && data.data && data.data.length > 0) {
+                        updateStatus(t('connected') + ' ' + data.data.length + ' rekod ditemui.', 'success');
+                        resolve(data.data);
                     } else {
-                        throw new Error('No data found');
+                        throw new Error(data.message || 'No data found');
                     }
                 })
                 .catch(err => {
                     updateStatus(t('connectionFail') + err.message, 'error');
                     reject(err);
                 });
-            });
-        }
-
-        // ============= UPDATE PHONE TYPE IN GOOGLE SHEET =============
-        function updatePhoneTypeInSheet(code, phoneType) {
-            const payload = {
-                action: 'UPDATE_PHONE_TYPE',
-                code: code,
-                phoneType: phoneType,
-                timestamp: new Date().toISOString()
-            };
-
-            console.log('[UPDATE_PHONE_TYPE]', payload);
-
-            // Send to Google Apps Script
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                console.log(`✅ PhoneType updated for ${code}: ${phoneType}`);
-            })
-            .catch(err => {
-                console.error(`❌ PhoneType update failed:`, err);
             });
         }
 
@@ -690,18 +664,15 @@
                         Lindungan: matchedStaff[24] || '',
                         YellowCard: matchedStaff[25] || '',
                         LoginPassword: matchedStaff[26] || '',
-                        PhoneType: deviceInfo,  // Store current device info
+                        PhoneType: deviceInfo,
                         UpdateDate: new Date().toISOString(),
                         SignupDate: matchedStaff[29] || ''
                     };
 
                     setSession(userData);
-                    
-                    // Update PhoneType in Google Sheet (column 28, index 27)
-                    updatePhoneTypeInSheet(userData.Code, deviceInfo);
 
-                    // Log login with device info
-                    logToSheet('LOGIN', { 
+                    // Send login data to Google Sheet (updates PhoneType and logs to PUNCH sheet)
+                    await sendToSheet('LOGIN', { 
                         code: userData.Code, 
                         name: userData.Name,
                         device: deviceInfo,
@@ -755,7 +726,7 @@
             msg.textContent = t('punchSuccess') + ' (' + timeStr + ')';
             msg.className = 'msg success';
 
-            logToSheet('PUNCH', payload);
+            sendToSheet('PUNCH', payload);
         }
 
         // ============= BACKUP =============
@@ -775,7 +746,7 @@
                 timestamp: new Date().toISOString()
             };
 
-            logToSheet('BACKUP', payload);
+            sendToSheet('BACKUP', payload);
             document.getElementById('actionMsg').textContent = t('backupSuccess');
             setTimeout(() => { document.getElementById('actionMsg').textContent = ''; }, 3000);
         }
@@ -795,8 +766,8 @@
             setTimeout(() => { document.getElementById('actionMsg').textContent = ''; }, 3000);
         }
 
-        // ============= LOG TO GOOGLE SHEET =============
-        function logToSheet(action, data) {
+        // ============= SEND TO GOOGLE SHEET =============
+        function sendToSheet(action, data) {
             const payload = {
                 action: action,
                 data: data,
@@ -805,7 +776,7 @@
 
             console.log(`[${action}]`, payload);
 
-            fetch(SCRIPT_URL, {
+            return fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
@@ -816,6 +787,7 @@
             })
             .catch(err => {
                 console.error(`❌ ${action} failed:`, err);
+                throw err;
             });
         }
 
