@@ -403,7 +403,8 @@
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
-        let punchStatus = 'none'; // 'none', 'clocked_in', 'clocked_out'
+        let punchStatus = 'none';
+        let isProcessing = false;
 
         // ============= TRANSLATIONS =============
         const translations = {
@@ -610,7 +611,6 @@
                 document.getElementById('punchMsg').className = 'msg';
                 startClock();
                 
-                // Check punch status for today
                 checkPunchStatus(session.code);
             } else {
                 document.getElementById('loginPanel').classList.remove('hidden');
@@ -688,10 +688,8 @@
                 if (data && data.length > 0) {
                     const record = data[0];
                     if (record[6] && record[6].toString().trim() !== '') {
-                        // Has clock out
                         punchStatus = 'clocked_out';
                     } else if (record[4] && record[4].toString().trim() !== '') {
-                        // Has clock in, no clock out
                         punchStatus = 'clocked_in';
                     } else {
                         punchStatus = 'none';
@@ -728,6 +726,13 @@
         // ============= UPDATE PUNCH BUTTON =============
         function updatePunchButton() {
             const btn = document.getElementById('punchBtn');
+            if (isProcessing) {
+                btn.textContent = '⏳ Memproses...';
+                btn.className = 'btn btn-warning';
+                btn.disabled = true;
+                return;
+            }
+            
             if (punchStatus === 'clocked_in') {
                 btn.textContent = '🔴 ' + t('punchOut');
                 btn.className = 'btn btn-danger';
@@ -753,8 +758,6 @@
                     timestamp: new Date().toISOString()
                 }
             };
-
-            console.log('[UPDATE_PHONE_TYPE]', payload);
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -831,7 +834,6 @@
                     
                     updatePhoneTypeInSheet(userData.Code, deviceInfo);
 
-                    // Log login with device info
                     const loginPayload = {
                         action: 'LOGIN',
                         data: {
@@ -869,7 +871,7 @@
             }
         }
 
-        // ============= PUNCH =============
+        // ============= PUNCH (FIXED) =============
         function performPunch() {
             const session = getSession();
             if (!session) {
@@ -885,6 +887,10 @@
                 msg.className = 'msg warning';
                 return;
             }
+
+            if (isProcessing) return;
+            isProcessing = true;
+            updatePunchButton();
 
             const deviceInfo = getDeviceInfo();
             const now = getMalaysiaTime();
@@ -904,7 +910,7 @@
             msg.textContent = '⏳ Memproses...';
             msg.className = 'msg info';
 
-            // 使用 no-cors 模式发送请求
+            // 发送打卡请求
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -912,28 +918,30 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                // 由于 no-cors 模式无法读取响应，我们需要再次查询打卡状态来确认
-                // 先显示成功消息
-                if (punchStatus === 'clocked_in') {
-                    punchStatus = 'clocked_out';
-                    msg.textContent = '✅ ' + t('punchOut') + ' (' + timeStr + ')';
-                } else {
-                    punchStatus = 'clocked_in';
-                    msg.textContent = '✅ ' + t('punchIn') + ' (' + timeStr + ')';
-                }
-                msg.className = 'msg success';
-                updatePunchStatus();
-                updatePunchButton();
-                
-                // 延迟后重新查询状态确认
+                // 等待2秒后重新查询状态
                 setTimeout(() => {
                     checkPunchStatus(session.code);
-                }, 2000);
+                    
+                    // 更新消息
+                    if (punchStatus === 'clocked_in') {
+                        msg.textContent = '✅ ' + t('punchIn') + ' (' + timeStr + ')';
+                    } else if (punchStatus === 'clocked_out') {
+                        msg.textContent = '✅ ' + t('punchOut') + ' (' + timeStr + ')';
+                    } else {
+                        msg.textContent = '✅ ' + t('punchSuccess') + ' (' + timeStr + ')';
+                    }
+                    msg.className = 'msg success';
+                    
+                    isProcessing = false;
+                    updatePunchButton();
+                }, 2500);
             })
             .catch(err => {
                 msg.textContent = '❌ ' + t('punchError') + ': ' + err.message;
                 msg.className = 'msg error';
                 console.error('Punch error:', err);
+                isProcessing = false;
+                updatePunchButton();
             });
         }
 
