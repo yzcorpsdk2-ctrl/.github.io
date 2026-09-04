@@ -39,7 +39,6 @@
             margin-bottom: 20px;
         }
 
-        /* Language Bar */
         .lang-bar {
             display: flex;
             justify-content: center;
@@ -63,7 +62,6 @@
             color: white;
         }
 
-        /* Status Bar */
         .status-bar {
             background: #edf2f7;
             padding: 10px 14px;
@@ -77,7 +75,6 @@
         .status-bar.error { background: #fed7d7; color: #9b2c2c; }
         .status-bar.info { background: #bee3f8; color: #2a4365; }
 
-        /* Clock Display */
         .clock-display {
             background: #f7fafc;
             border-radius: 16px;
@@ -103,7 +100,6 @@
             margin-top: 2px;
         }
 
-        /* Login Form */
         .login-form {
             margin-bottom: 0;
         }
@@ -134,7 +130,6 @@
             box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
         }
 
-        /* Buttons */
         .btn {
             padding: 14px 20px;
             border: none;
@@ -197,7 +192,6 @@
             width: auto;
         }
 
-        /* User Badge */
         .user-badge {
             background: #f7fafc;
             border-radius: 12px;
@@ -225,7 +219,6 @@
             font-size: 14px;
         }
 
-        /* Action Buttons Row */
         .action-row {
             display: flex;
             gap: 10px;
@@ -235,12 +228,10 @@
             flex: 1;
         }
 
-        /* Hidden */
         .hidden {
             display: none !important;
         }
 
-        /* Message */
         .msg {
             padding: 10px 14px;
             border-radius: 10px;
@@ -275,14 +266,6 @@
             margin-top: 16px;
         }
 
-        .flex-row {
-            display: flex;
-            gap: 10px;
-        }
-        .flex-row .btn {
-            flex: 1;
-        }
-
         @media (max-width: 480px) {
             .container { padding: 20px 16px; }
             .clock-display .time { font-size: 32px; }
@@ -298,14 +281,12 @@
         <h1 id="mainTitle">Sistem Punch Card</h1>
         <p class="subtitle" id="subtitle">Rekod kehadiran & backup ke Google Sheet</p>
 
-        <!-- Language Bar -->
         <div class="lang-bar">
             <button class="lang-btn active" data-lang="ms" onclick="setLanguage('ms')">Bahasa Melayu</button>
             <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
             <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
         </div>
 
-        <!-- Status Bar -->
         <div id="statusBar" class="status-bar">🔌 Menyambung ke Google Sheet...</div>
 
         <!-- ===== LOGIN PANEL ===== -->
@@ -329,14 +310,12 @@
 
         <!-- ===== LOGGED IN PANEL ===== -->
         <div id="loggedInPanel" class="hidden">
-            <!-- Clock Display -->
             <div class="clock-display">
                 <div class="time" id="clockTime">--:--:--</div>
                 <div class="date" id="clockDate">Loading...</div>
                 <div class="timezone">⏰ Waktu Malaysia (UTC+8)</div>
             </div>
 
-            <!-- User Badge -->
             <div class="user-badge">
                 <div class="info">
                     <div><span class="label">👤 Nama</span><br><span class="value" id="displayName">-</span></div>
@@ -346,11 +325,9 @@
                 <button class="btn btn-danger btn-sm" id="logoutBtn">🚪 Keluar</button>
             </div>
 
-            <!-- Punch Action -->
             <button class="btn btn-success" id="punchBtn">✅ Punch / 打卡签到</button>
             <div id="punchMsg" class="msg success"></div>
 
-            <!-- Action Row -->
             <div class="action-row">
                 <button class="btn btn-outline btn-sm" id="backupBtn">📤 Backup ke Google Sheet</button>
                 <button class="btn btn-outline btn-sm" id="renewBtn">🔄 Perbaharui Sesi</button>
@@ -359,7 +336,6 @@
 
             <div class="divider"></div>
 
-            <!-- Back Link -->
             <a href="#" id="backLink" style="color: #1a3a5c; text-decoration: none; font-weight: 600; font-size: 14px;">
                 ← Kembali ke Menu
             </a>
@@ -372,13 +348,13 @@
         // ============= CONFIG =============
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec';
         const STORAGE_KEY = 'yz_punch_session';
-        const SESSION_TTL = 48 * 60 * 60 * 1000; // 48 hours
+        const SESSION_TTL = 48 * 60 * 60 * 1000;
 
         // ============= STATE =============
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
-        let staffData = null; // Store full staff data
+        let staffData = null;
 
         // ============= TRANSLATIONS =============
         const translations = {
@@ -484,7 +460,7 @@
             document.getElementById('footerText').textContent = t('footer');
         }
 
-        // ============= CLOCK (Malaysia Time UTC+8) =============
+        // ============= CLOCK =============
         function getMalaysiaTime() {
             const now = new Date();
             const ms = now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000);
@@ -497,7 +473,6 @@
             const mm = String(dt.getMinutes()).padStart(2, '0');
             const ss = String(dt.getSeconds()).padStart(2, '0');
             document.getElementById('clockTime').textContent = `${hh}:${mm}:${ss}`;
-            
             const opts = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
             document.getElementById('clockDate').textContent = dt.toLocaleDateString('ms-MY', opts);
         }
@@ -540,6 +515,7 @@
             const payload = { 
                 code: userData.Code,
                 name: userData.Name,
+                phoneType: userData.PhoneType || '',
                 timestamp: Date.now()
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -562,7 +538,6 @@
                 document.getElementById('displayName').textContent = session.name || session.code;
                 document.getElementById('displayCode').textContent = session.code;
                 
-                // Get device info
                 const deviceInfo = getDeviceInfo();
                 document.getElementById('displayDevice').textContent = deviceInfo;
                 
@@ -597,7 +572,6 @@
                 device = 'Linux';
             }
             
-            // Add browser info
             let browser = 'Unknown';
             if (/Chrome/.test(ua) && !/Edge/.test(ua)) {
                 browser = 'Chrome';
@@ -612,7 +586,7 @@
             return device + ' (' + browser + ')';
         }
 
-        // ============= FETCH STAFF DATA FROM GOOGLE SHEET =============
+        // ============= FETCH STAFF DATA =============
         function fetchStaffData() {
             return new Promise((resolve, reject) => {
                 updateStatus(t('connecting'));
@@ -637,6 +611,32 @@
             });
         }
 
+        // ============= UPDATE PHONE TYPE IN GOOGLE SHEET =============
+        function updatePhoneTypeInSheet(code, phoneType) {
+            const payload = {
+                action: 'UPDATE_PHONE_TYPE',
+                code: code,
+                phoneType: phoneType,
+                timestamp: new Date().toISOString()
+            };
+
+            console.log('[UPDATE_PHONE_TYPE]', payload);
+
+            // Send to Google Apps Script
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                console.log(`✅ PhoneType updated for ${code}: ${phoneType}`);
+            })
+            .catch(err => {
+                console.error(`❌ PhoneType update failed:`, err);
+            });
+        }
+
         // ============= LOGIN =============
         async function performLogin() {
             const code = document.getElementById('loginCode').value.trim();
@@ -650,21 +650,18 @@
             }
 
             try {
-                // Fetch staff data from Google Sheet
                 const staffList = await fetchStaffData();
                 
-                // Find matching staff (Code column is at index 2, LoginPassword at index 26)
-                // Columns: Situation(0) | GroupName(1) | Code(2) | Name(3) | ...
-                // LoginPassword is at index 26 (0-based)
+                // Find matching staff: Code at index 2, LoginPassword at index 26
                 const matchedStaff = staffList.find(row => {
-                    // Row data comes as array from Google Sheet
-                    const staffCode = row[2] || ''; // Code column
-                    const staffPass = row[26] || ''; // LoginPassword column
+                    const staffCode = row[2] || '';
+                    const staffPass = row[26] || '';
                     return staffCode.toString().trim() === code && staffPass.toString().trim() === pass;
                 });
 
                 if (matchedStaff) {
-                    // Staff data mapping
+                    const deviceInfo = getDeviceInfo();
+                    
                     const userData = {
                         Code: matchedStaff[2] || '',
                         Name: matchedStaff[3] || '',
@@ -693,16 +690,17 @@
                         Lindungan: matchedStaff[24] || '',
                         YellowCard: matchedStaff[25] || '',
                         LoginPassword: matchedStaff[26] || '',
-                        PhoneType: matchedStaff[27] || '',
-                        UpdateDate: matchedStaff[28] || '',
+                        PhoneType: deviceInfo,  // Store current device info
+                        UpdateDate: new Date().toISOString(),
                         SignupDate: matchedStaff[29] || ''
                     };
 
-                    // Login success
                     setSession(userData);
                     
+                    // Update PhoneType in Google Sheet (column 28, index 27)
+                    updatePhoneTypeInSheet(userData.Code, deviceInfo);
+
                     // Log login with device info
-                    const deviceInfo = getDeviceInfo();
                     logToSheet('LOGIN', { 
                         code: userData.Code, 
                         name: userData.Name,
@@ -730,7 +728,7 @@
             }
         }
 
-        // ============= PUNCH / CLOCK IN =============
+        // ============= PUNCH =============
         function performPunch() {
             const session = getSession();
             if (!session) {
@@ -760,7 +758,7 @@
             logToSheet('PUNCH', payload);
         }
 
-        // ============= BACKUP TO GOOGLE SHEET =============
+        // ============= BACKUP =============
         function performBackup() {
             const session = getSession();
             if (!session) {
@@ -824,9 +822,7 @@
         // ============= INIT =============
         window.addEventListener('load', function() {
             console.log('🚀 Punch Card System loaded');
-            console.log('📍 Apps Script URL:', SCRIPT_URL);
 
-            // Check session
             const session = getSession();
             if (session) {
                 applySession(session);
@@ -838,14 +834,10 @@
                 applySession(null);
             }
 
-            // Load staff data in background
-            fetchStaffData().catch(() => {
-                // Silent fail - will retry on login
-            });
+            fetchStaffData().catch(() => {});
 
             setLanguage('ms');
 
-            // Event listeners
             document.getElementById('loginBtn').addEventListener('click', performLogin);
             document.getElementById('logoutBtn').addEventListener('click', () => {
                 clearSession();
@@ -860,7 +852,6 @@
                 document.getElementById('actionMsg').textContent = '🔙 Kembali ke menu utama';
             });
 
-            // Enter key on login
             document.querySelectorAll('#loginPanel input').forEach(inp => {
                 inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') performLogin(); });
             });
