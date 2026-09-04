@@ -77,7 +77,7 @@
         .status-bar.error { background: #fed7d7; color: #9b2c2c; }
         .status-bar.info { background: #bee3f8; color: #2a4365; }
 
-        /* Clock Display - only shown when logged in */
+        /* Clock Display */
         .clock-display {
             background: #f7fafc;
             border-radius: 16px;
@@ -283,23 +283,6 @@
             flex: 1;
         }
 
-        .test-conn-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-            justify-content: center;
-        }
-        .test-conn-row .btn {
-            width: auto;
-            padding: 8px 18px;
-            font-size: 13px;
-        }
-        .test-conn-row .result {
-            font-size: 13px;
-            color: #718096;
-        }
-
         @media (max-width: 480px) {
             .container { padding: 20px 16px; }
             .clock-display .time { font-size: 32px; }
@@ -329,10 +312,6 @@
         <div id="loginPanel">
             <div class="login-form">
                 <div class="input-group">
-                    <label id="lblUser">📱 Telefon / Email</label>
-                    <input type="text" id="loginUser" placeholder="+60 12-345 6789 / email@domain">
-                </div>
-                <div class="input-group">
                     <label id="lblCode">🔑 Kod Pekerja (Employee Code)</label>
                     <input type="text" id="loginCode" placeholder="Contoh: YZ-1001">
                 </div>
@@ -345,16 +324,12 @@
                 <div style="margin-top: 12px; font-size: 13px; color: #718096;">
                     <span>🔐 Sesi kekal 48 jam selepas log masuk</span>
                 </div>
-                <div class="test-conn-row">
-                    <button class="btn btn-outline btn-sm" id="testConnBtn">🔧 Test Connection</button>
-                    <span class="result" id="testResult"></span>
-                </div>
             </div>
         </div>
 
         <!-- ===== LOGGED IN PANEL ===== -->
         <div id="loggedInPanel" class="hidden">
-            <!-- Clock Display - only shown when logged in -->
+            <!-- Clock Display -->
             <div class="clock-display">
                 <div class="time" id="clockTime">--:--:--</div>
                 <div class="date" id="clockDate">Loading...</div>
@@ -364,8 +339,9 @@
             <!-- User Badge -->
             <div class="user-badge">
                 <div class="info">
-                    <div><span class="label">👤 Pengguna</span><br><span class="value" id="displayUser">-</span></div>
+                    <div><span class="label">👤 Nama</span><br><span class="value" id="displayName">-</span></div>
                     <div><span class="label">🆔 Kod Pekerja</span><br><span class="value" id="displayCode">-</span></div>
+                    <div><span class="label">📱 Peranti</span><br><span class="value" id="displayDevice">-</span></div>
                 </div>
                 <button class="btn btn-danger btn-sm" id="logoutBtn">🚪 Keluar</button>
             </div>
@@ -402,17 +378,17 @@
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
+        let staffData = null; // Store full staff data
 
         // ============= TRANSLATIONS =============
         const translations = {
             ms: {
                 title: 'Sistem Punch Card',
                 subtitle: 'Rekod kehadiran & backup ke Google Sheet',
-                userLabel: '📱 Telefon / Email',
                 codeLabel: '🔑 Kod Pekerja (Employee Code)',
                 passLabel: '🔒 Kata Laluan',
                 loginBtn: '🔓 Log Masuk',
-                loginError: '❌ Telefon/Email, Kod Pekerja atau Kata Laluan salah',
+                loginError: '❌ Kod Pekerja atau Kata Laluan salah',
                 loginSuccess: '✅ Log masuk berjaya!',
                 logout: '🚪 Keluar',
                 punch: '✅ Punch / 打卡签到',
@@ -434,11 +410,10 @@
             en: {
                 title: 'Punch Card System',
                 subtitle: 'Attendance record & backup to Google Sheet',
-                userLabel: '📱 Phone / Email',
                 codeLabel: '🔑 Employee Code',
                 passLabel: '🔒 Password',
                 loginBtn: '🔓 Login',
-                loginError: '❌ Phone/Email, Employee Code or Password is incorrect',
+                loginError: '❌ Employee Code or Password is incorrect',
                 loginSuccess: '✅ Login successful!',
                 logout: '🚪 Logout',
                 punch: '✅ Punch In',
@@ -460,11 +435,10 @@
             zh: {
                 title: '打卡记录系统',
                 subtitle: '考勤记录并备份至 Google Sheet',
-                userLabel: '📱 手机 / 邮箱',
                 codeLabel: '🔑 员工编号',
                 passLabel: '🔒 密码',
                 loginBtn: '🔓 登录',
-                loginError: '❌ 手机号/邮箱、员工编号或密码错误',
+                loginError: '❌ 员工编号或密码错误',
                 loginSuccess: '✅ 登录成功！',
                 logout: '🚪 退出',
                 punch: '✅ 打卡签到',
@@ -499,7 +473,6 @@
         function updateAllTexts() {
             document.getElementById('mainTitle').textContent = t('title');
             document.getElementById('subtitle').textContent = t('subtitle');
-            document.getElementById('lblUser').textContent = t('userLabel');
             document.getElementById('lblCode').textContent = t('codeLabel');
             document.getElementById('lblPass').textContent = t('passLabel');
             document.getElementById('loginBtn').textContent = t('loginBtn');
@@ -563,16 +536,22 @@
             } catch (_) { return null; }
         }
 
-        function setSession(user, code) {
-            const payload = { user, code, timestamp: Date.now() };
+        function setSession(userData) {
+            const payload = { 
+                code: userData.Code,
+                name: userData.Name,
+                timestamp: Date.now()
+            };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
             sessionData = payload;
+            staffData = userData;
             applySession(payload);
         }
 
         function clearSession() {
             localStorage.removeItem(STORAGE_KEY);
             sessionData = null;
+            staffData = null;
             applySession(null);
         }
 
@@ -580,11 +559,15 @@
             if (session) {
                 document.getElementById('loginPanel').classList.add('hidden');
                 document.getElementById('loggedInPanel').classList.remove('hidden');
-                document.getElementById('displayUser').textContent = session.user;
+                document.getElementById('displayName').textContent = session.name || session.code;
                 document.getElementById('displayCode').textContent = session.code;
+                
+                // Get device info
+                const deviceInfo = getDeviceInfo();
+                document.getElementById('displayDevice').textContent = deviceInfo;
+                
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
-                // Start clock when logged in
                 startClock();
             } else {
                 document.getElementById('loginPanel').classList.remove('hidden');
@@ -592,68 +575,159 @@
                 document.getElementById('loginPass').value = '';
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
-                // Stop clock when logged out
                 stopClock();
             }
         }
 
-        // ============= CONNECTION TEST =============
-        function testConnection() {
-            updateStatus(t('connecting'));
-            document.getElementById('testResult').textContent = '⏳';
+        // ============= DEVICE INFO =============
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let device = 'Unknown';
             
-            fetch(SCRIPT_URL + '?action=getData')
-            .then(response => {
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                return response.json();
-            })
-            .then(data => {
-                const count = data.length || 0;
-                updateStatus(t('connected') + ' ' + count + ' rekod ditemui.', 'success');
-                document.getElementById('testResult').textContent = '✅ OK';
-                console.log('✅ Connection successful. Data:', data);
-            })
-            .catch(err => {
-                updateStatus(t('connectionFail') + err.message, 'error');
-                document.getElementById('testResult').textContent = '❌ Gagal';
-                console.error('❌ Connection error:', err);
+            if (/iPhone|iPad|iPod/.test(ua)) {
+                device = 'iOS';
+            } else if (/Android/.test(ua)) {
+                const match = ua.match(/Android\s([\d.]+)/);
+                device = 'Android ' + (match ? match[1] : '');
+            } else if (/Windows/.test(ua)) {
+                device = 'Windows';
+            } else if (/Macintosh/.test(ua)) {
+                device = 'macOS';
+            } else if (/Linux/.test(ua)) {
+                device = 'Linux';
+            }
+            
+            // Add browser info
+            let browser = 'Unknown';
+            if (/Chrome/.test(ua) && !/Edge/.test(ua)) {
+                browser = 'Chrome';
+            } else if (/Firefox/.test(ua)) {
+                browser = 'Firefox';
+            } else if (/Safari/.test(ua) && !/Chrome/.test(ua)) {
+                browser = 'Safari';
+            } else if (/Edge/.test(ua)) {
+                browser = 'Edge';
+            }
+            
+            return device + ' (' + browser + ')';
+        }
+
+        // ============= FETCH STAFF DATA FROM GOOGLE SHEET =============
+        function fetchStaffData() {
+            return new Promise((resolve, reject) => {
+                updateStatus(t('connecting'));
+                
+                fetch(SCRIPT_URL + '?action=getStaffData')
+                .then(response => {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.length > 0) {
+                        updateStatus(t('connected') + ' ' + data.length + ' rekod ditemui.', 'success');
+                        resolve(data);
+                    } else {
+                        throw new Error('No data found');
+                    }
+                })
+                .catch(err => {
+                    updateStatus(t('connectionFail') + err.message, 'error');
+                    reject(err);
+                });
             });
         }
 
         // ============= LOGIN =============
-        function performLogin() {
-            const user = document.getElementById('loginUser').value.trim();
+        async function performLogin() {
             const code = document.getElementById('loginCode').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
 
-            if (!user || !code || !pass) {
+            if (!code || !pass) {
                 const msg = document.getElementById('loginMsg');
                 msg.textContent = '⚠️ Sila lengkapkan semua medan';
                 msg.className = 'msg error';
                 return;
             }
 
-            // Simulate login - in production, validate against Google Sheet
-            if (user.length < 3 || code.length < 2 || pass.length < 2) {
+            try {
+                // Fetch staff data from Google Sheet
+                const staffList = await fetchStaffData();
+                
+                // Find matching staff (Code column is at index 2, LoginPassword at index 26)
+                // Columns: Situation(0) | GroupName(1) | Code(2) | Name(3) | ...
+                // LoginPassword is at index 26 (0-based)
+                const matchedStaff = staffList.find(row => {
+                    // Row data comes as array from Google Sheet
+                    const staffCode = row[2] || ''; // Code column
+                    const staffPass = row[26] || ''; // LoginPassword column
+                    return staffCode.toString().trim() === code && staffPass.toString().trim() === pass;
+                });
+
+                if (matchedStaff) {
+                    // Staff data mapping
+                    const userData = {
+                        Code: matchedStaff[2] || '',
+                        Name: matchedStaff[3] || '',
+                        Situation: matchedStaff[0] || '',
+                        GroupName: matchedStaff[1] || '',
+                        Jantina: matchedStaff[4] || '',
+                        TarikhLahir: matchedStaff[5] || '',
+                        Holidays: matchedStaff[6] || '',
+                        Salary: matchedStaff[7] || '',
+                        IC: matchedStaff[8] || '',
+                        Jawatan: matchedStaff[9] || '',
+                        TarikhMasukKerja: matchedStaff[10] || '',
+                        TelefonNo: matchedStaff[11] || '',
+                        Email: matchedStaff[12] || '',
+                        ShiftType: matchedStaff[13] || '',
+                        OffDay: matchedStaff[14] || '',
+                        AgreementSituation: matchedStaff[15] || '',
+                        AlamatTetap: matchedStaff[16] || '',
+                        NamaWaris: matchedStaff[17] || '',
+                        AlamatWaris: matchedStaff[18] || '',
+                        BankNama: matchedStaff[19] || '',
+                        BankAccountNo: matchedStaff[20] || '',
+                        EPF: matchedStaff[21] || '',
+                        PERKESO: matchedStaff[22] || '',
+                        EIS: matchedStaff[23] || '',
+                        Lindungan: matchedStaff[24] || '',
+                        YellowCard: matchedStaff[25] || '',
+                        LoginPassword: matchedStaff[26] || '',
+                        PhoneType: matchedStaff[27] || '',
+                        UpdateDate: matchedStaff[28] || '',
+                        SignupDate: matchedStaff[29] || ''
+                    };
+
+                    // Login success
+                    setSession(userData);
+                    
+                    // Log login with device info
+                    const deviceInfo = getDeviceInfo();
+                    logToSheet('LOGIN', { 
+                        code: userData.Code, 
+                        name: userData.Name,
+                        device: deviceInfo,
+                        phoneType: userData.PhoneType
+                    });
+
+                    const msg = document.getElementById('loginMsg');
+                    msg.textContent = t('loginSuccess');
+                    msg.className = 'msg success';
+                    
+                    setTimeout(() => {
+                        msg.className = 'msg';
+                    }, 3000);
+                } else {
+                    const msg = document.getElementById('loginMsg');
+                    msg.textContent = t('loginError');
+                    msg.className = 'msg error';
+                }
+            } catch (err) {
                 const msg = document.getElementById('loginMsg');
-                msg.textContent = t('loginError');
+                msg.textContent = '⚠️ ' + t('connectionFail') + err.message;
                 msg.className = 'msg error';
-                return;
+                console.error('Login error:', err);
             }
-
-            // Login success
-            setSession(user, code);
-            const msg = document.getElementById('loginMsg');
-            msg.textContent = t('loginSuccess');
-            msg.className = 'msg success';
-
-            // Also log to Google Sheet (simulate)
-            logToSheet('LOGIN', { user, code });
-            
-            // Auto hide success message after 3s
-            setTimeout(() => {
-                msg.className = 'msg';
-            }, 3000);
         }
 
         // ============= PUNCH / CLOCK IN =============
@@ -668,21 +742,21 @@
 
             const now = getMalaysiaTime();
             const timeStr = now.toLocaleString('ms-MY', { hour12: false });
+            const deviceInfo = getDeviceInfo();
             
             const payload = {
-                user: session.user,
                 code: session.code,
+                name: session.name,
                 timestamp: now.toISOString(),
                 time: timeStr,
+                device: deviceInfo,
                 action: 'PUNCH_IN'
             };
 
-            // Show success immediately (optimistic)
             const msg = document.getElementById('punchMsg');
             msg.textContent = t('punchSuccess') + ' (' + timeStr + ')';
             msg.className = 'msg success';
 
-            // Send to Google Sheet
             logToSheet('PUNCH', payload);
         }
 
@@ -697,8 +771,8 @@
             document.getElementById('actionMsg').textContent = '⏳ ' + t('backup') + '...';
             
             const payload = {
-                user: session.user,
                 code: session.code,
+                name: session.name,
                 action: 'MANUAL_BACKUP',
                 timestamp: new Date().toISOString()
             };
@@ -757,19 +831,18 @@
             if (session) {
                 applySession(session);
                 const msg = document.getElementById('punchMsg');
-                msg.textContent = t('welcome') + session.user;
+                msg.textContent = t('welcome') + (session.name || session.code);
                 msg.className = 'msg info';
                 setTimeout(() => { msg.className = 'msg'; }, 3000);
             } else {
                 applySession(null);
-                // Fill demo credentials
-                document.getElementById('loginUser').value = 'demo@staff.com';
-                document.getElementById('loginCode').value = 'YZ-1001';
-                document.getElementById('loginPass').value = 'demo123';
             }
 
-            // Test connection after load
-            setTimeout(testConnection, 500);
+            // Load staff data in background
+            fetchStaffData().catch(() => {
+                // Silent fail - will retry on login
+            });
+
             setLanguage('ms');
 
             // Event listeners
@@ -781,7 +854,6 @@
             document.getElementById('punchBtn').addEventListener('click', performPunch);
             document.getElementById('backupBtn').addEventListener('click', performBackup);
             document.getElementById('renewBtn').addEventListener('click', renewSession);
-            document.getElementById('testConnBtn').addEventListener('click', testConnection);
 
             document.getElementById('backLink').addEventListener('click', (e) => {
                 e.preventDefault();
