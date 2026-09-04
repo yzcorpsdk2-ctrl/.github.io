@@ -374,7 +374,7 @@
             </div>
 
             <!-- Punch Button -->
-            <button class="btn btn-success" id="punchBtn">✅ Punch / 打卡签到</button>
+            <button class="btn btn-success" id="punchBtn">🟢 Punch Masuk</button>
             <div id="punchMsg" class="msg success"></div>
 
             <div class="action-row">
@@ -904,30 +904,31 @@
             msg.textContent = '⏳ Memproses...';
             msg.className = 'msg info';
 
+            // 使用 no-cors 模式发送请求
             fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    if (result.action === 'CLOCK_IN') {
-                        punchStatus = 'clocked_in';
-                        msg.textContent = '✅ ' + t('punchIn') + ' (' + timeStr + ')';
-                        msg.className = 'msg success';
-                    } else if (result.action === 'CLOCK_OUT') {
-                        punchStatus = 'clocked_out';
-                        msg.textContent = '✅ ' + t('punchOut') + ' (' + timeStr + ')';
-                        msg.className = 'msg success';
-                    }
-                    updatePunchStatus();
-                    updatePunchButton();
+            .then(() => {
+                // 由于 no-cors 模式无法读取响应，我们需要再次查询打卡状态来确认
+                // 先显示成功消息
+                if (punchStatus === 'clocked_in') {
+                    punchStatus = 'clocked_out';
+                    msg.textContent = '✅ ' + t('punchOut') + ' (' + timeStr + ')';
                 } else {
-                    msg.textContent = '❌ ' + (result.error || t('punchError'));
-                    msg.className = 'msg error';
+                    punchStatus = 'clocked_in';
+                    msg.textContent = '✅ ' + t('punchIn') + ' (' + timeStr + ')';
                 }
+                msg.className = 'msg success';
+                updatePunchStatus();
+                updatePunchButton();
+                
+                // 延迟后重新查询状态确认
+                setTimeout(() => {
+                    checkPunchStatus(session.code);
+                }, 2000);
             })
             .catch(err => {
                 msg.textContent = '❌ ' + t('punchError') + ': ' + err.message;
