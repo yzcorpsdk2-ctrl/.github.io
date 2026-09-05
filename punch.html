@@ -40,7 +40,6 @@
             margin-bottom: 20px;
         }
 
-        /* 左上角退出按钮 */
         .logout-btn-top {
             position: absolute;
             top: 16px;
@@ -339,7 +338,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- 左上角退出按钮 -->
         <button class="logout-btn-top" id="logoutBtnTop" title="Keluar">🚪</button>
 
         <div class="logo">🕐</div>
@@ -354,7 +352,6 @@
 
         <div id="statusBar" class="status-bar">🔌 Menyambung ke Google Sheet...</div>
 
-        <!-- ===== LOGIN PANEL ===== -->
         <div id="loginPanel">
             <div class="login-form">
                 <div class="input-group">
@@ -373,7 +370,6 @@
             </div>
         </div>
 
-        <!-- ===== LOGGED IN PANEL ===== -->
         <div id="loggedInPanel" class="hidden">
             <div class="clock-display">
                 <div class="time" id="clockTime">--:--:--</div>
@@ -389,12 +385,10 @@
                 </div>
             </div>
 
-            <!-- Punch Status -->
             <div id="punchStatusContainer">
                 <div id="punchStatus" class="punch-status no-record">⏳ Belum punch</div>
             </div>
 
-            <!-- Punch Button -->
             <button class="btn btn-success" id="punchBtn">🟢 Punch / 打卡</button>
             <div id="punchMsg" class="msg success"></div>
 
@@ -407,19 +401,15 @@
     </div>
 
     <script>
-        // ============= CONFIG =============
-        // 已替换为您的新 Apps Script URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwcuw62Whgciu46Tumwmp2C8D1syZXiMmOpY0Wntv_m2NJcEox-KkjJmIjXb3X_GD-A/exec';
         const STORAGE_KEY = 'yz_punch_session';
         const SESSION_TTL = 48 * 60 * 60 * 1000;
 
-        // ============= STATE =============
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
         let punchStatus = 'none';
 
-        // ============= TRANSLATIONS =============
         const translations = {
             ms: {
                 title: 'Sistem Punch Card',
@@ -491,7 +481,6 @@
 
         function t(key) { return translations[currentLanguage]?.[key] || key; }
 
-        // ============= LANGUAGE =============
         function setLanguage(lang) {
             currentLanguage = lang;
             document.querySelectorAll('.lang-btn').forEach(b => {
@@ -511,7 +500,6 @@
             document.getElementById('footerText').textContent = t('footer');
         }
 
-        // ============= CLOCK =============
         function getMalaysiaTime() {
             const now = new Date();
             const ms = now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000);
@@ -541,14 +529,12 @@
             }
         }
 
-        // ============= STATUS BAR =============
         function updateStatus(msg, type = '') {
             const el = document.getElementById('statusBar');
             el.textContent = msg;
             el.className = 'status-bar ' + type;
         }
 
-        // ============= SESSION MANAGEMENT =============
         function getSession() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
@@ -606,7 +592,6 @@
             }
         }
 
-        // ============= DEVICE INFO =============
         function getDeviceInfo() {
             const ua = navigator.userAgent;
             let device = 'Unknown';
@@ -638,7 +623,6 @@
             return device + ' (' + browser + ')';
         }
 
-        // ============= FETCH STAFF DATA =============
         function fetchStaffData() {
             return new Promise((resolve, reject) => {
                 updateStatus(t('connecting'));
@@ -663,7 +647,6 @@
             });
         }
 
-        // ============= CHECK PUNCH STATUS =============
         function checkPunchStatus(code) {
             fetch(SCRIPT_URL + '?action=getPunchRecord&code=' + encodeURIComponent(code))
             .then(response => response.json())
@@ -684,7 +667,6 @@
             });
         }
 
-        // ============= UPDATE PUNCH STATUS =============
         function updatePunchStatus() {
             const el = document.getElementById('punchStatus');
             if (punchStatus === 'has_records') {
@@ -696,7 +678,6 @@
             }
         }
 
-        // ============= UPDATE PUNCH BUTTON =============
         function updatePunchButton() {
             const btn = document.getElementById('punchBtn');
             btn.textContent = '🟢 ' + t('punch');
@@ -704,7 +685,6 @@
             btn.disabled = false;
         }
 
-        // ============= UPDATE PHONE TYPE =============
         function updatePhoneTypeInSheet(code, phoneType) {
             const payload = {
                 action: 'UPDATE_PHONE_TYPE',
@@ -729,7 +709,6 @@
             });
         }
 
-        // ============= LOGIN =============
         async function performLogin() {
             const code = document.getElementById('loginCode').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
@@ -800,7 +779,6 @@
             }
         }
 
-        // ============= PUNCH =============
         function performPunch() {
             const session = getSession();
             if (!session) {
@@ -862,7 +840,6 @@
             });
         }
 
-        // ============= INIT =============
         window.addEventListener('load', function() {
             console.log('🚀 Punch Card System loaded');
             console.log('📍 Apps Script URL:', SCRIPT_URL);
