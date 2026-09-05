@@ -188,6 +188,42 @@
             background: #2f855a;
         }
 
+        .btn-danger {
+            background: #c53030;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #9b2c2c;
+        }
+
+        .user-badge {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .user-badge .info {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .user-badge .info .label {
+            color: #718096;
+            font-size: 12px;
+        }
+        .user-badge .info .value {
+            font-weight: 600;
+            color: #1a3a5c;
+            font-size: 14px;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -231,32 +267,21 @@
             margin-top: 16px;
         }
 
-        .user-badge {
-            background: #f7fafc;
-            border-radius: 12px;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            margin-bottom: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .user-badge .info {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .user-badge .info .label {
-            color: #718096;
-            font-size: 12px;
-        }
-        .user-badge .info .value {
-            font-weight: 600;
-            color: #1a3a5c;
+        .punch-status {
+            padding: 8px 16px;
+            border-radius: 20px;
             font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .punch-status.has-records {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+        .punch-status.no-record {
+            background: #edf2f7;
+            color: #4a5568;
         }
 
         .back-link {
@@ -328,6 +353,10 @@
                 </div>
             </div>
 
+            <div id="punchStatusContainer">
+                <div id="punchStatus" class="punch-status no-record">⏳ Belum punch</div>
+            </div>
+
             <button class="btn btn-success" id="punchBtn">🟢 Punch / 打卡</button>
             <div id="punchMsg" class="msg success"></div>
 
@@ -347,6 +376,7 @@
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
+        let punchStatus = 'none';
 
         const translations = {
             ms: {
@@ -358,7 +388,7 @@
                 loginError: '❌ Kod Pekerja atau Kata Laluan salah',
                 loginSuccess: '✅ Log masuk berjaya!',
                 punch: '🟢 Punch / 打卡',
-                punchSuccess: '✅ Punch berjaya!',
+                punchSuccess: '✅ Punch berjaya! Rekod disimpan ke Google Sheet',
                 punchError: '❌ Punch gagal, sila cuba lagi',
                 back: '← Kembali ke Menu',
                 footer: '© 2026 Sistem Pengurusan Staf · Punch Card',
@@ -367,6 +397,8 @@
                 connectionFail: '❌ Sambungan gagal: ',
                 sessionExpired: '⚠️ Sesi tamat tempoh. Sila log masuk semula.',
                 welcome: '👋 Selamat datang, ',
+                hasRecords: '📋 Rekod punch wujud',
+                noRecord: '⏳ Belum punch',
                 punchTimeError: '⏰ Punch hanya dibenarkan antara 4:30 pagi hingga 11:59 malam'
             },
             en: {
@@ -378,7 +410,7 @@
                 loginError: '❌ Employee Code or Password is incorrect',
                 loginSuccess: '✅ Login successful!',
                 punch: '🟢 Punch',
-                punchSuccess: '✅ Punch successful!',
+                punchSuccess: '✅ Punch successful! Record saved to Google Sheet',
                 punchError: '❌ Punch failed, please try again',
                 back: '← Back to Menu',
                 footer: '© 2026 Staff Management System · Punch Card',
@@ -387,6 +419,8 @@
                 connectionFail: '❌ Connection failed: ',
                 sessionExpired: '⚠️ Session expired. Please login again.',
                 welcome: '👋 Welcome, ',
+                hasRecords: '📋 Punch records exist',
+                noRecord: '⏳ Not punched yet',
                 punchTimeError: '⏰ Punch only allowed between 4:30 AM and 11:59 PM'
             },
             zh: {
@@ -398,7 +432,7 @@
                 loginError: '❌ 员工编号或密码错误',
                 loginSuccess: '✅ 登录成功！',
                 punch: '🟢 打卡',
-                punchSuccess: '✅ 打卡成功！',
+                punchSuccess: '✅ 打卡成功！记录已保存至 Google Sheet',
                 punchError: '❌ 打卡失败，请重试',
                 back: '← 返回菜单',
                 footer: '© 2026 员工管理系统 · 打卡记录',
@@ -407,6 +441,8 @@
                 connectionFail: '❌ 连接失败：',
                 sessionExpired: '⚠️ 会话已过期，请重新登录。',
                 welcome: '👋 欢迎，',
+                hasRecords: '📋 已有打卡记录',
+                noRecord: '⏳ 尚未打卡',
                 punchTimeError: '⏰ 打卡时间仅允许在凌晨4:30至晚上11:59之间'
             }
         };
@@ -419,6 +455,7 @@
                 b.classList.toggle('active', b.dataset.lang === lang);
             });
             updateAllTexts();
+            updatePunchButton();
         }
 
         function updateAllTexts() {
@@ -503,10 +540,15 @@
                 document.getElementById('loggedInPanel').classList.remove('hidden');
                 document.getElementById('displayName').textContent = session.name || session.code;
                 document.getElementById('displayCode').textContent = session.code;
-                document.getElementById('displayDevice').textContent = getDeviceInfo();
+                
+                const deviceInfo = getDeviceInfo();
+                document.getElementById('displayDevice').textContent = deviceInfo;
+                
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
                 startClock();
+                
+                checkPunchStatus(session.code);
             } else {
                 document.getElementById('loginPanel').classList.remove('hidden');
                 document.getElementById('loggedInPanel').classList.add('hidden');
@@ -514,12 +556,14 @@
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
                 stopClock();
+                punchStatus = 'none';
             }
         }
 
         function getDeviceInfo() {
             const ua = navigator.userAgent;
             let device = 'Unknown';
+            
             if (/iPhone|iPad|iPod/.test(ua)) {
                 device = 'iOS';
             } else if (/Android/.test(ua)) {
@@ -532,6 +576,7 @@
             } else if (/Linux/.test(ua)) {
                 device = 'Linux';
             }
+            
             let browser = 'Unknown';
             if (/Chrome/.test(ua) && !/Edge/.test(ua)) {
                 browser = 'Chrome';
@@ -542,14 +587,19 @@
             } else if (/Edge/.test(ua)) {
                 browser = 'Edge';
             }
+            
             return device + ' (' + browser + ')';
         }
 
         function fetchStaffData() {
             return new Promise((resolve, reject) => {
                 updateStatus(t('connecting'));
+                
                 fetch(SCRIPT_URL + '?action=getStaffData')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
                 .then(data => {
                     if (data && data.length > 0) {
                         updateStatus(t('connected') + ' ' + data.length + ' rekod ditemui.', 'success');
@@ -565,16 +615,65 @@
             });
         }
 
+        function checkPunchStatus(code) {
+            fetch(SCRIPT_URL + '?action=getPunchRecord&code=' + encodeURIComponent(code))
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    punchStatus = 'has_records';
+                } else {
+                    punchStatus = 'none';
+                }
+                updatePunchStatus();
+                updatePunchButton();
+            })
+            .catch(err => {
+                console.error('Error checking punch status:', err);
+                punchStatus = 'none';
+                updatePunchStatus();
+                updatePunchButton();
+            });
+        }
+
+        function updatePunchStatus() {
+            const el = document.getElementById('punchStatus');
+            if (punchStatus === 'has_records') {
+                el.textContent = t('hasRecords');
+                el.className = 'punch-status has-records';
+            } else {
+                el.textContent = t('noRecord');
+                el.className = 'punch-status no-record';
+            }
+        }
+
+        function updatePunchButton() {
+            const btn = document.getElementById('punchBtn');
+            btn.textContent = '🟢 ' + t('punch');
+            btn.className = 'btn btn-success';
+            btn.disabled = false;
+        }
+
         function updatePhoneTypeInSheet(code, phoneType) {
             const payload = {
                 action: 'UPDATE_PHONE_TYPE',
-                data: { code: code, phoneType: phoneType }
+                data: {
+                    code: code,
+                    phoneType: phoneType,
+                    timestamp: new Date().toISOString()
+                }
             };
+
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
+            })
+            .then(() => {
+                console.log(`✅ PhoneType updated for ${code}: ${phoneType}`);
+            })
+            .catch(err => {
+                console.error(`❌ PhoneType update failed:`, err);
             });
         }
 
@@ -591,6 +690,7 @@
 
             try {
                 const staffList = await fetchStaffData();
+                
                 const matchedStaff = staffList.find(row => {
                     const staffCode = row[2] || '';
                     const staffPass = row[26] || '';
@@ -599,6 +699,7 @@
 
                 if (matchedStaff) {
                     const deviceInfo = getDeviceInfo();
+                    
                     const userData = {
                         Code: matchedStaff[2] || '',
                         Name: matchedStaff[3] || '',
@@ -606,9 +707,10 @@
                     };
 
                     setSession(userData);
+                    
                     updatePhoneTypeInSheet(userData.Code, deviceInfo);
 
-                    // 登录时创建/更新记录
+                    // 登录时在 PUNCH 表创建记录
                     const loginPayload = {
                         action: 'LOGIN',
                         data: {
@@ -618,6 +720,7 @@
                             phoneType: userData.PhoneType
                         }
                     };
+
                     fetch(SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -628,7 +731,10 @@
                     const msg = document.getElementById('loginMsg');
                     msg.textContent = t('loginSuccess');
                     msg.className = 'msg success';
-                    setTimeout(() => { msg.className = 'msg'; }, 3000);
+                    
+                    setTimeout(() => {
+                        msg.className = 'msg';
+                    }, 3000);
                 } else {
                     const msg = document.getElementById('loginMsg');
                     msg.textContent = t('loginError');
@@ -638,6 +744,7 @@
                 const msg = document.getElementById('loginMsg');
                 msg.textContent = '⚠️ ' + t('connectionFail') + err.message;
                 msg.className = 'msg error';
+                console.error('Login error:', err);
             }
         }
 
@@ -687,16 +794,24 @@
             .then(() => {
                 msg.textContent = '✅ ' + t('punchSuccess') + ' (' + timeStr + ')';
                 msg.className = 'msg success';
-                setTimeout(() => { msg.className = 'msg'; }, 3000);
+                punchStatus = 'has_records';
+                updatePunchStatus();
+                updatePunchButton();
+                
+                setTimeout(() => {
+                    checkPunchStatus(session.code);
+                }, 2000);
             })
             .catch(err => {
-                msg.textContent = '❌ ' + t('punchError');
+                msg.textContent = '❌ ' + t('punchError') + ': ' + err.message;
                 msg.className = 'msg error';
                 console.error('Punch error:', err);
             });
         }
 
         window.addEventListener('load', function() {
+            console.log('🚀 Punch Card System loaded');
+
             const session = getSession();
             if (session) {
                 applySession(session);
@@ -709,6 +824,7 @@
             }
 
             fetchStaffData().catch(() => {});
+
             setLanguage('ms');
 
             document.getElementById('loginBtn').addEventListener('click', performLogin);
@@ -720,6 +836,7 @@
                 setTimeout(() => { msg.className = 'msg'; }, 2000);
             });
             document.getElementById('punchBtn').addEventListener('click', performPunch);
+
             document.getElementById('backLink').addEventListener('click', (e) => {
                 e.preventDefault();
                 const msg = document.getElementById('punchMsg');
