@@ -308,6 +308,10 @@
             background: #edf2f7;
             color: #4a5568;
         }
+        .punch-status.has-records {
+            background: #bee3f8;
+            color: #2a4365;
+        }
 
         @media (max-width: 480px) {
             .container { padding: 20px 16px; }
@@ -374,7 +378,7 @@
             </div>
 
             <!-- Punch Button -->
-            <button class="btn btn-success" id="punchBtn">🟢 Punch Masuk</button>
+            <button class="btn btn-success" id="punchBtn">🟢 Punch / 打卡</button>
             <div id="punchMsg" class="msg success"></div>
 
             <div class="action-row">
@@ -403,8 +407,7 @@
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
-        let punchStatus = 'none';
-        let isProcessing = false;
+        let punchStatus = 'none'; // 'none', 'has_records'
 
         // ============= TRANSLATIONS =============
         const translations = {
@@ -417,9 +420,7 @@
                 loginError: '❌ Kod Pekerja atau Kata Laluan salah',
                 loginSuccess: '✅ Log masuk berjaya!',
                 logout: '🚪 Keluar',
-                punch: '✅ Punch / 打卡签到',
-                punchIn: '✅ Punch Masuk',
-                punchOut: '✅ Punch Keluar',
+                punch: '🟢 Punch / 打卡',
                 punchSuccess: '✅ Punch berjaya! Rekod disimpan ke Google Sheet',
                 punchError: '❌ Punch gagal, sila cuba lagi',
                 backup: '📤 Backup ke Google Sheet',
@@ -434,10 +435,9 @@
                 backupSuccess: '✅ Backup berjaya!',
                 backupFail: '❌ Backup gagal: ',
                 welcome: '👋 Selamat datang, ',
-                clockedIn: '✅ Telah punch masuk',
-                clockedOut: '❌ Telah punch keluar',
+                hasRecords: '📋 Rekod punch wujud',
                 noRecord: '⏳ Belum punch',
-                alreadyClockedOut: '⚠️ Anda telah punch keluar untuk hari ini'
+                punchTimeError: '⏰ Punch hanya dibenarkan antara 4:30 pagi hingga 11:59 malam'
             },
             en: {
                 title: 'Punch Card System',
@@ -448,9 +448,7 @@
                 loginError: '❌ Employee Code or Password is incorrect',
                 loginSuccess: '✅ Login successful!',
                 logout: '🚪 Logout',
-                punch: '✅ Punch In',
-                punchIn: '✅ Punch In',
-                punchOut: '✅ Punch Out',
+                punch: '🟢 Punch',
                 punchSuccess: '✅ Punch successful! Record saved to Google Sheet',
                 punchError: '❌ Punch failed, please try again',
                 backup: '📤 Backup to Google Sheet',
@@ -465,10 +463,9 @@
                 backupSuccess: '✅ Backup successful!',
                 backupFail: '❌ Backup failed: ',
                 welcome: '👋 Welcome, ',
-                clockedIn: '✅ Clocked in',
-                clockedOut: '❌ Clocked out',
+                hasRecords: '📋 Punch records exist',
                 noRecord: '⏳ Not punched yet',
-                alreadyClockedOut: '⚠️ You have already clocked out for today'
+                punchTimeError: '⏰ Punch only allowed between 4:30 AM and 11:59 PM'
             },
             zh: {
                 title: '打卡记录系统',
@@ -479,9 +476,7 @@
                 loginError: '❌ 员工编号或密码错误',
                 loginSuccess: '✅ 登录成功！',
                 logout: '🚪 退出',
-                punch: '✅ 打卡签到',
-                punchIn: '✅ 上班打卡',
-                punchOut: '✅ 下班打卡',
+                punch: '🟢 打卡',
                 punchSuccess: '✅ 打卡成功！记录已保存至 Google Sheet',
                 punchError: '❌ 打卡失败，请重试',
                 backup: '📤 备份至 Google Sheet',
@@ -496,10 +491,9 @@
                 backupSuccess: '✅ 备份成功！',
                 backupFail: '❌ 备份失败：',
                 welcome: '👋 欢迎，',
-                clockedIn: '✅ 已上班打卡',
-                clockedOut: '❌ 已下班打卡',
+                hasRecords: '📋 已有打卡记录',
                 noRecord: '⏳ 尚未打卡',
-                alreadyClockedOut: '⚠️ 您今天已下班打卡'
+                punchTimeError: '⏰ 打卡时间仅允许在凌晨4:30至晚上11:59之间'
             }
         };
 
@@ -686,14 +680,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    const record = data[0];
-                    if (record[6] && record[6].toString().trim() !== '') {
-                        punchStatus = 'clocked_out';
-                    } else if (record[4] && record[4].toString().trim() !== '') {
-                        punchStatus = 'clocked_in';
-                    } else {
-                        punchStatus = 'none';
-                    }
+                    punchStatus = 'has_records';
                 } else {
                     punchStatus = 'none';
                 }
@@ -711,12 +698,9 @@
         // ============= UPDATE PUNCH STATUS =============
         function updatePunchStatus() {
             const el = document.getElementById('punchStatus');
-            if (punchStatus === 'clocked_in') {
-                el.textContent = t('clockedIn');
-                el.className = 'punch-status clocked-in';
-            } else if (punchStatus === 'clocked_out') {
-                el.textContent = t('clockedOut');
-                el.className = 'punch-status clocked-out';
+            if (punchStatus === 'has_records') {
+                el.textContent = t('hasRecords');
+                el.className = 'punch-status has-records';
             } else {
                 el.textContent = t('noRecord');
                 el.className = 'punch-status no-record';
@@ -726,26 +710,9 @@
         // ============= UPDATE PUNCH BUTTON =============
         function updatePunchButton() {
             const btn = document.getElementById('punchBtn');
-            if (isProcessing) {
-                btn.textContent = '⏳ Memproses...';
-                btn.className = 'btn btn-warning';
-                btn.disabled = true;
-                return;
-            }
-            
-            if (punchStatus === 'clocked_in') {
-                btn.textContent = '🔴 ' + t('punchOut');
-                btn.className = 'btn btn-danger';
-                btn.disabled = false;
-            } else if (punchStatus === 'clocked_out') {
-                btn.textContent = '⛔ ' + t('punch');
-                btn.className = 'btn btn-warning btn-disabled';
-                btn.disabled = true;
-            } else {
-                btn.textContent = '🟢 ' + t('punchIn');
-                btn.className = 'btn btn-success';
-                btn.disabled = false;
-            }
+            btn.textContent = '🟢 ' + t('punch');
+            btn.className = 'btn btn-success';
+            btn.disabled = false;
         }
 
         // ============= UPDATE PHONE TYPE =============
@@ -758,6 +725,8 @@
                     timestamp: new Date().toISOString()
                 }
             };
+
+            console.log('[UPDATE_PHONE_TYPE]', payload);
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -871,7 +840,7 @@
             }
         }
 
-        // ============= PUNCH (FIXED) =============
+        // ============= PUNCH =============
         function performPunch() {
             const session = getSession();
             if (!session) {
@@ -881,19 +850,19 @@
                 return;
             }
 
-            if (punchStatus === 'clocked_out') {
+            // 检查当前时间是否在允许范围内 (4:30 AM - 11:59 PM)
+            const now = getMalaysiaTime();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            
+            if (hour < 4 || (hour === 4 && minute < 30) || hour >= 24) {
                 const msg = document.getElementById('punchMsg');
-                msg.textContent = t('alreadyClockedOut');
+                msg.textContent = t('punchTimeError');
                 msg.className = 'msg warning';
                 return;
             }
 
-            if (isProcessing) return;
-            isProcessing = true;
-            updatePunchButton();
-
             const deviceInfo = getDeviceInfo();
-            const now = getMalaysiaTime();
             const timeStr = now.toLocaleString('ms-MY', { hour12: false });
             
             const payload = {
@@ -910,7 +879,6 @@
             msg.textContent = '⏳ Memproses...';
             msg.className = 'msg info';
 
-            // 发送打卡请求
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -918,30 +886,20 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                // 等待2秒后重新查询状态
+                msg.textContent = '✅ ' + t('punchSuccess') + ' (' + timeStr + ')';
+                msg.className = 'msg success';
+                punchStatus = 'has_records';
+                updatePunchStatus();
+                updatePunchButton();
+                
                 setTimeout(() => {
                     checkPunchStatus(session.code);
-                    
-                    // 更新消息
-                    if (punchStatus === 'clocked_in') {
-                        msg.textContent = '✅ ' + t('punchIn') + ' (' + timeStr + ')';
-                    } else if (punchStatus === 'clocked_out') {
-                        msg.textContent = '✅ ' + t('punchOut') + ' (' + timeStr + ')';
-                    } else {
-                        msg.textContent = '✅ ' + t('punchSuccess') + ' (' + timeStr + ')';
-                    }
-                    msg.className = 'msg success';
-                    
-                    isProcessing = false;
-                    updatePunchButton();
-                }, 2500);
+                }, 2000);
             })
             .catch(err => {
                 msg.textContent = '❌ ' + t('punchError') + ': ' + err.message;
                 msg.className = 'msg error';
                 console.error('Punch error:', err);
-                isProcessing = false;
-                updatePunchButton();
             });
         }
 
