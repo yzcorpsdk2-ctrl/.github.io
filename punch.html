@@ -23,6 +23,7 @@
             padding: 30px 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             text-align: center;
+            position: relative;
         }
         .logo {
             font-size: 48px;
@@ -37,6 +38,25 @@
             color: #718096;
             font-size: 14px;
             margin-bottom: 20px;
+        }
+
+        /* 左上角退出按钮 */
+        .logout-btn-top {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #a0aec0;
+            transition: 0.2s;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+        .logout-btn-top:hover {
+            color: #c53030;
+            background: #fed7d7;
         }
 
         .lang-bar {
@@ -216,15 +236,16 @@
             border: 2px solid #e2e8f0;
             margin-bottom: 16px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 16px;
         }
         .user-badge .info {
             display: flex;
             gap: 16px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         .user-badge .info .label {
             color: #718096;
@@ -234,15 +255,6 @@
             font-weight: 600;
             color: #1a3a5c;
             font-size: 14px;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .action-row .btn {
-            flex: 1;
         }
 
         .hidden {
@@ -296,34 +308,40 @@
             display: inline-block;
             margin-bottom: 10px;
         }
-        .punch-status.clocked-in {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-        .punch-status.clocked-out {
-            background: #fed7d7;
-            color: #9b2c2c;
+        .punch-status.has-records {
+            background: #bee3f8;
+            color: #2a4365;
         }
         .punch-status.no-record {
             background: #edf2f7;
             color: #4a5568;
         }
-        .punch-status.has-records {
-            background: #bee3f8;
-            color: #2a4365;
+
+        .back-link {
+            color: #1a3a5c;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 480px) {
             .container { padding: 20px 16px; }
             .clock-display .time { font-size: 32px; }
-            .user-badge { flex-direction: column; align-items: stretch; text-align: center; }
+            .user-badge { flex-direction: column; }
             .user-badge .info { justify-content: center; }
-            .action-row { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- 左上角退出按钮 -->
+        <button class="logout-btn-top" id="logoutBtnTop" title="Keluar">🚪</button>
+
         <div class="logo">🕐</div>
         <h1 id="mainTitle">Sistem Punch Card</h1>
         <p class="subtitle" id="subtitle">Rekod kehadiran & backup ke Google Sheet</p>
@@ -369,7 +387,6 @@
                     <div><span class="label">🆔 Kod Pekerja</span><br><span class="value" id="displayCode">-</span></div>
                     <div><span class="label">📱 Peranti</span><br><span class="value" id="displayDevice">-</span></div>
                 </div>
-                <button class="btn btn-danger btn-sm" id="logoutBtn">🚪 Keluar</button>
             </div>
 
             <!-- Punch Status -->
@@ -381,17 +398,9 @@
             <button class="btn btn-success" id="punchBtn">🟢 Punch / 打卡</button>
             <div id="punchMsg" class="msg success"></div>
 
-            <div class="action-row">
-                <button class="btn btn-outline btn-sm" id="backupBtn">📤 Backup ke Google Sheet</button>
-                <button class="btn btn-outline btn-sm" id="renewBtn">🔄 Perbaharui Sesi</button>
-            </div>
-            <div id="actionMsg" style="margin-top: 8px; font-size: 13px; color: #718096;"></div>
-
             <div class="divider"></div>
 
-            <a href="#" id="backLink" style="color: #1a3a5c; text-decoration: none; font-weight: 600; font-size: 14px;">
-                ← Kembali ke Menu
-            </a>
+            <a href="#" id="backLink" class="back-link">← Kembali ke Menu</a>
         </div>
 
         <div class="footer-text" id="footerText">© 2026 Sistem Pengurusan Staf · Punch Card</div>
@@ -407,7 +416,7 @@
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
-        let punchStatus = 'none'; // 'none', 'has_records'
+        let punchStatus = 'none';
 
         // ============= TRANSLATIONS =============
         const translations = {
@@ -419,21 +428,15 @@
                 loginBtn: '🔓 Log Masuk',
                 loginError: '❌ Kod Pekerja atau Kata Laluan salah',
                 loginSuccess: '✅ Log masuk berjaya!',
-                logout: '🚪 Keluar',
                 punch: '🟢 Punch / 打卡',
                 punchSuccess: '✅ Punch berjaya! Rekod disimpan ke Google Sheet',
                 punchError: '❌ Punch gagal, sila cuba lagi',
-                backup: '📤 Backup ke Google Sheet',
-                renew: '🔄 Perbaharui Sesi',
-                renewSuccess: '✅ Sesi diperbaharui! (48 jam)',
                 back: '← Kembali ke Menu',
                 footer: '© 2026 Sistem Pengurusan Staf · Punch Card',
                 connecting: '🔌 Menyambung ke Google Sheet...',
                 connected: '✅ Bersambung!',
                 connectionFail: '❌ Sambungan gagal: ',
                 sessionExpired: '⚠️ Sesi tamat tempoh. Sila log masuk semula.',
-                backupSuccess: '✅ Backup berjaya!',
-                backupFail: '❌ Backup gagal: ',
                 welcome: '👋 Selamat datang, ',
                 hasRecords: '📋 Rekod punch wujud',
                 noRecord: '⏳ Belum punch',
@@ -447,21 +450,15 @@
                 loginBtn: '🔓 Login',
                 loginError: '❌ Employee Code or Password is incorrect',
                 loginSuccess: '✅ Login successful!',
-                logout: '🚪 Logout',
                 punch: '🟢 Punch',
                 punchSuccess: '✅ Punch successful! Record saved to Google Sheet',
                 punchError: '❌ Punch failed, please try again',
-                backup: '📤 Backup to Google Sheet',
-                renew: '🔄 Renew Session',
-                renewSuccess: '✅ Session renewed! (48 hours)',
                 back: '← Back to Menu',
                 footer: '© 2026 Staff Management System · Punch Card',
                 connecting: '🔌 Connecting to Google Sheet...',
                 connected: '✅ Connected!',
                 connectionFail: '❌ Connection failed: ',
                 sessionExpired: '⚠️ Session expired. Please login again.',
-                backupSuccess: '✅ Backup successful!',
-                backupFail: '❌ Backup failed: ',
                 welcome: '👋 Welcome, ',
                 hasRecords: '📋 Punch records exist',
                 noRecord: '⏳ Not punched yet',
@@ -475,21 +472,15 @@
                 loginBtn: '🔓 登录',
                 loginError: '❌ 员工编号或密码错误',
                 loginSuccess: '✅ 登录成功！',
-                logout: '🚪 退出',
                 punch: '🟢 打卡',
                 punchSuccess: '✅ 打卡成功！记录已保存至 Google Sheet',
                 punchError: '❌ 打卡失败，请重试',
-                backup: '📤 备份至 Google Sheet',
-                renew: '🔄 续期会话',
-                renewSuccess: '✅ 会话已续期！（48小时）',
                 back: '← 返回菜单',
                 footer: '© 2026 员工管理系统 · 打卡记录',
                 connecting: '🔌 正在连接 Google Sheet...',
                 connected: '✅ 已连接！',
                 connectionFail: '❌ 连接失败：',
                 sessionExpired: '⚠️ 会话已过期，请重新登录。',
-                backupSuccess: '✅ 备份成功！',
-                backupFail: '❌ 备份失败：',
                 welcome: '👋 欢迎，',
                 hasRecords: '📋 已有打卡记录',
                 noRecord: '⏳ 尚未打卡',
@@ -515,9 +506,6 @@
             document.getElementById('lblCode').textContent = t('codeLabel');
             document.getElementById('lblPass').textContent = t('passLabel');
             document.getElementById('loginBtn').textContent = t('loginBtn');
-            document.getElementById('logoutBtn').textContent = t('logout');
-            document.getElementById('backupBtn').textContent = t('backup');
-            document.getElementById('renewBtn').textContent = t('renew');
             document.getElementById('backLink').textContent = t('back');
             document.getElementById('footerText').textContent = t('footer');
         }
@@ -726,8 +714,6 @@
                 }
             };
 
-            console.log('[UPDATE_PHONE_TYPE]', payload);
-
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -769,34 +755,7 @@
                     const userData = {
                         Code: matchedStaff[2] || '',
                         Name: matchedStaff[3] || '',
-                        Situation: matchedStaff[0] || '',
-                        GroupName: matchedStaff[1] || '',
-                        Jantina: matchedStaff[4] || '',
-                        TarikhLahir: matchedStaff[5] || '',
-                        Holidays: matchedStaff[6] || '',
-                        Salary: matchedStaff[7] || '',
-                        IC: matchedStaff[8] || '',
-                        Jawatan: matchedStaff[9] || '',
-                        TarikhMasukKerja: matchedStaff[10] || '',
-                        TelefonNo: matchedStaff[11] || '',
-                        Email: matchedStaff[12] || '',
-                        ShiftType: matchedStaff[13] || '',
-                        OffDay: matchedStaff[14] || '',
-                        AgreementSituation: matchedStaff[15] || '',
-                        AlamatTetap: matchedStaff[16] || '',
-                        NamaWaris: matchedStaff[17] || '',
-                        AlamatWaris: matchedStaff[18] || '',
-                        BankNama: matchedStaff[19] || '',
-                        BankAccountNo: matchedStaff[20] || '',
-                        EPF: matchedStaff[21] || '',
-                        PERKESO: matchedStaff[22] || '',
-                        EIS: matchedStaff[23] || '',
-                        Lindungan: matchedStaff[24] || '',
-                        YellowCard: matchedStaff[25] || '',
-                        LoginPassword: matchedStaff[26] || '',
-                        PhoneType: deviceInfo,
-                        UpdateDate: new Date().toISOString(),
-                        SignupDate: matchedStaff[29] || ''
+                        PhoneType: deviceInfo
                     };
 
                     setSession(userData);
@@ -850,7 +809,6 @@
                 return;
             }
 
-            // 检查当前时间是否在允许范围内 (4:30 AM - 11:59 PM)
             const now = getMalaysiaTime();
             const hour = now.getHours();
             const minute = now.getMinutes();
@@ -903,56 +861,6 @@
             });
         }
 
-        // ============= BACKUP =============
-        function performBackup() {
-            const session = getSession();
-            if (!session) {
-                document.getElementById('actionMsg').textContent = t('sessionExpired');
-                return;
-            }
-
-            document.getElementById('actionMsg').textContent = '⏳ ' + t('backup') + '...';
-            
-            const payload = {
-                action: 'BACKUP',
-                data: {
-                    code: session.code,
-                    name: session.name,
-                    timestamp: new Date().toISOString()
-                }
-            };
-
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                document.getElementById('actionMsg').textContent = t('backupSuccess');
-                setTimeout(() => { document.getElementById('actionMsg').textContent = ''; }, 3000);
-            })
-            .catch(err => {
-                document.getElementById('actionMsg').textContent = t('backupFail') + err.message;
-                console.error('Backup error:', err);
-            });
-        }
-
-        // ============= RENEW SESSION =============
-        function renewSession() {
-            const session = getSession();
-            if (!session) {
-                document.getElementById('actionMsg').textContent = t('sessionExpired');
-                return;
-            }
-
-            const newSession = { ...session, timestamp: Date.now() };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newSession));
-            sessionData = newSession;
-            document.getElementById('actionMsg').textContent = t('renewSuccess');
-            setTimeout(() => { document.getElementById('actionMsg').textContent = ''; }, 3000);
-        }
-
         // ============= INIT =============
         window.addEventListener('load', function() {
             console.log('🚀 Punch Card System loaded');
@@ -973,17 +881,21 @@
             setLanguage('ms');
 
             document.getElementById('loginBtn').addEventListener('click', performLogin);
-            document.getElementById('logoutBtn').addEventListener('click', () => {
+            document.getElementById('logoutBtnTop').addEventListener('click', () => {
                 clearSession();
-                document.getElementById('actionMsg').textContent = '👋 Telah keluar';
+                const msg = document.getElementById('punchMsg');
+                msg.textContent = '👋 Telah keluar';
+                msg.className = 'msg info';
+                setTimeout(() => { msg.className = 'msg'; }, 2000);
             });
             document.getElementById('punchBtn').addEventListener('click', performPunch);
-            document.getElementById('backupBtn').addEventListener('click', performBackup);
-            document.getElementById('renewBtn').addEventListener('click', renewSession);
 
             document.getElementById('backLink').addEventListener('click', (e) => {
                 e.preventDefault();
-                document.getElementById('actionMsg').textContent = '🔙 Kembali ke menu utama';
+                const msg = document.getElementById('punchMsg');
+                msg.textContent = '🔙 Kembali ke menu utama';
+                msg.className = 'msg info';
+                setTimeout(() => { msg.className = 'msg'; }, 2000);
             });
 
             document.querySelectorAll('#loginPanel input').forEach(inp => {
