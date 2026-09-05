@@ -40,7 +40,6 @@
             margin-bottom: 20px;
         }
 
-        /* 左上角退出按钮 */
         .logout-btn-top {
             position: absolute;
             top: 16px;
@@ -189,74 +188,6 @@
             background: #2f855a;
         }
 
-        .btn-danger {
-            background: #c53030;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #9b2c2c;
-        }
-
-        .btn-warning {
-            background: #d69e2e;
-            color: white;
-        }
-        .btn-warning:hover {
-            background: #b7791f;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #1a3a5c;
-            border: 2px solid #1a3a5c;
-        }
-        .btn-outline:hover {
-            background: #1a3a5c;
-            color: white;
-        }
-
-        .btn-sm {
-            padding: 10px 16px;
-            font-size: 13px;
-            width: auto;
-        }
-        .btn-disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .btn-disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
-
-        .user-badge {
-            background: #f7fafc;
-            border-radius: 12px;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            margin-bottom: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .user-badge .info {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .user-badge .info .label {
-            color: #718096;
-            font-size: 12px;
-        }
-        .user-badge .info .value {
-            font-weight: 600;
-            color: #1a3a5c;
-            font-size: 14px;
-        }
-
         .hidden {
             display: none !important;
         }
@@ -300,21 +231,32 @@
             margin-top: 16px;
         }
 
-        .punch-status {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+        .user-badge {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .user-badge .info {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .user-badge .info .label {
+            color: #718096;
+            font-size: 12px;
+        }
+        .user-badge .info .value {
             font-weight: 600;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-        .punch-status.has-records {
-            background: #bee3f8;
-            color: #2a4365;
-        }
-        .punch-status.no-record {
-            background: #edf2f7;
-            color: #4a5568;
+            color: #1a3a5c;
+            font-size: 14px;
         }
 
         .back-link {
@@ -339,7 +281,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- 左上角退出按钮 -->
         <button class="logout-btn-top" id="logoutBtnTop" title="Keluar">🚪</button>
 
         <div class="logo">🕐</div>
@@ -354,7 +295,6 @@
 
         <div id="statusBar" class="status-bar">🔌 Menyambung ke Google Sheet...</div>
 
-        <!-- ===== LOGIN PANEL ===== -->
         <div id="loginPanel">
             <div class="login-form">
                 <div class="input-group">
@@ -373,7 +313,6 @@
             </div>
         </div>
 
-        <!-- ===== LOGGED IN PANEL ===== -->
         <div id="loggedInPanel" class="hidden">
             <div class="clock-display">
                 <div class="time" id="clockTime">--:--:--</div>
@@ -389,12 +328,6 @@
                 </div>
             </div>
 
-            <!-- Punch Status -->
-            <div id="punchStatusContainer">
-                <div id="punchStatus" class="punch-status no-record">⏳ Belum punch</div>
-            </div>
-
-            <!-- Punch Button -->
             <button class="btn btn-success" id="punchBtn">🟢 Punch / 打卡</button>
             <div id="punchMsg" class="msg success"></div>
 
@@ -407,18 +340,14 @@
     </div>
 
     <script>
-        // ============= CONFIG =============
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjv9pL3y6tmpKb7_bBUCddXhAVxzrRUze_jgIC4ZgGGpFClFPw0IUYIsNkMYlmrtwJ/exec';
         const STORAGE_KEY = 'yz_punch_session';
         const SESSION_TTL = 48 * 60 * 60 * 1000;
 
-        // ============= STATE =============
         let currentLanguage = 'ms';
         let sessionData = null;
         let clockInterval = null;
-        let punchStatus = 'none';
 
-        // ============= TRANSLATIONS =============
         const translations = {
             ms: {
                 title: 'Sistem Punch Card',
@@ -429,7 +358,7 @@
                 loginError: '❌ Kod Pekerja atau Kata Laluan salah',
                 loginSuccess: '✅ Log masuk berjaya!',
                 punch: '🟢 Punch / 打卡',
-                punchSuccess: '✅ Punch berjaya! Rekod disimpan ke Google Sheet',
+                punchSuccess: '✅ Punch berjaya!',
                 punchError: '❌ Punch gagal, sila cuba lagi',
                 back: '← Kembali ke Menu',
                 footer: '© 2026 Sistem Pengurusan Staf · Punch Card',
@@ -438,8 +367,6 @@
                 connectionFail: '❌ Sambungan gagal: ',
                 sessionExpired: '⚠️ Sesi tamat tempoh. Sila log masuk semula.',
                 welcome: '👋 Selamat datang, ',
-                hasRecords: '📋 Rekod punch wujud',
-                noRecord: '⏳ Belum punch',
                 punchTimeError: '⏰ Punch hanya dibenarkan antara 4:30 pagi hingga 11:59 malam'
             },
             en: {
@@ -451,7 +378,7 @@
                 loginError: '❌ Employee Code or Password is incorrect',
                 loginSuccess: '✅ Login successful!',
                 punch: '🟢 Punch',
-                punchSuccess: '✅ Punch successful! Record saved to Google Sheet',
+                punchSuccess: '✅ Punch successful!',
                 punchError: '❌ Punch failed, please try again',
                 back: '← Back to Menu',
                 footer: '© 2026 Staff Management System · Punch Card',
@@ -460,8 +387,6 @@
                 connectionFail: '❌ Connection failed: ',
                 sessionExpired: '⚠️ Session expired. Please login again.',
                 welcome: '👋 Welcome, ',
-                hasRecords: '📋 Punch records exist',
-                noRecord: '⏳ Not punched yet',
                 punchTimeError: '⏰ Punch only allowed between 4:30 AM and 11:59 PM'
             },
             zh: {
@@ -473,7 +398,7 @@
                 loginError: '❌ 员工编号或密码错误',
                 loginSuccess: '✅ 登录成功！',
                 punch: '🟢 打卡',
-                punchSuccess: '✅ 打卡成功！记录已保存至 Google Sheet',
+                punchSuccess: '✅ 打卡成功！',
                 punchError: '❌ 打卡失败，请重试',
                 back: '← 返回菜单',
                 footer: '© 2026 员工管理系统 · 打卡记录',
@@ -482,22 +407,18 @@
                 connectionFail: '❌ 连接失败：',
                 sessionExpired: '⚠️ 会话已过期，请重新登录。',
                 welcome: '👋 欢迎，',
-                hasRecords: '📋 已有打卡记录',
-                noRecord: '⏳ 尚未打卡',
                 punchTimeError: '⏰ 打卡时间仅允许在凌晨4:30至晚上11:59之间'
             }
         };
 
         function t(key) { return translations[currentLanguage]?.[key] || key; }
 
-        // ============= LANGUAGE =============
         function setLanguage(lang) {
             currentLanguage = lang;
             document.querySelectorAll('.lang-btn').forEach(b => {
                 b.classList.toggle('active', b.dataset.lang === lang);
             });
             updateAllTexts();
-            updatePunchButton();
         }
 
         function updateAllTexts() {
@@ -510,7 +431,6 @@
             document.getElementById('footerText').textContent = t('footer');
         }
 
-        // ============= CLOCK =============
         function getMalaysiaTime() {
             const now = new Date();
             const ms = now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000);
@@ -540,14 +460,12 @@
             }
         }
 
-        // ============= STATUS BAR =============
         function updateStatus(msg, type = '') {
             const el = document.getElementById('statusBar');
             el.textContent = msg;
             el.className = 'status-bar ' + type;
         }
 
-        // ============= SESSION MANAGEMENT =============
         function getSession() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
@@ -585,15 +503,10 @@
                 document.getElementById('loggedInPanel').classList.remove('hidden');
                 document.getElementById('displayName').textContent = session.name || session.code;
                 document.getElementById('displayCode').textContent = session.code;
-                
-                const deviceInfo = getDeviceInfo();
-                document.getElementById('displayDevice').textContent = deviceInfo;
-                
+                document.getElementById('displayDevice').textContent = getDeviceInfo();
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
                 startClock();
-                
-                checkPunchStatus(session.code);
             } else {
                 document.getElementById('loginPanel').classList.remove('hidden');
                 document.getElementById('loggedInPanel').classList.add('hidden');
@@ -601,15 +514,12 @@
                 document.getElementById('loginMsg').className = 'msg';
                 document.getElementById('punchMsg').className = 'msg';
                 stopClock();
-                punchStatus = 'none';
             }
         }
 
-        // ============= DEVICE INFO =============
         function getDeviceInfo() {
             const ua = navigator.userAgent;
             let device = 'Unknown';
-            
             if (/iPhone|iPad|iPod/.test(ua)) {
                 device = 'iOS';
             } else if (/Android/.test(ua)) {
@@ -622,7 +532,6 @@
             } else if (/Linux/.test(ua)) {
                 device = 'Linux';
             }
-            
             let browser = 'Unknown';
             if (/Chrome/.test(ua) && !/Edge/.test(ua)) {
                 browser = 'Chrome';
@@ -633,20 +542,14 @@
             } else if (/Edge/.test(ua)) {
                 browser = 'Edge';
             }
-            
             return device + ' (' + browser + ')';
         }
 
-        // ============= FETCH STAFF DATA =============
         function fetchStaffData() {
             return new Promise((resolve, reject) => {
                 updateStatus(t('connecting'));
-                
                 fetch(SCRIPT_URL + '?action=getStaffData')
-                .then(response => {
-                    if (!response.ok) throw new Error('HTTP ' + response.status);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     if (data && data.length > 0) {
                         updateStatus(t('connected') + ' ' + data.length + ' rekod ditemui.', 'success');
@@ -662,73 +565,19 @@
             });
         }
 
-        // ============= CHECK PUNCH STATUS =============
-        function checkPunchStatus(code) {
-            fetch(SCRIPT_URL + '?action=getPunchRecord&code=' + encodeURIComponent(code))
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.length > 0) {
-                    punchStatus = 'has_records';
-                } else {
-                    punchStatus = 'none';
-                }
-                updatePunchStatus();
-                updatePunchButton();
-            })
-            .catch(err => {
-                console.error('Error checking punch status:', err);
-                punchStatus = 'none';
-                updatePunchStatus();
-                updatePunchButton();
-            });
-        }
-
-        // ============= UPDATE PUNCH STATUS =============
-        function updatePunchStatus() {
-            const el = document.getElementById('punchStatus');
-            if (punchStatus === 'has_records') {
-                el.textContent = t('hasRecords');
-                el.className = 'punch-status has-records';
-            } else {
-                el.textContent = t('noRecord');
-                el.className = 'punch-status no-record';
-            }
-        }
-
-        // ============= UPDATE PUNCH BUTTON =============
-        function updatePunchButton() {
-            const btn = document.getElementById('punchBtn');
-            btn.textContent = '🟢 ' + t('punch');
-            btn.className = 'btn btn-success';
-            btn.disabled = false;
-        }
-
-        // ============= UPDATE PHONE TYPE =============
         function updatePhoneTypeInSheet(code, phoneType) {
             const payload = {
                 action: 'UPDATE_PHONE_TYPE',
-                data: {
-                    code: code,
-                    phoneType: phoneType,
-                    timestamp: new Date().toISOString()
-                }
+                data: { code: code, phoneType: phoneType }
             };
-
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            })
-            .then(() => {
-                console.log(`✅ PhoneType updated for ${code}: ${phoneType}`);
-            })
-            .catch(err => {
-                console.error(`❌ PhoneType update failed:`, err);
             });
         }
 
-        // ============= LOGIN =============
         async function performLogin() {
             const code = document.getElementById('loginCode').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
@@ -742,7 +591,6 @@
 
             try {
                 const staffList = await fetchStaffData();
-                
                 const matchedStaff = staffList.find(row => {
                     const staffCode = row[2] || '';
                     const staffPass = row[26] || '';
@@ -751,7 +599,6 @@
 
                 if (matchedStaff) {
                     const deviceInfo = getDeviceInfo();
-                    
                     const userData = {
                         Code: matchedStaff[2] || '',
                         Name: matchedStaff[3] || '',
@@ -759,9 +606,9 @@
                     };
 
                     setSession(userData);
-                    
                     updatePhoneTypeInSheet(userData.Code, deviceInfo);
 
+                    // 登录时创建/更新记录
                     const loginPayload = {
                         action: 'LOGIN',
                         data: {
@@ -771,7 +618,6 @@
                             phoneType: userData.PhoneType
                         }
                     };
-
                     fetch(SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -782,10 +628,7 @@
                     const msg = document.getElementById('loginMsg');
                     msg.textContent = t('loginSuccess');
                     msg.className = 'msg success';
-                    
-                    setTimeout(() => {
-                        msg.className = 'msg';
-                    }, 3000);
+                    setTimeout(() => { msg.className = 'msg'; }, 3000);
                 } else {
                     const msg = document.getElementById('loginMsg');
                     msg.textContent = t('loginError');
@@ -795,11 +638,9 @@
                 const msg = document.getElementById('loginMsg');
                 msg.textContent = '⚠️ ' + t('connectionFail') + err.message;
                 msg.className = 'msg error';
-                console.error('Login error:', err);
             }
         }
 
-        // ============= PUNCH =============
         function performPunch() {
             const session = getSession();
             if (!session) {
@@ -846,25 +687,16 @@
             .then(() => {
                 msg.textContent = '✅ ' + t('punchSuccess') + ' (' + timeStr + ')';
                 msg.className = 'msg success';
-                punchStatus = 'has_records';
-                updatePunchStatus();
-                updatePunchButton();
-                
-                setTimeout(() => {
-                    checkPunchStatus(session.code);
-                }, 2000);
+                setTimeout(() => { msg.className = 'msg'; }, 3000);
             })
             .catch(err => {
-                msg.textContent = '❌ ' + t('punchError') + ': ' + err.message;
+                msg.textContent = '❌ ' + t('punchError');
                 msg.className = 'msg error';
                 console.error('Punch error:', err);
             });
         }
 
-        // ============= INIT =============
         window.addEventListener('load', function() {
-            console.log('🚀 Punch Card System loaded');
-
             const session = getSession();
             if (session) {
                 applySession(session);
@@ -877,7 +709,6 @@
             }
 
             fetchStaffData().catch(() => {});
-
             setLanguage('ms');
 
             document.getElementById('loginBtn').addEventListener('click', performLogin);
@@ -889,7 +720,6 @@
                 setTimeout(() => { msg.className = 'msg'; }, 2000);
             });
             document.getElementById('punchBtn').addEventListener('click', performPunch);
-
             document.getElementById('backLink').addEventListener('click', (e) => {
                 e.preventDefault();
                 const msg = document.getElementById('punchMsg');
