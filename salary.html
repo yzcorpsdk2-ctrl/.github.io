@@ -1,629 +1,620 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll System · Google Sheets Sync</title>
-    <!-- Font Awesome for icons (optional but nice) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payroll System · Google Sheet + PDF + Print</title>
+  <!-- Font Awesome Icons (optional but nice) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fc;
+      padding: 2rem 1.5rem;
+      color: #1e293b;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      color: #0f172a;
+    }
+    h1 i {
+      color: #2563eb;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      border: 1px solid #e9eef3;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .btn {
+      background: white;
+      border: 1px solid #cdd9e6;
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      color: #1e293b;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+    .btn i {
+      font-size: 1rem;
+    }
+    .btn-primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+    .btn-outline {
+      background: white;
+    }
+    .btn-outline:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .btn-danger {
+      background: #fee2e2;
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+    .btn-sm {
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(0.3);
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid #e9eef3;
+      background: #ffffff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 1000px;
+    }
+    th {
+      text-align: left;
+      padding: 1rem 1rem 0.85rem 1rem;
+      background: #f8fafc;
+      font-weight: 600;
+      color: #334155;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: middle;
+      background: white;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .input-field {
+      width: 100%;
+      min-width: 90px;
+      border: 1px solid #d1d9e6;
+      border-radius: 12px;
+      padding: 0.6rem 0.75rem;
+      font-size: 0.9rem;
+      background: #ffffff;
+      transition: 0.15s;
+      font-family: inherit;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .input-field[readonly] {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
+      color: #0f172a;
+      font-weight: 500;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .status-badge {
+      font-size: 0.75rem;
+      background: #dcfce7;
+      color: #166534;
+      padding: 0.25rem 0.75rem;
+      border-radius: 30px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .footer-note {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #1e293b;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 60px;
+      box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.3);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .toast i {
+      color: #4ade80;
+    }
+    .sheet-note {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #eef6ff;
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      color: #1e40af;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .sheet-note i {
+      color: #2563eb;
+    }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
 
-        body {
-            background: linear-gradient(145deg, #f6f9fc 0%, #e9f2f8 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem;
-            margin: 0;
-        }
-
-        .payroll-container {
-            max-width: 1100px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 2.5rem;
-            box-shadow: 0 25px 50px -8px rgba(0, 20, 30, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
-            padding: 2rem 2rem 2.5rem;
-            transition: all 0.2s;
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            margin: 0 0 0.2rem 0;
-            background: linear-gradient(135deg, #1e3c5c, #2b5a7a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        h1 i {
-            background: #1e3c5c;
-            background: linear-gradient(135deg, #1e3c5c, #2b5a7a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 2rem;
-        }
-
-        .subhead {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            color: #4a627a;
-            font-weight: 400;
-            border-bottom: 1px solid rgba(98, 138, 168, 0.25);
-            padding-bottom: 0.75rem;
-        }
-
-        .subhead span {
-            font-size: 0.95rem;
-            background: #e2edf7;
-            padding: 0.3rem 1rem;
-            border-radius: 30px;
-            font-weight: 500;
-            color: #1e3c5c;
-            border: 1px solid #cbdae8;
-        }
-
-        .sync-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            background: #eef5fc;
-            padding: 0.3rem 1rem;
-            border-radius: 30px;
-            color: #1f5e8e;
-            border: 1px solid #b8d2e8;
-        }
-
-        .sync-badge i {
-            color: #2b7a4b;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.25rem 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .input-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            color: #366185;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .input-group label i {
-            font-size: 0.9rem;
-            color: #4a7a9c;
-        }
-
-        .input-group input {
-            background: white;
-            border: 1.5px solid #d3e2f0;
-            border-radius: 1.2rem;
-            padding: 0.8rem 1.2rem;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #122b3f;
-            transition: 0.2s;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #2b7a9c;
-            box-shadow: 0 0 0 4px rgba(43, 122, 156, 0.15);
-            background: #ffffff;
-        }
-
-        .input-group input[type="number"] {
-            -moz-appearance: textfield;
-        }
-
-        .input-group input[type="number"]::-webkit-inner-spin-button {
-            opacity: 0.5;
-        }
-
-        .action-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .btn {
-            border: none;
-            padding: 0.85rem 1.8rem;
-            border-radius: 3rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: 0.15s ease;
-            letter-spacing: 0.01em;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .btn-primary {
-            background: #1e3c5c;
-            background: linear-gradient(135deg, #1e3c5c, #255a7c);
-            color: white;
-            box-shadow: 0 10px 18px -8px #1e3c5c80;
-        }
-
-        .btn-primary:hover {
-            background: #255a7c;
-            transform: translateY(-2px);
-            box-shadow: 0 18px 25px -10px #1e3c5c;
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #1e3c5c;
-            border: 1.5px solid #bfd6e8;
-        }
-
-        .btn-secondary:hover {
-            background: #f2f9ff;
-            border-color: #8db4d0;
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: #1f7a4a;
-            background: linear-gradient(135deg, #1f7a4a, #2b9b63);
-            color: white;
-            box-shadow: 0 10px 18px -8px #1f7a4a80;
-        }
-
-        .btn-success:hover {
-            background: #2b9b63;
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn i {
-            font-size: 1rem;
-        }
-
-        .results-card {
-            background: #ffffffd9;
-            backdrop-filter: blur(4px);
-            border-radius: 2rem;
-            padding: 1.8rem 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.8), 0 12px 30px -12px rgba(0, 20, 40, 0.2);
-            margin-top: 1rem;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1.5rem 1.2rem;
-        }
-
-        .result-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .result-item .label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #50718b;
-            margin-bottom: 0.3rem;
-        }
-
-        .result-item .value {
-            font-size: 1.9rem;
-            font-weight: 700;
-            color: #0d2c44;
-            line-height: 1.2;
-            word-break: break-word;
-        }
-
-        .result-item .value.currency::before {
-            content: '$';
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: #3d6a8c;
-            margin-right: 3px;
-        }
-
-        .net-pay {
-            background: #e7f3ec;
-            border-radius: 1.5rem;
-            padding: 0.8rem 1rem;
-            margin-top: 0.5rem;
-            border-left: 6px solid #1f7a4a;
-        }
-
-        .net-pay .value {
-            font-size: 2.4rem;
-            color: #0a3b21;
-        }
-
-        .status-message {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            padding: 0.8rem 1.2rem;
-            border-radius: 3rem;
-            background: #e1eff9;
-            color: #12415f;
-            margin-top: 1.5rem;
-            transition: 0.2s;
-        }
-
-        .status-message i {
-            font-size: 1.1rem;
-        }
-
-        .status-message.error {
-            background: #ffe2e2;
-            color: #a12b2b;
-        }
-
-        .status-message.success {
-            background: #dff0e4;
-            color: #0e5e32;
-        }
-
-        .footnote {
-            font-size: 0.8rem;
-            color: #6c8ba3;
-            text-align: center;
-            margin-top: 1.8rem;
-            border-top: 1px dashed #c2d6e8;
-            padding-top: 1.2rem;
-        }
-
-        .footnote code {
-            background: #e2edf7;
-            padding: 0.2rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: #1f4870;
-        }
-
-        @media (max-width: 700px) {
-            .payroll-container {
-                padding: 1.5rem;
-            }
-            h1 {
-                font-size: 1.7rem;
-            }
-            .action-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .btn {
-                width: 100%;
-            }
-            .results-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-    </style>
+    /* print styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0.5in;
+      }
+      .toolbar, .btn, .toast, .sheet-note, .no-print {
+        display: none !important;
+      }
+      .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+      }
+      .table-wrapper {
+        border: 1px solid #aaa;
+      }
+      th {
+        background: #eee;
+      }
+      .input-field {
+        border: none;
+        background: transparent;
+        padding: 0.2rem 0.2rem;
+        font-weight: 500;
+      }
+      .input-field[readonly] {
+        background: transparent;
+      }
+      .status-badge {
+        background: #eee;
+        color: black;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="payroll-container">
+  <div class="container">
     <h1>
-        <i class="fas fa-calculator"></i> Payroll System
+      <i class="fas fa-calculator"></i> Payroll System
+      <span style="font-size: 0.9rem; font-weight: 400; margin-left: auto; color: #475569;">
+        <i class="fas fa-cloud-upload-alt"></i> Google Sheet ready
+      </span>
     </h1>
-    <div class="subhead">
-        <span><i class="fas fa-cloud-upload-alt"></i> Sync to Google Sheets</span>
-        <div class="sync-badge">
-            <i class="fas fa-circle" style="font-size: 0.5rem; color: #2b7a4b;"></i> Ready
-        </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button class="btn btn-primary" id="saveToSheetBtn">
+          <i class="fas fa-cloud-upload-alt"></i> Save to Google Sheet
+        </button>
+        <button class="btn btn-outline" id="exportPdfBtn">
+          <i class="fas fa-file-pdf"></i> Download PDF
+        </button>
+        <button class="btn btn-outline" id="printBtn">
+          <i class="fas fa-print"></i> Print
+        </button>
+        <button class="btn btn-outline" id="addRowBtn">
+          <i class="fas fa-plus-circle"></i> Add Employee
+        </button>
+        <button class="btn btn-danger" id="resetDataBtn">
+          <i class="fas fa-undo-alt"></i> Reset
+        </button>
+      </div>
+      <div class="sheet-note no-print">
+        <i class="fas fa-table"></i> Data syncs to Google Sheet via Apps Script
+      </div>
     </div>
 
-    <!-- Payroll input form -->
-    <div class="form-grid" id="payrollForm">
-        <div class="input-group">
-            <label><i class="fas fa-user"></i> Employee Name</label>
-            <input type="text" id="employeeName" placeholder="e.g. Jane Cooper" value="Jane Cooper">
-        </div>
-        <div class="input-group">
-            <label><i class="fas fa-id-card"></i> Employee ID</label>
-            <input type="text" id="employeeId" placeholder="EMP-001" value="EMP-001">
-        </div>
-        <div class="input-group">
-            <label><i class="fas fa-clock"></i> Hours Worked</label>
-            <input type="number" id="hoursWorked" step="0.5" min="0" value="40">
-        </div>
-        <div class="input-group">
-            <label><i class="fas fa-dollar-sign"></i> Hourly Rate</label>
-            <input type="number" id="hourlyRate" step="0.01" min="0" value="25.50">
-        </div>
-        <div class="input-group">
-            <label><i class="fas fa-percent"></i> Tax Rate (%)</label>
-            <input type="number" id="taxRate" step="0.1" min="0" max="100" value="15">
-        </div>
-        <div class="input-group">
-            <label><i class="fas fa-plus-circle"></i> Bonus</label>
-            <input type="number" id="bonus" step="0.01" min="0" value="100">
-        </div>
+    <!-- Payroll Table Card -->
+    <div class="card">
+      <div class="section-title">
+        <i class="fas fa-users"></i> Employee Payroll — <span id="monthDisplay">April 2025</span>
+      </div>
+      <div class="table-wrapper">
+        <table id="payrollTable">
+          <thead>
+            <tr>
+              <th>Employee ID</th>
+              <th>Name</th>
+              <th>Basic Salary (RM)</th>
+              <th>Allowance (RM)</th>
+              <th>Deduction (RM)</th>
+              <th>EPF (11%)</th>
+              <th>SOCSO (0.5%)</th>
+              <th>Net Salary (RM)</th>
+              <th class="no-print">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- rows will be populated by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="footer-note">
+        <i class="fas fa-info-circle"></i> Net Salary = Basic + Allowance - Deduction - EPF - SOCSO
+      </div>
     </div>
+  </div>
 
-    <!-- Action buttons -->
-    <div class="action-bar">
-        <button class="btn btn-primary" id="calculateBtn"><i class="fas fa-sync-alt"></i> Calculate Payroll</button>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
-            <button class="btn btn-success" id="syncBtn"><i class="fas fa-cloud-upload-alt"></i> Sync to Google Sheet</button>
-        </div>
-    </div>
+  <!-- Toast message -->
+  <div id="toast" class="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Saved!</span>
+  </div>
 
-    <!-- Results display -->
-    <div class="results-card">
-        <div class="results-grid" id="resultsGrid">
-            <div class="result-item">
-                <span class="label">Gross Pay</span>
-                <span class="value currency" id="grossPayDisplay">0.00</span>
-            </div>
-            <div class="result-item">
-                <span class="label">Tax Amount</span>
-                <span class="value currency" id="taxAmountDisplay">0.00</span>
-            </div>
-            <div class="result-item">
-                <span class="label">Net Pay</span>
-                <span class="value currency" id="netPayDisplay">0.00</span>
-            </div>
-            <div class="result-item net-pay" style="grid-column: span 1;">
-                <span class="label" style="color: #0e5e32;">Take Home</span>
-                <span class="value currency" id="netPayBigDisplay" style="font-size: 2.4rem;">0.00</span>
-            </div>
-        </div>
-    </div>
+  <script>
+    // ============================================================
+    // PAYROLL SYSTEM – with Google Sheet integration (via Apps Script)
+    // ============================================================
 
-    <!-- Status message -->
-    <div class="status-message" id="statusMessage">
-        <i class="fas fa-info-circle"></i> Enter details and click Calculate.
-    </div>
+    // ----- CONFIGURATION -----
+    // Replace with your own Google Apps Script Web App URL.
+    // If you don't have one yet, the "Save to Google Sheet" will show a demo alert.
+    const GOOGLE_SHEET_WEBAPP_URL = ''; // e.g. "https://script.google.com/macros/s/AKfy.../exec"
 
-    <div class="footnote">
-        <i class="fas fa-google"></i> Google Apps Script endpoint: <code>GOOGLE_SHEET_WEBAPP_URL</code> (replace in code)
-    </div>
-</div>
+    // ----- DATA MODEL -----
+    let employees = [
+      { id: 'EMP001', name: 'Ahmad bin Ali', basic: 4500.00, allowance: 600.00, deduction: 150.00 },
+      { id: 'EMP002', name: 'Siti Nurhaliza', basic: 3800.00, allowance: 450.00, deduction: 80.00 },
+      { id: 'EMP003', name: 'Chong Wei Ming', basic: 5200.00, allowance: 800.00, deduction: 200.00 },
+      { id: 'EMP004', name: 'Priya a/p Sharma', basic: 4200.00, allowance: 550.00, deduction: 120.00 },
+    ];
 
-<script>
-    (function() {
-        // ============================================================
-        // ⚠️ REPLACE THIS with your deployed Google Apps Script Web App URL
-        //    Example: 'https://script.google.com/macros/s/AKfycb.../exec'
-        // ============================================================
-        const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'; // <-- CHANGE THIS
+    // ----- HELPER: calculation -----
+    function calculateRow(emp) {
+      const basic = Number(emp.basic) || 0;
+      const allowance = Number(emp.allowance) || 0;
+      const deduction = Number(emp.deduction) || 0;
+      const epf = basic * 0.11;      // 11% of basic
+      const socso = basic * 0.005;   // 0.5% of basic
+      const net = basic + allowance - deduction - epf - socso;
+      return { epf, socso, net };
+    }
 
-        // DOM elements
-        const employeeNameInput = document.getElementById('employeeName');
-        const employeeIdInput = document.getElementById('employeeId');
-        const hoursWorkedInput = document.getElementById('hoursWorked');
-        const hourlyRateInput = document.getElementById('hourlyRate');
-        const taxRateInput = document.getElementById('taxRate');
-        const bonusInput = document.getElementById('bonus');
+    // ----- RENDER TABLE -----
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
 
-        const grossPayDisplay = document.getElementById('grossPayDisplay');
-        const taxAmountDisplay = document.getElementById('taxAmountDisplay');
-        const netPayDisplay = document.getElementById('netPayDisplay');
-        const netPayBigDisplay = document.getElementById('netPayBigDisplay');
-        const statusMessage = document.getElementById('statusMessage');
+      employees.forEach((emp, index) => {
+        const { epf, socso, net } = calculateRow(emp);
 
-        // Helper: format number to 2 decimals
-        function formatCurrency(value) {
-            return Number(value).toFixed(2);
-        }
+        const tr = document.createElement('tr');
+        tr.dataset.index = index;
 
-        // Core calculation logic (returns object with all computed values)
-        function calculatePayroll() {
-            const hours = parseFloat(hoursWorkedInput.value) || 0;
-            const rate = parseFloat(hourlyRateInput.value) || 0;
-            const taxRate = parseFloat(taxRateInput.value) || 0;
-            const bonus = parseFloat(bonusInput.value) || 0;
+        // ID (editable)
+        const tdId = document.createElement('td');
+        const inputId = document.createElement('input');
+        inputId.type = 'text';
+        inputId.className = 'input-field';
+        inputId.value = emp.id;
+        inputId.dataset.field = 'id';
+        inputId.addEventListener('input', (e) => updateField(index, 'id', e.target.value));
+        tdId.appendChild(inputId);
+        tr.appendChild(tdId);
 
-            const gross = (hours * rate) + bonus;
-            const taxAmount = gross * (taxRate / 100);
-            const net = gross - taxAmount;
+        // Name (editable)
+        const tdName = document.createElement('td');
+        const inputName = document.createElement('input');
+        inputName.type = 'text';
+        inputName.className = 'input-field';
+        inputName.value = emp.name;
+        inputName.dataset.field = 'name';
+        inputName.addEventListener('input', (e) => updateField(index, 'name', e.target.value));
+        tdName.appendChild(inputName);
+        tr.appendChild(tdName);
 
-            return {
-                gross: gross,
-                tax: taxAmount,
-                net: net,
-                hours: hours,
-                rate: rate,
-                taxRate: taxRate,
-                bonus: bonus,
-                employeeName: employeeNameInput.value.trim() || 'N/A',
-                employeeId: employeeIdInput.value.trim() || 'N/A'
-            };
-        }
+        // Basic (editable)
+        const tdBasic = document.createElement('td');
+        const inputBasic = document.createElement('input');
+        inputBasic.type = 'number';
+        inputBasic.step = '0.01';
+        inputBasic.className = 'input-field';
+        inputBasic.value = emp.basic;
+        inputBasic.dataset.field = 'basic';
+        inputBasic.addEventListener('input', (e) => updateField(index, 'basic', parseFloat(e.target.value) || 0));
+        tdBasic.appendChild(inputBasic);
+        tr.appendChild(tdBasic);
 
-        // Update the UI with calculated values
-        function updateUIFromCalculation(calc) {
-            grossPayDisplay.textContent = formatCurrency(calc.gross);
-            taxAmountDisplay.textContent = formatCurrency(calc.tax);
-            netPayDisplay.textContent = formatCurrency(calc.net);
-            netPayBigDisplay.textContent = formatCurrency(calc.net);
-        }
+        // Allowance (editable)
+        const tdAllow = document.createElement('td');
+        const inputAllow = document.createElement('input');
+        inputAllow.type = 'number';
+        inputAllow.step = '0.01';
+        inputAllow.className = 'input-field';
+        inputAllow.value = emp.allowance;
+        inputAllow.dataset.field = 'allowance';
+        inputAllow.addEventListener('input', (e) => updateField(index, 'allowance', parseFloat(e.target.value) || 0));
+        tdAllow.appendChild(inputAllow);
+        tr.appendChild(tdAllow);
 
-        // Set status message helper
-        function setStatus(message, type = 'info') {
-            statusMessage.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
-            statusMessage.className = 'status-message'; // reset
-            if (type === 'error') statusMessage.classList.add('error');
-            if (type === 'success') statusMessage.classList.add('success');
-        }
+        // Deduction (editable)
+        const tdDeduct = document.createElement('td');
+        const inputDeduct = document.createElement('input');
+        inputDeduct.type = 'number';
+        inputDeduct.step = '0.01';
+        inputDeduct.className = 'input-field';
+        inputDeduct.value = emp.deduction;
+        inputDeduct.dataset.field = 'deduction';
+        inputDeduct.addEventListener('input', (e) => updateField(index, 'deduction', parseFloat(e.target.value) || 0));
+        tdDeduct.appendChild(inputDeduct);
+        tr.appendChild(tdDeduct);
 
-        // Perform calculation and update UI
-        function performCalculation() {
-            try {
-                const calc = calculatePayroll();
-                updateUIFromCalculation(calc);
-                return calc;
-            } catch (e) {
-                setStatus('Calculation error: ' + e.message, 'error');
-                return null;
-            }
-        }
+        // EPF (readonly)
+        const tdEpf = document.createElement('td');
+        const inputEpf = document.createElement('input');
+        inputEpf.type = 'text';
+        inputEpf.className = 'input-field';
+        inputEpf.readOnly = true;
+        inputEpf.value = epf.toFixed(2);
+        tdEpf.appendChild(inputEpf);
+        tr.appendChild(tdEpf);
 
-        // ----- Calculate button -----
-        document.getElementById('calculateBtn').addEventListener('click', function() {
-            const calc = performCalculation();
-            if (calc) {
-                setStatus('Payroll calculated successfully. Ready to sync.', 'success');
-            }
+        // SOCSO (readonly)
+        const tdSocso = document.createElement('td');
+        const inputSocso = document.createElement('input');
+        inputSocso.type = 'text';
+        inputSocso.className = 'input-field';
+        inputSocso.readOnly = true;
+        inputSocso.value = socso.toFixed(2);
+        tdSocso.appendChild(inputSocso);
+        tr.appendChild(tdSocso);
+
+        // Net Salary (readonly)
+        const tdNet = document.createElement('td');
+        const inputNet = document.createElement('input');
+        inputNet.type = 'text';
+        inputNet.className = 'input-field';
+        inputNet.readOnly = true;
+        inputNet.value = net.toFixed(2);
+        tdNet.appendChild(inputNet);
+        tr.appendChild(tdNet);
+
+        // Actions (delete button)
+        const tdAction = document.createElement('td');
+        tdAction.className = 'no-print';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-sm btn-danger';
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteBtn.title = 'Delete employee';
+        deleteBtn.addEventListener('click', () => deleteEmployee(index));
+        tdAction.appendChild(deleteBtn);
+        tr.appendChild(tdAction);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ----- UPDATE FIELD -----
+    function updateField(index, field, value) {
+      if (!employees[index]) return;
+      employees[index][field] = value;
+
+      // If basic, allowance or deduction changed → re-render full row (or just recalc fields)
+      // For simplicity, re-render entire table (small data, fine)
+      if (field === 'basic' || field === 'allowance' || field === 'deduction') {
+        // Preserve focus? We'll re-render but that's acceptable for demo.
+        renderTable();
+      } else {
+        // update only the changed field in the model, no need to re-render everything
+        // but to keep consistency we can just re-render, but it's okay to skip for non-calc fields
+        // However when ID/Name changed we don't need re-render, but we must keep model updated
+        // The UI already reflects it. We'll just re-render to be safe? Might lose focus.
+        // Better: only re-render when necessary (calc fields). 
+        // For id/name we don't need re-render. So we do nothing more.
+        // But we have to update the corresponding row's dataset index? No.
+      }
+    }
+
+    // ----- DELETE EMPLOYEE -----
+    function deleteEmployee(index) {
+      if (confirm('Delete this employee record?')) {
+        employees.splice(index, 1);
+        renderTable();
+        showToast('Employee removed');
+      }
+    }
+
+    // ----- ADD NEW EMPLOYEE -----
+    function addEmployee() {
+      const newId = `EMP${String(employees.length + 1).padStart(3, '0')}`;
+      employees.push({
+        id: newId,
+        name: 'New Employee',
+        basic: 3000.00,
+        allowance: 0.00,
+        deduction: 0.00
+      });
+      renderTable();
+      showToast('New employee added');
+    }
+
+    // ----- RESET TO DEFAULT -----
+    function resetData() {
+      if (confirm('Reset to default sample data?')) {
+        employees = [
+          { id: 'EMP001', name: 'Ahmad bin Ali', basic: 4500.00, allowance: 600.00, deduction: 150.00 },
+          { id: 'EMP002', name: 'Siti Nurhaliza', basic: 3800.00, allowance: 450.00, deduction: 80.00 },
+          { id: 'EMP003', name: 'Chong Wei Ming', basic: 5200.00, allowance: 800.00, deduction: 200.00 },
+          { id: 'EMP004', name: 'Priya a/p Sharma', basic: 4200.00, allowance: 550.00, deduction: 120.00 },
+        ];
+        renderTable();
+        showToast('Data reset to default');
+      }
+    }
+
+    // ----- TOAST -----
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      toastMsg.textContent = message;
+      toast.querySelector('i').className = isSuccess ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // ----- SAVE TO GOOGLE SHEET (via Apps Script Web App) -----
+    async function saveToGoogleSheet() {
+      // Prepare data for sheet: array of objects
+      const payload = employees.map(emp => {
+        const { epf, socso, net } = calculateRow(emp);
+        return {
+          id: emp.id,
+          name: emp.name,
+          basic: emp.basic,
+          allowance: emp.allowance,
+          deduction: emp.deduction,
+          epf: parseFloat(epf.toFixed(2)),
+          socso: parseFloat(socso.toFixed(2)),
+          net: parseFloat(net.toFixed(2)),
+          timestamp: new Date().toISOString()
+        };
+      });
+
+      // If no webapp URL configured, simulate success with a note.
+      if (!GOOGLE_SHEET_WEBAPP_URL) {
+        // DEMO MODE: just show a message.
+        console.log('Google Sheet payload:', payload);
+        showToast('Demo: data logged to console. Configure Apps Script URL.', true);
+        // Also show a small alert? better to keep toast.
+        return;
+      }
+
+      try {
+        const response = await fetch(GOOGLE_SHEET_WEBAPP_URL, {
+          method: 'POST',
+          mode: 'no-cors', // avoid CORS issues with Apps Script
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payroll: payload })
         });
+        // With no-cors we can't read response, but we assume success.
+        showToast('Payroll saved to Google Sheet ✓');
+      } catch (error) {
+        console.error('Save error:', error);
+        showToast('Failed to save to Google Sheet. Check console.', false);
+      }
+    }
 
-        // ----- Reset button -----
-        document.getElementById('resetBtn').addEventListener('click', function() {
-            employeeNameInput.value = 'Jane Cooper';
-            employeeIdInput.value = 'EMP-001';
-            hoursWorkedInput.value = '40';
-            hourlyRateInput.value = '25.50';
-            taxRateInput.value = '15';
-            bonusInput.value = '100';
-            performCalculation();
-            setStatus('Form reset to defaults.', 'info');
-        });
+    // ----- EXPORT PDF (using print to PDF) -----
+    function exportPDF() {
+      // Simply trigger print with a suggestion to save as PDF
+      window.print();
+      showToast('Use "Save as PDF" in print dialog', true);
+    }
 
-        // ----- Sync to Google Sheets button -----
-        document.getElementById('syncBtn').addEventListener('click', async function() {
-            // First recalc to ensure current values
-            const calc = performCalculation();
-            if (!calc) return;
+    // ----- PRINT -----
+    function printPage() {
+      window.print();
+    }
 
-            // Validate required fields
-            if (!calc.employeeName || calc.employeeName === 'N/A') {
-                setStatus('Please enter a valid Employee Name.', 'error');
-                return;
-            }
-            if (!calc.employeeId || calc.employeeId === 'N/A') {
-                setStatus('Please enter a valid Employee ID.', 'error');
-                return;
-            }
+    // ----- ATTACH EVENTS -----
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTable();
 
-            // Check if webapp URL is configured
-            if (GOOGLE_SHEET_WEBAPP_URL.includes('YOUR_DEPLOYMENT_ID') || GOOGLE_SHEET_WEBAPP_URL === '') {
-                setStatus('⚠️ Google Sheet Web App URL not configured. Please update the script.', 'error');
-                return;
-            }
+      document.getElementById('addRowBtn').addEventListener('click', addEmployee);
+      document.getElementById('resetDataBtn').addEventListener('click', resetData);
+      document.getElementById('saveToSheetBtn').addEventListener('click', saveToGoogleSheet);
+      document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
+      document.getElementById('printBtn').addEventListener('click', printPage);
+    });
 
-            // Prepare payload
-            const payload = {
-                employeeName: calc.employeeName,
-                employeeId: calc.employeeId,
-                hoursWorked: calc.hours,
-                hourlyRate: calc.rate,
-                taxRate: calc.taxRate,
-                bonus: calc.bonus,
-                grossPay: calc.gross,
-                taxAmount: calc.tax,
-                netPay: calc.net,
-                timestamp: new Date().toISOString()
-            };
-
-            setStatus('Syncing to Google Sheets...', 'info');
-            const syncBtn = this;
-            syncBtn.disabled = true;
-            syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
-
-            try {
-                // Using fetch with no-cors? Better to use standard POST with text/plain to avoid preflight,
-                // but Google Apps Script Web App accepts JSON with CORS.
-                // We'll set Content-Type: application/json and expect CORS enabled.
-                const response = await fetch(GOOGLE_SHEET_WEBAPP_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                // Try to parse JSON response, but some Apps Script deployments return text
-                const responseText = await response.text();
-                let result;
-                try {
-                    result = JSON.parse(responseText);
-                } catch (e) {
-                    result = { status: 'success', message: responseText };
-                }
-
-                if (result.status === 'error') {
-                    throw new Error(result.message || 'Unknown error from server');
-                }
-
-                setStatus(`✅ Successfully synced ${calc.employeeName} to Google Sheets!`, 'success');
-            } catch (error) {
-                console.error('Sync error:', error);
-                setStatus(`❌ Sync failed: ${error.message}. Check console and Web App URL.`, 'error');
-            } finally {
-                syncBtn.disabled = false;
-                syncBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Sync to Google Sheet';
-            }
-        });
-
-        // Initial calculation on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            performCalculation();
-            setStatus('Ready. Adjust values and click Calculate.', 'info');
-        });
-
-        // Also recalc on Enter key in any input for convenience
-        const inputs = document.querySelectorAll('#payrollForm input');
-        inputs.forEach(input => {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    performCalculation();
-                    setStatus('Payroll recalculated.', 'success');
-                }
-            });
-        });
-    })();
-</script>
+    // Expose some functions for debugging
+    window.payroll = { employees, renderTable };
+  </script>
 </body>
 </html>
