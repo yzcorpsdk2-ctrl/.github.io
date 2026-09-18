@@ -1,1 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll System</title>
+<style>
+  :root{--brand:#2563eb;--brand-d:#1d4ed8;--bg:#f1f5f9;--card:#fff;--line:#e2e8f0;--txt:#0f172a;--muted:#64748b;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--txt);}
+  header{background:var(--brand);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  header h1{margin:0;font-size:20px;font-weight:600;}
+  header .sub{font-size:12px;opacity:.85;}
+  main{max-width:1200px;margin:24px auto;padding:0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+  input,select,button{font:inherit;}
+  input[type="text"],input[type="number"],input[type="month"],select{
+    padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;min-width:90px;
+  }
+  input[type="number"]{width:100px;text-align:right;}
+  button{padding:9px 16px;border:none;border-radius:8px;background:var(--brand);color:#fff;cursor:pointer;font-weight:600;}
+  button:hover{background:var(--brand-d);}
+  button.ghost{background:#e2e8f0;color:var(--txt);}
+  button.ghost:hover{background:#cbd5e1;}
+  button:disabled{opacity:.55;cursor:not-allowed;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:middle;}
+  th{background:#f8fafc;font-weight:600;white-space:nowrap;position:sticky;top:0;z-index:2;}
+  td.num,th.num{text-align:right;}
+  .wrap{overflow:auto;max-height:65vh;border:1px solid var(--line);border-radius:10px;}
+  tfoot td{font-weight:700;background:#f8fafc;position:sticky;bottom:0;}
+  .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#dbeafe;color:#1e40af;font-size:11px;}
+  .status{font-size:13px;color:var(--muted);}
+  .status.err{color:#b91c1c;}
+  .status.ok{color:#15803d;}
+  .row-check{transform:scale(1.15);}
+  .totals{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;font-size:14px;}
+  .totals b{color:var(--brand-d);}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Payroll System</h1>
+    <div class="sub">薪资计算 · 同步 Google Sheet</div>
+  </div>
+  <div id="empCount" class="sub">员工：0</div>
+</header>
 
+<main>
+  <div class="card">
+    <div class="toolbar">
+      <label>月份 <input type="month" id="month"></label>
+      <button id="loadBtn">🔄 加载员工</button>
+      <button id="calcBtn" class="ghost">🧮 重新计算</button>
+      <button id="saveBtn">☁️ 同步到 Google Sheet</button>
+      <span id="status" class="status"></span>
+    </div>
+    <div class="status">提示：EPF/PERKESO/EIS/Lindungan 若在 Sheet 里填的是百分比（如 11），此处按百分比扣。员工可勾选参与本月发薪。</div>
+  </div>
+
+  <div class="card">
+    <div class="wrap">
+      <table id="payTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="checkAll" class="row-check"></th>
+            <th>Name</th><th>Code</th><th>Group</th>
+            <th class="num">Basic</th>
+            <th class="num">Allowance</th>
+            <th class="num">Overtime</th>
+            <th class="num">Deduction</th>
+            <th class="num">EPF%</th>
+            <th class="num">PERKESO%</th>
+            <th class="num">EIS%</th>
+            <th class="num">Lindungan%</th>
+            <th class="num">Gross</th>
+            <th class="num">Net Pay</th>
+            <th>Bank</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4">合计</td>
+            <td class="num" id="tBasic">0.00</td>
+            <td class="num" id="tAllow">0.00</td>
+            <td class="num" id="tOT">0.00</td>
+            <td class="num" id="tDed">0.00</td>
+            <td colspan="4"></td>
+            <td class="num" id="tGross">0.00</td>
+            <td class="num" id="tNet">0.00</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+/* ============ 配置：替换成你的 Apps Script Web App URL ============ */
+const API_URL = "https://script.google.com/macros/s/AKfycbyYHor1cVicMNC3HZukXsTveA_rf3PSsQFpoFQXAamV2E1NR4pfP3tCKtjb4vKfIQoj/exec";
+/* ================================================================ */
+
+let EMPLOYEES = [];   // 原始员工数据
+let ROWS = [];        // 表格行状态
+
+const $ = id => document.getElementById(id);
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const money = v => num(v).toFixed(2);
+
+function setStatus(msg, type = "") {
+  const el = $("status");
+  el.textContent = msg;
+  el.className = "status " + type;
+}
+
+function initMonth() {
+  const d = new Date();
+  $("month").value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+/* ---------- 加载员工 ---------- */
+async function loadEmployees() {
+  setStatus("加载员工中…");
+  $("loadBtn").disabled = true;
+  try {
+    const res = await fetch(`${API_URL}?action=getEmployees`, { method: "GET" });
+    const json = await res.json();
+    if (json.status !== "ok") throw new Error(json.message || "返回错误");
+    EMPLOYEES = json.data || [];
+    buildRows();
+    setStatus(`✅ 已加载 ${EMPLOYEES.length} 位员工`, "ok");
+    $("empCount").textContent = `员工：${EMPLOYEES.length}`;
+  } catch (err) {
+    console.error(err);
+    setStatus("❌ 加载失败：" + err.message, "err");
+  } finally {
+    $("loadBtn").disabled = false;
+  }
+}
+
+function buildRows() {
+  ROWS = EMPLOYEES.map(emp => ({
+    checked: true,
+    emp,
+    allowance: 0,
+    overtime: 0,
+    deduction: 0
+  }));
+  render();
+}
+
+/* ---------- 计算 ---------- */
+function calcRow(r) {
+  const e = r.emp;
+  const basic = num(e.Salary);
+  const gross = basic + num(r.allowance) + num(r.overtime);
+  const epfPct = num(e.EPF);
+  const socPct = num(e.PERKESO);
+  const eisPct = num(e.EIS);
+  const linPct = num(e.Lindungan);
+
+  // 员工扣除部分（按百分比）
+  const epfEmp = gross * epfPct / 100;
+  const soc = Math.min(gross, 6000) * socPct / 100; // PERKESO 上限常见 6000，可按需修改
+  const eis = Math.min(gross, 6000) * eisPct / 100;
+  const lin = gross * linPct / 100;
+
+  const totalDeduction = epfEmp + soc + eis + lin + num(r.deduction);
+  const net = gross - totalDeduction;
+
+  return { basic, gross, epfEmp, soc, eis, lin, totalDeduction, net };
+}
+
+/* ---------- 渲染 ---------- */
+function render() {
+  const tbody = $("tbody");
+  tbody.innerHTML = "";
+  const t = { basic:0, allow:0, ot:0, ded:0, gross:0, net:0 };
+
+  ROWS.forEach((r, i) => {
+    const c = calcRow(r);
+    if (r.checked) {
+      t.basic += c.basic; t.allow += num(r.allowance); t.ot += num(r.overtime);
+      t.ded += c.totalDeduction; t.gross += c.gross; t.net += c.net;
+    }
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="checkbox" class="row-check" data-i="${i}" ${r.checked ? "checked" : ""}></td>
+      <td>${esc(r.emp.Name)}</td>
+      <td>${esc(r.emp.Code)}</td>
+      <td><span class="badge">${esc(r.emp.GroupName || "-")}</span></td>
+      <td class="num">${money(c.basic)}</td>
+      <td class="num"><input type="number" step="0.01" data-i="${i}" data-f="allowance" value="${r.allowance}"></td>
+      <td class="num"><input type="number" step="0.01" data-i="${i}" data-f="overtime" value="${r.overtime}"></td>
+      <td class="num"><input type="number" step="0.01" data-i="${i}" data-f="deduction" value="${r.deduction}"></td>
+      <td class="num">${num(r.emp.EPF)}%</td>
+      <td class="num">${num(r.emp.PERKESO)}%</td>
+      <td class="num">${num(r.emp.EIS)}%</td>
+      <td class="num">${num(r.emp.Lindungan)}%</td>
+      <td class="num"><b>${money(c.gross)}</b></td>
+      <td class="num" style="color:${c.net<0?'#b91c1c':'#15803d'};font-weight:700">${money(c.net)}</td>
+      <td>${esc(r.emp.BankNama || "")} ${esc(r.emp.BankAccountNo || "")}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  $("tBasic").textContent = money(t.basic);
+  $("tAllow").textContent = money(t.allow);
+  $("tOT").textContent = money(t.ot);
+  $("tDed").textContent = money(t.ded);
+  $("tGross").textContent = money(t.gross);
+  $("tNet").textContent = money(t.net);
+}
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ---------- 事件 ---------- */
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (el.matches("input[type=number][data-f]")) {
+    const i = +el.dataset.i, f = el.dataset.f;
+    ROWS[i][f] = num(el.value);
+    render();
+  }
+  if (el.matches("input[type=checkbox].row-check")) {
+    const i = +el.dataset.i;
+    ROWS[i].checked = el.checked;
+    render();
+  }
+});
+
+$("checkAll")?.addEventListener("change", e => {
+  ROWS.forEach(r => r.checked = e.target.checked);
+  render();
+});
+
+/* ---------- 保存到 Google Sheet ---------- */
+async function savePayroll() {
+  const month = $("month").value;
+  if (!month) { setStatus("请先选择月份", "err"); return; }
+
+  const records = ROWS.filter(r => r.checked).map(r => {
+    const c = calcRow(r);
+    return {
+      Month: month,
+      Name: r.emp.Name,
+      Code: r.emp.Code,
+      GroupName: r.emp.GroupName,
+      BasicSalary: c.basic,
+      Allowance: num(r.allowance),
+      Overtime: num(r.overtime),
+      Deduction: num(r.deduction),
+      EPF_Employee: c.epfEmp.toFixed(2),
+      EPF_Employer: (c.gross * num(r.emp.EPF) / 100).toFixed(2),
+      PERKESO: c.soc.toFixed(2),
+      EIS: c.eis.toFixed(2),
+      Lindungan: c.lin.toFixed(2),
+      GrossPay: c.gross.toFixed(2),
+      NetPay: c.net.toFixed(2),
+      BankNama: r.emp.BankNama,
+      BankAccountNo: r.emp.BankAccountNo
+    };
+  });
+
+  if (!records.length) { setStatus("没有勾选任何员工", "err"); return; }
+
+  setStatus(`同步 ${records.length} 条记录中…`);
+  $("saveBtn").disabled = true;
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      // 用 text/plain 避免 CORS 预检
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "savePayroll", records })
+    });
+    const json = await res.json();
+    if (json.status !== "ok") throw new Error(json.message || "返回错误");
+    setStatus(`✅ 成功同步 ${json.result.saved} 条记录到 Google Sheet`, "ok");
+  } catch (err) {
+    console.error(err);
+    setStatus("❌ 同步失败：" + err.message, "err");
+  } finally {
+    $("saveBtn").disabled = false;
+  }
+}
+
+/* ---------- 启动 ---------- */
+initMonth();
+$("loadBtn").addEventListener("click", loadEmployees);
+$("calcBtn").addEventListener("click", render);
+$("saveBtn").addEventListener("click", savePayroll);
+loadEmployees(); // 打开页面自动加载
+</script>
+</body>
+</html>
