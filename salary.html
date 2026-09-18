@@ -1,301 +1,629 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Payroll System</title>
-<style>
-  :root{--brand:#2563eb;--brand-d:#1d4ed8;--bg:#f1f5f9;--card:#fff;--line:#e2e8f0;--txt:#0f172a;--muted:#64748b;}
-  *{box-sizing:border-box;}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--txt);}
-  header{background:var(--brand);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-  header h1{margin:0;font-size:20px;font-weight:600;}
-  header .sub{font-size:12px;opacity:.85;}
-  main{max-width:1200px;margin:24px auto;padding:0 16px;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
-  input,select,button{font:inherit;}
-  input[type="text"],input[type="number"],input[type="month"],select{
-    padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;min-width:90px;
-  }
-  input[type="number"]{width:100px;text-align:right;}
-  button{padding:9px 16px;border:none;border-radius:8px;background:var(--brand);color:#fff;cursor:pointer;font-weight:600;}
-  button:hover{background:var(--brand-d);}
-  button.ghost{background:#e2e8f0;color:var(--txt);}
-  button.ghost:hover{background:#cbd5e1;}
-  button:disabled{opacity:.55;cursor:not-allowed;}
-  table{width:100%;border-collapse:collapse;font-size:13px;}
-  th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:middle;}
-  th{background:#f8fafc;font-weight:600;white-space:nowrap;position:sticky;top:0;z-index:2;}
-  td.num,th.num{text-align:right;}
-  .wrap{overflow:auto;max-height:65vh;border:1px solid var(--line);border-radius:10px;}
-  tfoot td{font-weight:700;background:#f8fafc;position:sticky;bottom:0;}
-  .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#dbeafe;color:#1e40af;font-size:11px;}
-  .status{font-size:13px;color:var(--muted);}
-  .status.err{color:#b91c1c;}
-  .status.ok{color:#15803d;}
-  .row-check{transform:scale(1.15);}
-  .totals{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;font-size:14px;}
-  .totals b{color:var(--brand-d);}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll System · Google Sheets Sync</title>
+    <!-- Font Awesome for icons (optional but nice) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #e9f2f8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        .payroll-container {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -8px rgba(0, 20, 30, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
+            padding: 2rem 2rem 2.5rem;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.2rem 0;
+            background: linear-gradient(135deg, #1e3c5c, #2b5a7a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            background: #1e3c5c;
+            background: linear-gradient(135deg, #1e3c5c, #2b5a7a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+        }
+
+        .subhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: #4a627a;
+            font-weight: 400;
+            border-bottom: 1px solid rgba(98, 138, 168, 0.25);
+            padding-bottom: 0.75rem;
+        }
+
+        .subhead span {
+            font-size: 0.95rem;
+            background: #e2edf7;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: 500;
+            color: #1e3c5c;
+            border: 1px solid #cbdae8;
+        }
+
+        .sync-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            background: #eef5fc;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            color: #1f5e8e;
+            border: 1px solid #b8d2e8;
+        }
+
+        .sync-badge i {
+            color: #2b7a4b;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #366185;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-group label i {
+            font-size: 0.9rem;
+            color: #4a7a9c;
+        }
+
+        .input-group input {
+            background: white;
+            border: 1.5px solid #d3e2f0;
+            border-radius: 1.2rem;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #122b3f;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #2b7a9c;
+            box-shadow: 0 0 0 4px rgba(43, 122, 156, 0.15);
+            background: #ffffff;
+        }
+
+        .input-group input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .input-group input[type="number"]::-webkit-inner-spin-button {
+            opacity: 0.5;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            border: none;
+            padding: 0.85rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.15s ease;
+            letter-spacing: 0.01em;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary {
+            background: #1e3c5c;
+            background: linear-gradient(135deg, #1e3c5c, #255a7c);
+            color: white;
+            box-shadow: 0 10px 18px -8px #1e3c5c80;
+        }
+
+        .btn-primary:hover {
+            background: #255a7c;
+            transform: translateY(-2px);
+            box-shadow: 0 18px 25px -10px #1e3c5c;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1e3c5c;
+            border: 1.5px solid #bfd6e8;
+        }
+
+        .btn-secondary:hover {
+            background: #f2f9ff;
+            border-color: #8db4d0;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #1f7a4a;
+            background: linear-gradient(135deg, #1f7a4a, #2b9b63);
+            color: white;
+            box-shadow: 0 10px 18px -8px #1f7a4a80;
+        }
+
+        .btn-success:hover {
+            background: #2b9b63;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .results-card {
+            background: #ffffffd9;
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.8), 0 12px 30px -12px rgba(0, 20, 40, 0.2);
+            margin-top: 1rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem 1.2rem;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-item .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #50718b;
+            margin-bottom: 0.3rem;
+        }
+
+        .result-item .value {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #0d2c44;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .result-item .value.currency::before {
+            content: '$';
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #3d6a8c;
+            margin-right: 3px;
+        }
+
+        .net-pay {
+            background: #e7f3ec;
+            border-radius: 1.5rem;
+            padding: 0.8rem 1rem;
+            margin-top: 0.5rem;
+            border-left: 6px solid #1f7a4a;
+        }
+
+        .net-pay .value {
+            font-size: 2.4rem;
+            color: #0a3b21;
+        }
+
+        .status-message {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            padding: 0.8rem 1.2rem;
+            border-radius: 3rem;
+            background: #e1eff9;
+            color: #12415f;
+            margin-top: 1.5rem;
+            transition: 0.2s;
+        }
+
+        .status-message i {
+            font-size: 1.1rem;
+        }
+
+        .status-message.error {
+            background: #ffe2e2;
+            color: #a12b2b;
+        }
+
+        .status-message.success {
+            background: #dff0e4;
+            color: #0e5e32;
+        }
+
+        .footnote {
+            font-size: 0.8rem;
+            color: #6c8ba3;
+            text-align: center;
+            margin-top: 1.8rem;
+            border-top: 1px dashed #c2d6e8;
+            padding-top: 1.2rem;
+        }
+
+        .footnote code {
+            background: #e2edf7;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #1f4870;
+        }
+
+        @media (max-width: 700px) {
+            .payroll-container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn {
+                width: 100%;
+            }
+            .results-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<header>
-  <div>
-    <h1>Payroll System</h1>
-    <div class="sub">薪资计算 · 同步 Google Sheet</div>
-  </div>
-  <div id="empCount" class="sub">员工：0</div>
-</header>
-
-<main>
-  <div class="card">
-    <div class="toolbar">
-      <label>月份 <input type="month" id="month"></label>
-      <button id="loadBtn">🔄 加载员工</button>
-      <button id="calcBtn" class="ghost">🧮 重新计算</button>
-      <button id="saveBtn">☁️ 同步到 Google Sheet</button>
-      <span id="status" class="status"></span>
+<div class="payroll-container">
+    <h1>
+        <i class="fas fa-calculator"></i> Payroll System
+    </h1>
+    <div class="subhead">
+        <span><i class="fas fa-cloud-upload-alt"></i> Sync to Google Sheets</span>
+        <div class="sync-badge">
+            <i class="fas fa-circle" style="font-size: 0.5rem; color: #2b7a4b;"></i> Ready
+        </div>
     </div>
-    <div class="status">提示：EPF/PERKESO/EIS/Lindungan 若在 Sheet 里填的是百分比（如 11），此处按百分比扣。员工可勾选参与本月发薪。</div>
-  </div>
 
-  <div class="card">
-    <div class="wrap">
-      <table id="payTable">
-        <thead>
-          <tr>
-            <th><input type="checkbox" id="checkAll" class="row-check"></th>
-            <th>Name</th><th>Code</th><th>Group</th>
-            <th class="num">Basic</th>
-            <th class="num">Allowance</th>
-            <th class="num">Overtime</th>
-            <th class="num">Deduction</th>
-            <th class="num">EPF%</th>
-            <th class="num">PERKESO%</th>
-            <th class="num">EIS%</th>
-            <th class="num">Lindungan%</th>
-            <th class="num">Gross</th>
-            <th class="num">Net Pay</th>
-            <th>Bank</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="4">合计</td>
-            <td class="num" id="tBasic">0.00</td>
-            <td class="num" id="tAllow">0.00</td>
-            <td class="num" id="tOT">0.00</td>
-            <td class="num" id="tDed">0.00</td>
-            <td colspan="4"></td>
-            <td class="num" id="tGross">0.00</td>
-            <td class="num" id="tNet">0.00</td>
-            <td></td>
-          </tr>
-        </tfoot>
-      </table>
+    <!-- Payroll input form -->
+    <div class="form-grid" id="payrollForm">
+        <div class="input-group">
+            <label><i class="fas fa-user"></i> Employee Name</label>
+            <input type="text" id="employeeName" placeholder="e.g. Jane Cooper" value="Jane Cooper">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-id-card"></i> Employee ID</label>
+            <input type="text" id="employeeId" placeholder="EMP-001" value="EMP-001">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-clock"></i> Hours Worked</label>
+            <input type="number" id="hoursWorked" step="0.5" min="0" value="40">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-dollar-sign"></i> Hourly Rate</label>
+            <input type="number" id="hourlyRate" step="0.01" min="0" value="25.50">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-percent"></i> Tax Rate (%)</label>
+            <input type="number" id="taxRate" step="0.1" min="0" max="100" value="15">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-plus-circle"></i> Bonus</label>
+            <input type="number" id="bonus" step="0.01" min="0" value="100">
+        </div>
     </div>
-  </div>
-</main>
+
+    <!-- Action buttons -->
+    <div class="action-bar">
+        <button class="btn btn-primary" id="calculateBtn"><i class="fas fa-sync-alt"></i> Calculate Payroll</button>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+            <button class="btn btn-success" id="syncBtn"><i class="fas fa-cloud-upload-alt"></i> Sync to Google Sheet</button>
+        </div>
+    </div>
+
+    <!-- Results display -->
+    <div class="results-card">
+        <div class="results-grid" id="resultsGrid">
+            <div class="result-item">
+                <span class="label">Gross Pay</span>
+                <span class="value currency" id="grossPayDisplay">0.00</span>
+            </div>
+            <div class="result-item">
+                <span class="label">Tax Amount</span>
+                <span class="value currency" id="taxAmountDisplay">0.00</span>
+            </div>
+            <div class="result-item">
+                <span class="label">Net Pay</span>
+                <span class="value currency" id="netPayDisplay">0.00</span>
+            </div>
+            <div class="result-item net-pay" style="grid-column: span 1;">
+                <span class="label" style="color: #0e5e32;">Take Home</span>
+                <span class="value currency" id="netPayBigDisplay" style="font-size: 2.4rem;">0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status message -->
+    <div class="status-message" id="statusMessage">
+        <i class="fas fa-info-circle"></i> Enter details and click Calculate.
+    </div>
+
+    <div class="footnote">
+        <i class="fas fa-google"></i> Google Apps Script endpoint: <code>GOOGLE_SHEET_WEBAPP_URL</code> (replace in code)
+    </div>
+</div>
 
 <script>
-/* ============ 配置：替换成你的 Apps Script Web App URL ============ */
-const API_URL = "https://script.google.com/macros/s/AKfycbzMvU6u4HEWNoULZedWPs3XvjJMY8fb-J3UDCRbNeRnijj7DDbqPXnb07RlL2st0xsmHQ/exec";
-/* ================================================================ */
+    (function() {
+        // ============================================================
+        // ⚠️ REPLACE THIS with your deployed Google Apps Script Web App URL
+        //    Example: 'https://script.google.com/macros/s/AKfycb.../exec'
+        // ============================================================
+        const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'; // <-- CHANGE THIS
 
-let EMPLOYEES = [];   // 原始员工数据
-let ROWS = [];        // 表格行状态
+        // DOM elements
+        const employeeNameInput = document.getElementById('employeeName');
+        const employeeIdInput = document.getElementById('employeeId');
+        const hoursWorkedInput = document.getElementById('hoursWorked');
+        const hourlyRateInput = document.getElementById('hourlyRate');
+        const taxRateInput = document.getElementById('taxRate');
+        const bonusInput = document.getElementById('bonus');
 
-const $ = id => document.getElementById(id);
-const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
-const money = v => num(v).toFixed(2);
+        const grossPayDisplay = document.getElementById('grossPayDisplay');
+        const taxAmountDisplay = document.getElementById('taxAmountDisplay');
+        const netPayDisplay = document.getElementById('netPayDisplay');
+        const netPayBigDisplay = document.getElementById('netPayBigDisplay');
+        const statusMessage = document.getElementById('statusMessage');
 
-function setStatus(msg, type = "") {
-  const el = $("status");
-  el.textContent = msg;
-  el.className = "status " + type;
-}
+        // Helper: format number to 2 decimals
+        function formatCurrency(value) {
+            return Number(value).toFixed(2);
+        }
 
-function initMonth() {
-  const d = new Date();
-  $("month").value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
+        // Core calculation logic (returns object with all computed values)
+        function calculatePayroll() {
+            const hours = parseFloat(hoursWorkedInput.value) || 0;
+            const rate = parseFloat(hourlyRateInput.value) || 0;
+            const taxRate = parseFloat(taxRateInput.value) || 0;
+            const bonus = parseFloat(bonusInput.value) || 0;
 
-/* ---------- 加载员工 ---------- */
-async function loadEmployees() {
-  setStatus("加载员工中…");
-  $("loadBtn").disabled = true;
-  try {
-    const res = await fetch(`${API_URL}?action=getEmployees`, { method: "GET" });
-    const json = await res.json();
-    if (json.status !== "ok") throw new Error(json.message || "返回错误");
-    EMPLOYEES = json.data || [];
-    buildRows();
-    setStatus(`✅ 已加载 ${EMPLOYEES.length} 位员工`, "ok");
-    $("empCount").textContent = `员工：${EMPLOYEES.length}`;
-  } catch (err) {
-    console.error(err);
-    setStatus("❌ 加载失败：" + err.message, "err");
-  } finally {
-    $("loadBtn").disabled = false;
-  }
-}
+            const gross = (hours * rate) + bonus;
+            const taxAmount = gross * (taxRate / 100);
+            const net = gross - taxAmount;
 
-function buildRows() {
-  ROWS = EMPLOYEES.map(emp => ({
-    checked: true,
-    emp,
-    allowance: 0,
-    overtime: 0,
-    deduction: 0
-  }));
-  render();
-}
+            return {
+                gross: gross,
+                tax: taxAmount,
+                net: net,
+                hours: hours,
+                rate: rate,
+                taxRate: taxRate,
+                bonus: bonus,
+                employeeName: employeeNameInput.value.trim() || 'N/A',
+                employeeId: employeeIdInput.value.trim() || 'N/A'
+            };
+        }
 
-/* ---------- 计算 ---------- */
-function calcRow(r) {
-  const e = r.emp;
-  const basic = num(e.Salary);
-  const gross = basic + num(r.allowance) + num(r.overtime);
-  const epfPct = num(e.EPF);
-  const socPct = num(e.PERKESO);
-  const eisPct = num(e.EIS);
-  const linPct = num(e.Lindungan);
+        // Update the UI with calculated values
+        function updateUIFromCalculation(calc) {
+            grossPayDisplay.textContent = formatCurrency(calc.gross);
+            taxAmountDisplay.textContent = formatCurrency(calc.tax);
+            netPayDisplay.textContent = formatCurrency(calc.net);
+            netPayBigDisplay.textContent = formatCurrency(calc.net);
+        }
 
-  // 员工扣除部分（按百分比）
-  const epfEmp = gross * epfPct / 100;
-  const soc = Math.min(gross, 6000) * socPct / 100; // PERKESO 上限常见 6000，可按需修改
-  const eis = Math.min(gross, 6000) * eisPct / 100;
-  const lin = gross * linPct / 100;
+        // Set status message helper
+        function setStatus(message, type = 'info') {
+            statusMessage.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
+            statusMessage.className = 'status-message'; // reset
+            if (type === 'error') statusMessage.classList.add('error');
+            if (type === 'success') statusMessage.classList.add('success');
+        }
 
-  const totalDeduction = epfEmp + soc + eis + lin + num(r.deduction);
-  const net = gross - totalDeduction;
+        // Perform calculation and update UI
+        function performCalculation() {
+            try {
+                const calc = calculatePayroll();
+                updateUIFromCalculation(calc);
+                return calc;
+            } catch (e) {
+                setStatus('Calculation error: ' + e.message, 'error');
+                return null;
+            }
+        }
 
-  return { basic, gross, epfEmp, soc, eis, lin, totalDeduction, net };
-}
+        // ----- Calculate button -----
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            const calc = performCalculation();
+            if (calc) {
+                setStatus('Payroll calculated successfully. Ready to sync.', 'success');
+            }
+        });
 
-/* ---------- 渲染 ---------- */
-function render() {
-  const tbody = $("tbody");
-  tbody.innerHTML = "";
-  const t = { basic:0, allow:0, ot:0, ded:0, gross:0, net:0 };
+        // ----- Reset button -----
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            employeeNameInput.value = 'Jane Cooper';
+            employeeIdInput.value = 'EMP-001';
+            hoursWorkedInput.value = '40';
+            hourlyRateInput.value = '25.50';
+            taxRateInput.value = '15';
+            bonusInput.value = '100';
+            performCalculation();
+            setStatus('Form reset to defaults.', 'info');
+        });
 
-  ROWS.forEach((r, i) => {
-    const c = calcRow(r);
-    if (r.checked) {
-      t.basic += c.basic; t.allow += num(r.allowance); t.ot += num(r.overtime);
-      t.ded += c.totalDeduction; t.gross += c.gross; t.net += c.net;
-    }
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><input type="checkbox" class="row-check" data-i="${i}" ${r.checked ? "checked" : ""}></td>
-      <td>${esc(r.emp.Name)}</td>
-      <td>${esc(r.emp.Code)}</td>
-      <td><span class="badge">${esc(r.emp.GroupName || "-")}</span></td>
-      <td class="num">${money(c.basic)}</td>
-      <td class="num"><input type="number" step="0.01" data-i="${i}" data-f="allowance" value="${r.allowance}"></td>
-      <td class="num"><input type="number" step="0.01" data-i="${i}" data-f="overtime" value="${r.overtime}"></td>
-      <td class="num"><input type="number" step="0.01" data-i="${i}" data-f="deduction" value="${r.deduction}"></td>
-      <td class="num">${num(r.emp.EPF)}%</td>
-      <td class="num">${num(r.emp.PERKESO)}%</td>
-      <td class="num">${num(r.emp.EIS)}%</td>
-      <td class="num">${num(r.emp.Lindungan)}%</td>
-      <td class="num"><b>${money(c.gross)}</b></td>
-      <td class="num" style="color:${c.net<0?'#b91c1c':'#15803d'};font-weight:700">${money(c.net)}</td>
-      <td>${esc(r.emp.BankNama || "")} ${esc(r.emp.BankAccountNo || "")}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+        // ----- Sync to Google Sheets button -----
+        document.getElementById('syncBtn').addEventListener('click', async function() {
+            // First recalc to ensure current values
+            const calc = performCalculation();
+            if (!calc) return;
 
-  $("tBasic").textContent = money(t.basic);
-  $("tAllow").textContent = money(t.allow);
-  $("tOT").textContent = money(t.ot);
-  $("tDed").textContent = money(t.ded);
-  $("tGross").textContent = money(t.gross);
-  $("tNet").textContent = money(t.net);
-}
+            // Validate required fields
+            if (!calc.employeeName || calc.employeeName === 'N/A') {
+                setStatus('Please enter a valid Employee Name.', 'error');
+                return;
+            }
+            if (!calc.employeeId || calc.employeeId === 'N/A') {
+                setStatus('Please enter a valid Employee ID.', 'error');
+                return;
+            }
 
-function esc(s) {
-  return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
+            // Check if webapp URL is configured
+            if (GOOGLE_SHEET_WEBAPP_URL.includes('YOUR_DEPLOYMENT_ID') || GOOGLE_SHEET_WEBAPP_URL === '') {
+                setStatus('⚠️ Google Sheet Web App URL not configured. Please update the script.', 'error');
+                return;
+            }
 
-/* ---------- 事件 ---------- */
-document.addEventListener("input", e => {
-  const el = e.target;
-  if (el.matches("input[type=number][data-f]")) {
-    const i = +el.dataset.i, f = el.dataset.f;
-    ROWS[i][f] = num(el.value);
-    render();
-  }
-  if (el.matches("input[type=checkbox].row-check")) {
-    const i = +el.dataset.i;
-    ROWS[i].checked = el.checked;
-    render();
-  }
-});
+            // Prepare payload
+            const payload = {
+                employeeName: calc.employeeName,
+                employeeId: calc.employeeId,
+                hoursWorked: calc.hours,
+                hourlyRate: calc.rate,
+                taxRate: calc.taxRate,
+                bonus: calc.bonus,
+                grossPay: calc.gross,
+                taxAmount: calc.tax,
+                netPay: calc.net,
+                timestamp: new Date().toISOString()
+            };
 
-$("checkAll")?.addEventListener("change", e => {
-  ROWS.forEach(r => r.checked = e.target.checked);
-  render();
-});
+            setStatus('Syncing to Google Sheets...', 'info');
+            const syncBtn = this;
+            syncBtn.disabled = true;
+            syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
 
-/* ---------- 保存到 Google Sheet ---------- */
-async function savePayroll() {
-  const month = $("month").value;
-  if (!month) { setStatus("请先选择月份", "err"); return; }
+            try {
+                // Using fetch with no-cors? Better to use standard POST with text/plain to avoid preflight,
+                // but Google Apps Script Web App accepts JSON with CORS.
+                // We'll set Content-Type: application/json and expect CORS enabled.
+                const response = await fetch(GOOGLE_SHEET_WEBAPP_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-  const records = ROWS.filter(r => r.checked).map(r => {
-    const c = calcRow(r);
-    return {
-      Month: month,
-      Name: r.emp.Name,
-      Code: r.emp.Code,
-      GroupName: r.emp.GroupName,
-      BasicSalary: c.basic,
-      Allowance: num(r.allowance),
-      Overtime: num(r.overtime),
-      Deduction: num(r.deduction),
-      EPF_Employee: c.epfEmp.toFixed(2),
-      EPF_Employer: (c.gross * num(r.emp.EPF) / 100).toFixed(2),
-      PERKESO: c.soc.toFixed(2),
-      EIS: c.eis.toFixed(2),
-      Lindungan: c.lin.toFixed(2),
-      GrossPay: c.gross.toFixed(2),
-      NetPay: c.net.toFixed(2),
-      BankNama: r.emp.BankNama,
-      BankAccountNo: r.emp.BankAccountNo
-    };
-  });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
-  if (!records.length) { setStatus("没有勾选任何员工", "err"); return; }
+                // Try to parse JSON response, but some Apps Script deployments return text
+                const responseText = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    result = { status: 'success', message: responseText };
+                }
 
-  setStatus(`同步 ${records.length} 条记录中…`);
-  $("saveBtn").disabled = true;
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      // 用 text/plain 避免 CORS 预检
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "savePayroll", records })
-    });
-    const json = await res.json();
-    if (json.status !== "ok") throw new Error(json.message || "返回错误");
-    setStatus(`✅ 成功同步 ${json.result.saved} 条记录到 Google Sheet`, "ok");
-  } catch (err) {
-    console.error(err);
-    setStatus("❌ 同步失败：" + err.message, "err");
-  } finally {
-    $("saveBtn").disabled = false;
-  }
-}
+                if (result.status === 'error') {
+                    throw new Error(result.message || 'Unknown error from server');
+                }
 
-/* ---------- 启动 ---------- */
-initMonth();
-$("loadBtn").addEventListener("click", loadEmployees);
-$("calcBtn").addEventListener("click", render);
-$("saveBtn").addEventListener("click", savePayroll);
-loadEmployees(); // 打开页面自动加载
+                setStatus(`✅ Successfully synced ${calc.employeeName} to Google Sheets!`, 'success');
+            } catch (error) {
+                console.error('Sync error:', error);
+                setStatus(`❌ Sync failed: ${error.message}. Check console and Web App URL.`, 'error');
+            } finally {
+                syncBtn.disabled = false;
+                syncBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Sync to Google Sheet';
+            }
+        });
+
+        // Initial calculation on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            performCalculation();
+            setStatus('Ready. Adjust values and click Calculate.', 'info');
+        });
+
+        // Also recalc on Enter key in any input for convenience
+        const inputs = document.querySelectorAll('#payrollForm input');
+        inputs.forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performCalculation();
+                    setStatus('Payroll recalculated.', 'success');
+                }
+            });
+        });
+    })();
 </script>
 </body>
 </html>
